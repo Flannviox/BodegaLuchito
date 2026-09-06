@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BodegaLuchito.Application/BodegaLuchito.Application.csproj" />
+    <Project Path="src/BodegaLuchito.Desktop/BodegaLuchito.Desktop.csproj" />
+    <Project Path="src/BodegaLuchito.Domain/BodegaLuchito.Domain.csproj" />
+    <Project Path="src/BodegaLuchito.Infrastructure/BodegaLuchito.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BodegaLuchito.Tests/BodegaLuchito.Tests.csproj" />
+  </Folder>
+</Solution>

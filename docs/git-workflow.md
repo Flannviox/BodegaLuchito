@@ -1,0 +1,156 @@
+# \# Flujo Git - Bodega Luchito
+
+# 
+
+# \## Ramas principales
+
+# 
+
+# main:
+
+# contiene versiones estables.
+
+# 
+
+# develop:
+
+# contiene la integración del desarrollo actual.
+
+# 
+
+# \## Ramas de trabajo
+
+# 
+
+# Las funcionalidades deben crearse desde develop.
+
+# 
+
+# Ejemplo:
+
+# 
+
+# feature/RF-PRO-01-registrar-producto
+
+# 
+
+# feature/RF-VEN-01-registrar-venta
+
+# 
+
+# Las tareas técnicas pueden utilizar:
+
+# 
+
+# chore/configuracion-base
+
+# 
+
+# Los errores pueden utilizar:
+
+# 
+
+# fix/corregir-calculo-venta
+
+# 
+
+# \## Flujo
+
+# 
+
+# develop
+
+# &#x20;  ↓
+
+# crear rama
+
+# &#x20;  ↓
+
+# desarrollar
+
+# &#x20;  ↓
+
+# compilar y probar
+
+# &#x20;  ↓
+
+# commit
+
+# &#x20;  ↓
+
+# push
+
+# &#x20;  ↓
+
+# Pull Request hacia develop
+
+# &#x20;  ↓
+
+# revisión
+
+# &#x20;  ↓
+
+# merge
+
+# 
+
+# \## Commits
+
+# 
+
+# Formato:
+
+# 
+
+# tipo(modulo): descripcion
+
+# 
+
+# Ejemplos:
+
+# 
+
+# feat(productos): implementar registro de producto
+
+# 
+
+# fix(ventas): corregir calculo del total
+
+# 
+
+# test(inventario): agregar pruebas de stock
+
+# 
+
+# docs: actualizar arquitectura
+
+# 
+
+# chore: configurar proyecto
+
+# 
+
+# \## Reglas
+
+# 
+
+# No desarrollar directamente en main.
+
+# 
+
+# No desarrollar funcionalidades directamente en develop.
+
+# 
+
+# Antes de crear una nueva rama, actualizar develop.
+
+# 
+
+# Antes de realizar un Pull Request, comprobar que la solución compile.
+
+# 
+
+# Resolver los conflictos en la rama de trabajo, no directamente
+
+# sobre develop o main.
+

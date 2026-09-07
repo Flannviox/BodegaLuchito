@@ -11,39 +11,72 @@
     <Grid>
 
         <Grid.ColumnDefinitions>
+
             <ColumnDefinition Width="220" />
+
             <ColumnDefinition Width="*" />
+
         </Grid.ColumnDefinitions>
 
-        <!-- MENÚ LATERAL -->
+
+        <!-- MENU LATERAL -->
 
         <Border Grid.Column="0"
                 BorderBrush="LightGray"
                 BorderThickness="0,0,1,0">
 
-            <StackPanel Margin="16">
+            <Grid Margin="16">
 
-                <TextBlock Text="Bodega Luchito"
+                <Grid.RowDefinitions>
+
+                    <RowDefinition Height="Auto" />
+
+                    <RowDefinition Height="*" />
+
+                    <RowDefinition Height="Auto" />
+
+                </Grid.RowDefinitions>
+
+
+                <!-- TITULO -->
+
+                <TextBlock Grid.Row="0"
+                           Text="Bodega Luchito"
                            FontSize="22"
                            FontWeight="Bold"
                            Margin="0,10,0,30" />
 
-                <Button Content="Inicio"
-                        Command="{Binding IrAInicioCommand}"
-                        Height="42"
-                        Margin="0,0,0,10" />
 
-                <Button Content="Productos"
-                        Command="{Binding IrAProductosCommand}"
-                        Height="42"
-                        Margin="0,0,0,10" />
+                <!-- MENU -->
 
-                <Button Content="Ventas"
-                        Command="{Binding IrAVentasCommand}"
-                        Height="42"
-                        Margin="0,0,0,10" />
+                <ItemsControl Grid.Row="1"
+                              ItemsSource="{Binding MenuItems}">
 
-            </StackPanel>
+                    <ItemsControl.ItemTemplate>
+
+                        <DataTemplate>
+
+                            <Button Content="{Binding Titulo}"
+                                    Command="{Binding Command}"
+                                    Height="42"
+                                    Margin="0,0,0,10" />
+
+                        </DataTemplate>
+
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+
+
+                <!-- CERRAR SESION -->
+
+                <Button Grid.Row="2"
+                        Content="Cerrar sesion"
+                        Command="{Binding CerrarSesionCommand}"
+                        Height="42"
+                        Margin="0,15,0,0" />
+
+            </Grid>
 
         </Border>
 
@@ -53,20 +86,57 @@
         <Grid Grid.Column="1">
 
             <Grid.RowDefinitions>
+
                 <RowDefinition Height="Auto" />
+
                 <RowDefinition Height="*" />
+
             </Grid.RowDefinitions>
+
+
+            <!-- HEADER -->
 
             <Border Grid.Row="0"
                     BorderBrush="LightGray"
                     BorderThickness="0,0,0,1"
-                    Padding="24,18">
+                    Padding="24,16">
 
-                <TextBlock Text="{Binding Titulo}"
-                           FontSize="20"
-                           FontWeight="SemiBold" />
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition Width="*" />
+
+                        <ColumnDefinition Width="Auto" />
+
+                    </Grid.ColumnDefinitions>
+
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding Titulo}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+
+
+                    <StackPanel Grid.Column="1">
+
+                        <TextBlock Text="{Binding NombreUsuario}"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Right" />
+
+                        <TextBlock Text="{Binding NombreRol}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Right" />
+
+                    </StackPanel>
+
+                </Grid>
 
             </Border>
+
+
+            <!-- MODULO ACTUAL -->
 
             <ContentControl Grid.Row="1"
                             Content="{Binding CurrentViewModel}"

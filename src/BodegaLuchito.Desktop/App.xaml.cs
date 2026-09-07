@@ -5,6 +5,8 @@ using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using BodegaLuchito.Desktop.Shell.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using BodegaLuchito.Application.Common.Session;
+using System.Windows.Threading;
 
 namespace BodegaLuchito.Desktop;
 
@@ -18,7 +20,11 @@ public partial class App : System.Windows.Application
 
         ConfigureServices(services);
 
-        _serviceProvider = services.BuildServiceProvider();
+        _serviceProvider =
+            services.BuildServiceProvider();
+
+        DispatcherUnhandledException +=
+            OnDispatcherUnhandledException;
     }
 
     private static void ConfigureServices(
@@ -27,6 +33,8 @@ public partial class App : System.Windows.Application
         // Navegación
         services.AddSingleton<INavigationService, NavigationService>();
 
+        //Navegacion
+        services.AddSingleton<ISesionUsuario, SesionUsuario>();
         // Shell
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<MainWindow>();
@@ -37,11 +45,28 @@ public partial class App : System.Windows.Application
         services.AddTransient<VentasViewModel>();
     }
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override void OnStartup(
+    StartupEventArgs e)
     {
         base.OnStartup(e);
 
-        var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+#if DEBUG
+
+        var sesion =
+            _serviceProvider.GetRequiredService<ISesionUsuario>();
+
+        sesion.IniciarSesion(
+            new UsuarioSesion
+            {
+                IdUsuario = 1,
+                NombreUsuario = "Usuario Desarrollo",
+                NombreRol = "Administrador"
+            });
+
+#endif
+
+        var mainWindow =
+            _serviceProvider.GetRequiredService<MainWindow>();
 
         mainWindow.Show();
     }
@@ -51,5 +76,25 @@ public partial class App : System.Windows.Application
         _serviceProvider.Dispose();
 
         base.OnExit(e);
+    }
+    private static void OnDispatcherUnhandledException(
+    object sender,
+    DispatcherUnhandledExceptionEventArgs e)
+    {
+        MessageBox.Show(
+            "Ocurrio un error inesperado en la aplicacion.",
+            "Bodega Luchito",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+
+#if DEBUG
+
+        e.Handled = false;
+
+#else
+
+    e.Handled = true;
+
+#endif
     }
 }

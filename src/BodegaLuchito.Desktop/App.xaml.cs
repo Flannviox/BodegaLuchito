@@ -7,6 +7,7 @@ using BodegaLuchito.Desktop.Shell.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using BodegaLuchito.Application.Common.Session;
 using System.Windows.Threading;
+using BodegaLuchito.Infrastructure;
 
 namespace BodegaLuchito.Desktop;
 
@@ -30,11 +31,15 @@ public partial class App : System.Windows.Application
     private static void ConfigureServices(
     IServiceCollection services)
     {
+        // Infrastructure
+        services.AddInfrastructure();
+
+        //Sesion
+        services.AddSingleton<ISesionUsuario, SesionUsuario>();
+
         // Navegación
         services.AddSingleton<INavigationService, NavigationService>();
 
-        //Navegacion
-        services.AddSingleton<ISesionUsuario, SesionUsuario>();
         // Shell
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<MainWindow>();

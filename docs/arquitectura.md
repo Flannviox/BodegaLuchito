@@ -1,184 +1,242 @@
-# \# Arquitectura - Bodega Luchito
+##### \# Arquitectura - Bodega Luchito
 
-# 
+##### 
 
-# \## Descripción
+##### \## Descripción
 
-# 
+##### 
 
-# Bodega Luchito es una aplicación de escritorio local desarrollada
+##### Bodega Luchito es una aplicación de escritorio local desarrollada
 
-# con C#, .NET 10 y WPF.
+##### con C#, .NET 10 y WPF.
 
-# 
+##### 
 
-# El sistema utiliza una arquitectura por capas con organización modular.
+##### El sistema utiliza una arquitectura por capas con organización modular.
 
-# 
+##### 
 
-# \## Capas
+##### \## Capas
 
-# 
+##### 
 
-# \### BodegaLuchito.Domain
+##### \### BodegaLuchito.Domain
 
-# 
+##### 
 
-# Contiene los conceptos y reglas fundamentales del negocio.
+##### Contiene los conceptos y reglas fundamentales del negocio.
 
-# 
+##### 
 
-# Ejemplos:
+##### Ejemplos:
 
-# \- Producto
+##### \- Producto
 
-# \- Proveedor
+##### \- Proveedor
 
-# \- Venta
+##### \- Venta
 
-# \- DetalleVenta
+##### \- DetalleVenta
 
-# \- MovimientoInventario
+##### \- MovimientoInventario
 
-# \- Usuario
+##### \- Usuario
 
-# \- CierreCaja
+##### \- SesionCaja
 
-# 
+##### \- MovimientoCaja
 
-# Domain no debe depender de WPF, Entity Framework Core, SQLite
+##### 
 
-# ni de otros proyectos de la solución.
+##### Domain no debe depender de WPF, Entity Framework Core, SQLite
 
-# 
+##### ni de otros proyectos de la solución.
 
-# \### BodegaLuchito.Application
+##### 
 
-# 
+##### \### BodegaLuchito.Application
 
-# Contiene los casos de uso y procesos de la aplicación.
+##### 
 
-# 
+##### Contiene los casos de uso y procesos de la aplicación.
 
-# Ejemplos:
+##### 
 
-# \- Registrar producto
+##### Ejemplos:
 
-# \- Registrar venta
+##### \- Registrar producto
 
-# \- Registrar abastecimiento
+##### \- Registrar venta
 
-# \- Consultar inventario
+##### \- Registrar abastecimiento
 
-# \- Realizar cierre de caja
+##### \- Consultar inventario
 
-# 
+##### \- Realizar cierre de caja
 
-# Application depende de Domain.
+##### 
 
-# 
+##### Application depende de Domain.
 
-# \### BodegaLuchito.Infrastructure
+##### 
 
-# 
+##### \### BodegaLuchito.Infrastructure
 
-# Contiene las implementaciones relacionadas con tecnologías externas.
+##### 
 
-# 
+##### Contiene las implementaciones relacionadas con tecnologías externas.
 
-# Ejemplos:
+##### 
 
-# \- Entity Framework Core
+##### Ejemplos:
 
-# \- SQLite
+##### \- Entity Framework Core
 
-# \- Repositorios
+##### \- SQLite
 
-# \- Exportación Excel
+##### \- Repositorios
 
-# \- Impresión ESC/POS
+##### \- Exportación Excel
 
-# 
+##### \- Impresión ESC/POS
 
-# Infrastructure puede depender de Application y Domain.
+##### 
 
-# 
+##### Infrastructure puede depender de Application y Domain.
 
-# \### BodegaLuchito.Desktop
+##### 
 
-# 
+##### \### BodegaLuchito.Desktop
 
-# Contiene la interfaz gráfica desarrollada con WPF y MVVM.
+##### 
 
-# 
+##### Contiene la interfaz gráfica desarrollada con WPF y MVVM.
 
-# Incluye:
+##### 
 
-# \- Views
+##### Incluye:
 
-# \- ViewModels
+##### \- Views
 
-# \- Controles
+##### \- ViewModels
 
-# \- Navegación
+##### \- Controles
 
-# \- Recursos visuales
+##### \- Navegación
 
-# 
+##### \- Recursos visuales
 
-# Desktop consume los servicios de Application y realiza la composición
+##### 
 
-# con Infrastructure.
+##### Desktop consume los servicios de Application y realiza la composición
 
-# 
+##### con Infrastructure.
 
-# \## Organización modular
+##### 
 
-# 
+##### \## Organización modular
 
-# El sistema se organiza internamente en los siguientes módulos:
+##### 
 
-# 
+##### El sistema se organiza internamente en los siguientes módulos:
 
-# \- Autenticacion
+##### 
 
-# \- Productos
+##### \- Autenticacion
 
-# \- Proveedores
+##### \- Productos
 
-# \- Abastecimientos
+##### \- Proveedores
 
-# \- Inventario
+##### \- Abastecimientos
 
-# \- Ventas
+##### \- Inventario
 
-# \- Caja
+##### \- Ventas
 
-# \- Reportes
+##### \- Caja
 
-# \- BI
+##### \- Reportes
 
-# 
+##### \- BI
 
-# La generación de tickets pertenece funcionalmente al módulo Ventas.
+##### 
 
-# 
+##### La generación de tickets pertenece funcionalmente al módulo Ventas.
 
-# Los módulos se organizan dentro de cada capa. No se crea un proyecto
+##### 
 
-# .csproj independiente por cada módulo.
+##### Los módulos se organizan dentro de cada capa. No se crea un proyecto
 
-# 
+##### .csproj independiente por cada módulo.
 
-# \## Base de datos
+##### 
 
-# 
+##### \## Comunicación entre módulos
 
-# El sistema utilizará una única base de datos SQLite local.
+##### 
 
-# 
+##### Los módulos pueden depender funcionalmente de otros módulos,
 
-# La estructura de la base de datos será gestionada mediante
+##### pero deben evitar acceder directamente a su persistencia interna.
 
-# Entity Framework Core y migraciones.
+##### 
+
+##### Las interacciones deben realizarse mediante contratos definidos
+
+##### en Application.
+
+##### 
+
+##### Dependencias funcionales principales:
+
+##### 
+
+##### Productos → Inventario → Ventas
+
+##### 
+
+##### Proveedores → Abastecimientos
+
+##### 
+
+##### Abastecimientos → Inventario
+
+##### 
+
+##### Abastecimientos → Caja
+
+##### 
+
+##### Ventas → Inventario
+
+##### 
+
+##### Ventas → Caja
+
+##### 
+
+##### Ventas → Tickets
+
+##### 
+
+##### Autenticacion → operaciones que requieren usuario y trazabilidad
+
+##### 
+
+##### Operaciones → Reportes → BI
+
+##### 
+
+##### \## Base de datos
+
+##### 
+
+##### El sistema utilizará una única base de datos SQLite local.
+
+##### 
+
+##### La estructura de la base de datos será gestionada mediante
+
+##### Entity Framework Core y migraciones.
 

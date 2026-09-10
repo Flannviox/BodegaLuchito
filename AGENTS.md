@@ -1,264 +1,348 @@
-# \# AGENTS.md - Bodega Luchito
+##### \# AGENTS.md - Bodega Luchito
 
-# 
+##### 
 
-# \## Proyecto
+##### \## Proyecto
 
-# 
+##### 
 
-# Sistema local de información comercial para Bodega Luchito.
+##### Sistema local de información comercial para Bodega Luchito.
 
-# 
+##### 
 
-# Aplicación de escritorio Windows utilizada en un único punto de venta.
+##### Aplicación de escritorio Windows utilizada en un único punto de venta.
 
-# 
+##### 
 
-# \## Stack tecnológico
+##### \## Stack tecnológico
 
-# 
+##### 
 
-# \- C# 14
+##### \- C# 14
 
-# \- .NET 10
+##### \- .NET 10
 
-# \- WPF
+##### \- WPF
 
-# \- MVVM
+##### \- MVVM
 
-# \- SQLite
+##### \- SQLite
 
-# \- Entity Framework Core
+##### \- Entity Framework Core
 
-# \- ClosedXML
+##### \- ClosedXML
 
-# \- LiveCharts2
+##### \- LiveCharts2
 
-# \- xUnit
+##### \- xUnit
 
-# \- Git / GitHub
+##### \- Git / GitHub
 
-# 
+##### 
 
-# \## Arquitectura
+##### \## Arquitectura
 
-# 
+##### 
 
-# La solución utiliza arquitectura por capas con organización modular.
+##### La solución utiliza arquitectura por capas con organización modular.
 
-# 
+##### 
 
-# Proyectos:
+##### Proyectos:
 
-# 
+##### 
 
-# \- BodegaLuchito.Domain
+##### \- BodegaLuchito.Domain
 
-# \- BodegaLuchito.Application
+##### \- BodegaLuchito.Application
 
-# \- BodegaLuchito.Infrastructure
+##### \- BodegaLuchito.Infrastructure
 
-# \- BodegaLuchito.Desktop
+##### \- BodegaLuchito.Desktop
 
-# \- BodegaLuchito.Tests
+##### \- BodegaLuchito.Tests
 
-# 
+##### 
 
-# \## Dependencias
+##### \## Dependencias
 
-# 
+##### 
 
-# Domain no depende de ningún otro proyecto interno.
+##### Domain no depende de ningún otro proyecto interno.
 
-# 
+##### 
 
-# Application depende de Domain.
+##### Application depende de Domain.
 
-# 
+##### 
 
-# Infrastructure puede depender de Application y Domain.
+##### Infrastructure puede depender de Application y Domain.
 
-# 
+##### 
 
-# Desktop depende de Application e Infrastructure.
+##### Desktop depende de Application e Infrastructure.
 
-# 
+##### 
 
-# Tests puede probar Domain, Application y cuando corresponda Infrastructure.
+##### Tests puede probar Domain, Application y cuando corresponda Infrastructure.
 
-# 
+##### 
 
-# \## Módulos
+##### \## Módulos
 
-# 
+##### 
 
-# \- Autenticacion
+##### \- Autenticacion
 
-# \- Productos
+##### \- Productos
 
-# \- Proveedores
+##### \- Proveedores
 
-# \- Abastecimientos
+##### \- Abastecimientos
 
-# \- Inventario
+##### \- Inventario
 
-# \- Ventas
+##### \- Ventas
 
-# \- Caja
+##### \- Caja
 
-# \- Reportes
+##### \- Reportes
 
-# \- BI
+##### \- BI
 
-# 
+##### 
 
-# Tickets forma parte funcionalmente de Ventas.
+##### Tickets forma parte funcionalmente de Ventas.
 
-# 
+##### 
 
-# \## Reglas obligatorias
+##### \## Reglas obligatorias
 
-# 
+##### 
 
-# No colocar lógica de negocio en Views ni en code-behind de WPF.
+##### No colocar lógica de negocio en Views ni en code-behind de WPF.
 
-# 
+##### 
 
-# No agregar referencias de Infrastructure, Desktop, EF Core o SQLite
+##### No agregar referencias de Infrastructure, Desktop, EF Core o SQLite
 
-# dentro de Domain.
+##### dentro de Domain.
 
-# 
+##### 
 
-# No acceder directamente a SQLite desde Desktop.
+##### No acceder directamente a SQLite desde Desktop.
 
-# 
+##### 
 
-# No modificar manualmente la estructura de la base de datos cuando
+##### No modificar manualmente la estructura de la base de datos cuando
 
-# exista Entity Framework Core. Utilizar migraciones.
+##### exista Entity Framework Core. Utilizar migraciones.
 
-# 
+##### 
 
-# Mantener las funcionalidades dentro de su módulo correspondiente.
+##### Mantener las funcionalidades dentro de su módulo correspondiente.
 
-# 
+##### 
 
-# No crear proyectos .csproj adicionales sin una razón arquitectónica
+##### No crear proyectos .csproj adicionales sin una razón arquitectónica
 
-# explícita.
+##### explícita.
 
-# 
+##### 
 
-# No agregar paquetes NuGet sin explicar su necesidad.
+##### No agregar paquetes NuGet sin explicar su necesidad.
 
-# 
+##### 
 
-# No cambiar la arquitectura general del proyecto sin autorización.
+##### No cambiar la arquitectura general del proyecto sin coordinación
 
-# 
+##### y aprobación del equipo.
 
-# \## Estilo
+##### 
 
-# 
+##### \## Estilo
 
-# Los conceptos del negocio se escriben en español sin tildes
+##### 
 
-# en identificadores.
+##### Los conceptos del negocio se escriben en español sin tildes
 
-# 
+##### en identificadores.
 
-# Utilizar PascalCase para clases, propiedades y métodos.
+##### 
 
-# 
+##### Utilizar PascalCase para clases, propiedades y métodos.
 
-# Utilizar camelCase para variables y parámetros.
+##### 
 
-# 
+##### Utilizar camelCase para variables y parámetros.
 
-# Los métodos asincrónicos deben terminar en Async.
+##### 
 
-# 
+##### Los métodos asincrónicos deben terminar en Async.
 
-# Nullable debe permanecer habilitado.
+##### 
 
-# 
+##### Nullable debe permanecer habilitado.
 
-# \## Git
+##### 
 
-# 
+##### \## Git
 
-# main es estable.
+##### 
 
-# 
+##### main es estable.
 
-# develop es la rama de integración.
+##### 
 
-# 
+##### develop es la rama de integración.
 
-# Las funcionalidades se desarrollan en ramas feature creadas
+##### 
 
-# desde develop.
+##### Las funcionalidades se desarrollan en ramas feature creadas
 
-# 
+##### desde develop.
 
-# Ejemplo:
+##### 
 
-# 
+##### Ejemplo:
 
-# feature/RF-PRO-01-registrar-producto
+##### 
 
-# 
+##### feature/RF-PRO-01-registrar-producto
 
-# No realizar cambios directamente sobre main.
+##### 
 
-# 
+##### No realizar cambios directamente sobre main.
 
-# \## Validación
+##### 
 
-# 
+##### \## Interacción entre módulos
 
-# Antes de considerar terminada una modificación:
+##### 
 
-# 
+##### Un módulo no debe modificar directamente la persistencia interna
 
-# 1\. Compilar la solución.
+##### de otro módulo.
 
-# 2\. Ejecutar las pruebas relacionadas.
+##### 
 
-# 3\. Revisar que no existan errores de compilación.
+##### Las interacciones entre módulos deben realizarse mediante casos de uso,
 
-# 4\. Mostrar claramente qué archivos fueron modificados.
+##### interfaces o contratos definidos en Application.
 
-# 
+##### 
 
-# \## Comandos
+##### Ejemplos:
 
-# 
+##### 
 
-# Desde la raíz del repositorio:
+##### \- Abastecimientos solicita a Inventario registrar una entrada.
 
-# 
+##### \- Ventas solicita a Inventario registrar una salida.
 
-# dotnet build
+##### \- Ventas solicita a Caja registrar un ingreso.
 
-# 
+##### \- Abastecimientos solicita a Caja registrar un egreso.
 
-# dotnet test
+##### 
 
-# 
+##### No duplicar lógica perteneciente a otro módulo.
 
-# \## Documentación
+##### 
 
-# 
+##### \## Trabajo paralelo
 
-# Antes de realizar cambios arquitectónicos revisar:
+##### 
 
-# 
+##### El equipo está formado por cuatro desarrolladores.
 
-# docs/arquitectura.md
+##### 
 
-# docs/convenciones.md
+##### Las funcionalidades se desarrollan en ramas independientes creadas
 
-# docs/git-workflow.md
+##### desde develop.
+
+##### 
+
+##### Durante trabajo paralelo no modificar archivos centrales compartidos
+
+##### sin coordinación previa.
+
+##### 
+
+##### Ejemplos de archivos sensibles:
+
+##### 
+
+##### \- App.xaml.cs
+
+##### \- MainWindow.xaml
+
+##### \- MainWindow.xaml.cs
+
+##### \- MainWindowViewModel.cs
+
+##### \- Resources/ViewTemplates.xaml
+
+##### \- Infrastructure/DependencyInjection.cs
+
+##### \- Persistence/Migrations/
+
+##### \- BodegaLuchitoDbContextModelSnapshot.cs
+
+##### 
+
+##### Las migraciones de Entity Framework deben generarse de forma coordinada
+
+##### después de integrar cambios que afecten simultáneamente al modelo de datos.
+
+##### 
+
+##### \## Validación
+
+##### 
+
+##### Antes de considerar terminada una modificación:
+
+##### 
+
+##### 1\. Compilar la solución.
+
+##### 2\. Ejecutar las pruebas relacionadas.
+
+##### 3\. Revisar que no existan errores de compilación.
+
+##### 4\. Mostrar claramente qué archivos fueron modificados.
+
+##### 
+
+##### \## Comandos
+
+##### 
+
+##### Desde la raíz del repositorio:
+
+##### 
+
+##### dotnet build
+
+##### 
+
+##### dotnet test
+
+##### 
+
+##### \## Documentación
+
+##### 
+
+##### Antes de realizar cambios arquitectónicos revisar:
+
+##### 
+
+##### docs/arquitectura.md
+
+##### docs/convenciones.md
+
+##### docs/git-workflow.md
 

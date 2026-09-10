@@ -1,264 +1,348 @@
-# \# AGENTS.md - Bodega Luchito
+\# AGENTS.md - Bodega Luchito
 
-# 
 
-# \## Proyecto
 
-# 
+\## Proyecto
 
-# Sistema local de información comercial para Bodega Luchito.
 
-# 
 
-# Aplicación de escritorio Windows utilizada en un único punto de venta.
+Sistema local de información comercial para Bodega Luchito.
 
-# 
 
-# \## Stack tecnológico
 
-# 
+Aplicación de escritorio Windows utilizada en un único punto de venta.
 
-# \- C# 14
 
-# \- .NET 10
 
-# \- WPF
+\## Stack tecnológico
 
-# \- MVVM
 
-# \- SQLite
 
-# \- Entity Framework Core
+\- C# 14
 
-# \- ClosedXML
+\- .NET 10
 
-# \- LiveCharts2
+\- WPF
 
-# \- xUnit
+\- MVVM
 
-# \- Git / GitHub
+\- SQLite
 
-# 
+\- Entity Framework Core
 
-# \## Arquitectura
+\- ClosedXML
 
-# 
+\- LiveCharts2
 
-# La solución utiliza arquitectura por capas con organización modular.
+\- xUnit
 
-# 
+\- Git / GitHub
 
-# Proyectos:
 
-# 
 
-# \- BodegaLuchito.Domain
+\## Arquitectura
 
-# \- BodegaLuchito.Application
 
-# \- BodegaLuchito.Infrastructure
 
-# \- BodegaLuchito.Desktop
+La solución utiliza arquitectura por capas con organización modular.
 
-# \- BodegaLuchito.Tests
 
-# 
 
-# \## Dependencias
+Proyectos:
 
-# 
 
-# Domain no depende de ningún otro proyecto interno.
 
-# 
+\- BodegaLuchito.Domain
 
-# Application depende de Domain.
+\- BodegaLuchito.Application
 
-# 
+\- BodegaLuchito.Infrastructure
 
-# Infrastructure puede depender de Application y Domain.
+\- BodegaLuchito.Desktop
 
-# 
+\- BodegaLuchito.Tests
 
-# Desktop depende de Application e Infrastructure.
 
-# 
 
-# Tests puede probar Domain, Application y cuando corresponda Infrastructure.
+\## Dependencias
 
-# 
 
-# \## Módulos
 
-# 
+Domain no depende de ningún otro proyecto interno.
 
-# \- Autenticacion
 
-# \- Productos
 
-# \- Proveedores
+Application depende de Domain.
 
-# \- Abastecimientos
 
-# \- Inventario
 
-# \- Ventas
+Infrastructure puede depender de Application y Domain.
 
-# \- Caja
 
-# \- Reportes
 
-# \- BI
+Desktop depende de Application e Infrastructure.
 
-# 
 
-# Tickets forma parte funcionalmente de Ventas.
 
-# 
+Tests puede probar Domain, Application y cuando corresponda Infrastructure.
 
-# \## Reglas obligatorias
 
-# 
 
-# No colocar lógica de negocio en Views ni en code-behind de WPF.
+\## Módulos
 
-# 
 
-# No agregar referencias de Infrastructure, Desktop, EF Core o SQLite
 
-# dentro de Domain.
+\- Autenticacion
 
-# 
+\- Productos
 
-# No acceder directamente a SQLite desde Desktop.
+\- Proveedores
 
-# 
+\- Abastecimientos
 
-# No modificar manualmente la estructura de la base de datos cuando
+\- Inventario
 
-# exista Entity Framework Core. Utilizar migraciones.
+\- Ventas
 
-# 
+\- Caja
 
-# Mantener las funcionalidades dentro de su módulo correspondiente.
+\- Reportes
 
-# 
+\- BI
 
-# No crear proyectos .csproj adicionales sin una razón arquitectónica
 
-# explícita.
 
-# 
+Tickets forma parte funcionalmente de Ventas.
 
-# No agregar paquetes NuGet sin explicar su necesidad.
 
-# 
 
-# No cambiar la arquitectura general del proyecto sin autorización.
+\## Reglas obligatorias
 
-# 
 
-# \## Estilo
 
-# 
+No colocar lógica de negocio en Views ni en code-behind de WPF.
 
-# Los conceptos del negocio se escriben en español sin tildes
 
-# en identificadores.
 
-# 
+No agregar referencias de Infrastructure, Desktop, EF Core o SQLite
 
-# Utilizar PascalCase para clases, propiedades y métodos.
+dentro de Domain.
 
-# 
 
-# Utilizar camelCase para variables y parámetros.
 
-# 
+No acceder directamente a SQLite desde Desktop.
 
-# Los métodos asincrónicos deben terminar en Async.
 
-# 
 
-# Nullable debe permanecer habilitado.
+No modificar manualmente la estructura de la base de datos cuando
 
-# 
+exista Entity Framework Core. Utilizar migraciones.
 
-# \## Git
 
-# 
 
-# main es estable.
+Mantener las funcionalidades dentro de su módulo correspondiente.
 
-# 
 
-# develop es la rama de integración.
 
-# 
+No crear proyectos .csproj adicionales sin una razón arquitectónica
 
-# Las funcionalidades se desarrollan en ramas feature creadas
+explícita.
 
-# desde develop.
 
-# 
 
-# Ejemplo:
+No agregar paquetes NuGet sin explicar su necesidad.
 
-# 
 
-# feature/RF-PRO-01-registrar-producto
 
-# 
+No cambiar la arquitectura general del proyecto sin coordinación
 
-# No realizar cambios directamente sobre main.
+y aprobación del equipo.
 
-# 
 
-# \## Validación
 
-# 
+\## Estilo
 
-# Antes de considerar terminada una modificación:
 
-# 
 
-# 1\. Compilar la solución.
+Los conceptos del negocio se escriben en español sin tildes
 
-# 2\. Ejecutar las pruebas relacionadas.
+en identificadores.
 
-# 3\. Revisar que no existan errores de compilación.
 
-# 4\. Mostrar claramente qué archivos fueron modificados.
 
-# 
+Utilizar PascalCase para clases, propiedades y métodos.
 
-# \## Comandos
 
-# 
 
-# Desde la raíz del repositorio:
+Utilizar camelCase para variables y parámetros.
 
-# 
 
-# dotnet build
 
-# 
+Los métodos asincrónicos deben terminar en Async.
 
-# dotnet test
 
-# 
 
-# \## Documentación
+Nullable debe permanecer habilitado.
 
-# 
 
-# Antes de realizar cambios arquitectónicos revisar:
 
-# 
+\## Git
 
-# docs/arquitectura.md
 
-# docs/convenciones.md
 
-# docs/git-workflow.md
+main es estable.
+
+
+
+develop es la rama de integración.
+
+
+
+Las funcionalidades se desarrollan en ramas feature creadas
+
+desde develop.
+
+
+
+Ejemplo:
+
+
+
+feature/RF-PRO-01-registrar-producto
+
+
+
+No realizar cambios directamente sobre main.
+
+
+
+\## Interacción entre módulos
+
+
+
+Un módulo no debe modificar directamente la persistencia interna
+
+de otro módulo.
+
+
+
+Las interacciones entre módulos deben realizarse mediante casos de uso,
+
+interfaces o contratos definidos en Application.
+
+
+
+Ejemplos:
+
+
+
+\- Abastecimientos solicita a Inventario registrar una entrada.
+
+\- Ventas solicita a Inventario registrar una salida.
+
+\- Ventas solicita a Caja registrar un ingreso.
+
+\- Abastecimientos solicita a Caja registrar un egreso.
+
+
+
+No duplicar lógica perteneciente a otro módulo.
+
+
+
+\## Trabajo paralelo
+
+
+
+El equipo está formado por cuatro desarrolladores.
+
+
+
+Las funcionalidades se desarrollan en ramas independientes creadas
+
+desde develop.
+
+
+
+Durante trabajo paralelo no modificar archivos centrales compartidos
+
+sin coordinación previa.
+
+
+
+Ejemplos de archivos sensibles:
+
+
+
+\- App.xaml.cs
+
+\- MainWindow.xaml
+
+\- MainWindow.xaml.cs
+
+\- MainWindowViewModel.cs
+
+\- Resources/ViewTemplates.xaml
+
+\- Infrastructure/DependencyInjection.cs
+
+\- Persistence/Migrations/
+
+\- BodegaLuchitoDbContextModelSnapshot.cs
+
+
+
+Las migraciones de Entity Framework deben generarse de forma coordinada
+
+después de integrar cambios que afecten simultáneamente al modelo de datos.
+
+
+
+\## Validación
+
+
+
+Antes de considerar terminada una modificación:
+
+
+
+1\. Compilar la solución.
+
+2\. Ejecutar las pruebas relacionadas.
+
+3\. Revisar que no existan errores de compilación.
+
+4\. Mostrar claramente qué archivos fueron modificados.
+
+
+
+\## Comandos
+
+
+
+Desde la raíz del repositorio:
+
+
+
+dotnet build
+
+
+
+dotnet test
+
+
+
+\## Documentación
+
+
+
+Antes de realizar cambios arquitectónicos revisar:
+
+
+
+docs/arquitectura.md
+
+docs/convenciones.md
+
+docs/git-workflow.md
 

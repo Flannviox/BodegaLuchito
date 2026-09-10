@@ -1,166 +1,214 @@
-# \# Convenciones de desarrollo
+##### \# Convenciones de desarrollo
 
-# 
+##### 
 
-# \## Tecnologías
+##### \## Tecnologías
 
-# 
+##### 
 
-# \- C# 14
+##### \- C# 14
 
-# \- .NET 10
+##### \- .NET 10
 
-# \- WPF
+##### \- WPF
 
-# \- MVVM
+##### \- MVVM
 
-# \- Entity Framework Core
+##### \- Entity Framework Core
 
-# \- SQLite
+##### \- SQLite
 
-# \- xUnit
+##### \- xUnit
 
-# 
+##### 
 
-# \## Idioma del código
+##### \## Idioma del código
 
-# 
+##### 
 
-# Los conceptos propios del negocio se escribirán en español.
+##### Los conceptos propios del negocio se escribirán en español.
 
-# 
+##### 
 
-# Ejemplos:
+##### Ejemplos:
 
-# 
+##### 
 
-# Producto
+##### Producto
 
-# Venta
+##### Venta
 
-# Proveedor
+##### Proveedor
 
-# RegistrarVenta
+##### RegistrarVenta
 
-# CierreCaja
+##### CierreCaja
 
-# 
+##### 
 
-# No utilizar tildes ni caracteres especiales en nombres de clases,
+##### No utilizar tildes ni caracteres especiales en nombres de clases,
 
-# métodos, propiedades, archivos o carpetas.
+##### métodos, propiedades, archivos o carpetas.
 
-# 
+##### 
 
-# \## Nombres
+##### \## Nombres
 
-# 
+##### 
 
-# Clases, métodos y propiedades:
+##### Clases, métodos y propiedades:
 
-# PascalCase
+##### PascalCase
 
-# 
+##### 
 
-# Variables locales y parámetros:
+##### Variables locales y parámetros:
 
-# camelCase
+##### camelCase
 
-# 
+##### 
 
-# Ejemplo:
+##### Ejemplo:
 
-# 
+##### 
 
-# public class Producto
+##### Ejemplo:
 
-# {
+##### 
 
-# &#x20;   public string Nombre { get; set; }
+##### ```csharp
 
-# }
+##### public class Producto
 
-# 
+##### {
 
-# \## Async
+##### &#x20;   public string Nombre { get; set; } = string.Empty;
 
-# 
+##### }
 
-# Los métodos asincrónicos deben terminar con Async.
+##### ```
 
-# 
+##### \## Async
 
-# Ejemplo:
+##### 
 
-# 
+##### Los métodos asincrónicos deben terminar con Async.
 
-# GuardarProductoAsync()
+##### 
 
-# 
+##### Ejemplo:
 
-# \## Responsabilidades
+##### 
 
-# 
+##### GuardarProductoAsync()
 
-# No colocar lógica de negocio en Views ni en code-behind de WPF.
+##### 
 
-# 
+##### \## Responsabilidades
 
-# Domain no debe depender de Infrastructure ni Desktop.
+##### 
 
-# 
+##### No colocar lógica de negocio en Views ni en code-behind de WPF.
 
-# Las operaciones de base de datos pertenecen a Infrastructure.
+##### 
 
-# 
+##### Domain contiene entidades, enums, value objects y reglas fundamentales
 
-# Los casos de uso pertenecen a Application.
+##### del negocio.
 
-# 
+##### 
 
-# \## Módulos
+##### Application contiene casos de uso, DTOs, interfaces y contratos entre
 
-# 
+##### módulos.
 
-# Cada funcionalidad debe colocarse dentro de su módulo correspondiente.
+##### 
 
-# 
+##### Infrastructure contiene Entity Framework Core, repositorios,
 
-# Ejemplo:
+##### persistencia e integraciones externas.
 
-# 
+##### 
 
-# Domain/Productos
+##### Desktop contiene Views, ViewModels, navegación y composición de UI.
 
-# Application/Productos
+##### 
 
-# Infrastructure/Productos
+##### Desktop no debe acceder directamente a SQLite.
 
-# Desktop/Modules/Productos
+##### 
 
-# 
+##### Un módulo no debe modificar directamente la persistencia interna
 
-# \## Código
+##### de otro módulo.
 
-# 
+##### \## Módulos
 
-# Evitar clases gigantes.
+##### 
 
-# 
+##### Cada funcionalidad debe colocarse dentro de su módulo correspondiente.
 
-# Evitar duplicación de código.
+##### 
 
-# 
+##### Ejemplo:
 
-# Mantener Nullable habilitado.
+##### 
 
-# 
+##### Domain/Productos
 
-# No utilizar valores mágicos cuando corresponda una constante,
+##### Application/Productos
 
-# enumeración o configuración.
+##### Infrastructure/Productos
 
-# 
+##### Desktop/Modules/Productos
 
-# No introducir una nueva dependencia NuGet sin justificar su necesidad.
+##### 
+
+##### \## Código
+
+##### 
+
+##### Evitar clases gigantes.
+
+##### 
+
+##### Evitar duplicación de código.
+
+##### 
+
+##### Mantener Nullable habilitado.
+
+##### 
+
+##### No utilizar valores mágicos cuando corresponda una constante,
+
+##### enumeración o configuración.
+
+##### 
+
+##### No introducir una nueva dependencia NuGet sin justificar su necesidad.
+
+##### 
+
+##### \## Entity Framework Core
+
+##### 
+
+##### Las entidades de Domain no deben utilizar atributos específicos
+
+##### de Entity Framework Core.
+
+##### 
+
+##### La configuración de persistencia debe realizarse mediante Fluent API
+
+##### dentro de Infrastructure.
+
+##### 
+
+##### Las migraciones deben mantenerse dentro de:
+
+##### 
+
+##### Infrastructure/Persistence/Migrations
 

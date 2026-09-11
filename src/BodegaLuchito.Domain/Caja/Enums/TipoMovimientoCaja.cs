@@ -6,7 +6,7 @@ namespace BodegaLuchito.Domain.Caja.Enums
 {
     public enum TipoMovimientoCaja
     {
-        Ingreso = 1,
+        IngresoVenta = 1,
         EgresoAbastecimiento = 2,
         ReversionVenta = 3
     }

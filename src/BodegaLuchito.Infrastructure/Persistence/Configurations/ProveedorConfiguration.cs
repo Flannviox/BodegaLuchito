@@ -8,7 +8,7 @@ public sealed class ProveedorConfiguration : IEntityTypeConfiguration<Proveedor>
 {
     public void Configure(EntityTypeBuilder<Proveedor> builder)
     {
-        builder.ToTable("Proveedores");
+        builder.ToTable("Proveedor");
 
         builder.HasKey(x => x.Id);
 
@@ -31,6 +31,6 @@ public sealed class ProveedorConfiguration : IEntityTypeConfiguration<Proveedor>
 
         builder.Property(x => x.Activo).IsRequired();
         builder.Property(x => x.FechaCreacion).IsRequired();
-        builder.Property(x => x.FechaActualizacion).IsRequired();
+        builder.Property(x => x.FechaActualizacion);
     }
 }

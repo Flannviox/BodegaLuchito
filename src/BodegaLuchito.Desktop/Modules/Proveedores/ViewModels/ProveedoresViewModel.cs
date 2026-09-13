@@ -4,9 +4,9 @@ using BodegaLuchito.Application.Proveedores.DTOs;
 using BodegaLuchito.Application.Proveedores.Interfaces;
 using BodegaLuchito.Application.Proveedores.UseCases;
 using BodegaLuchito.Domain.Proveedores.Entities;
+using BodegaLuchito.Desktop.Common.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using BodegaLuchito.Desktop.Common.ViewModels;
 
 namespace BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
 
@@ -26,7 +26,20 @@ public partial class ProveedoresViewModel : ViewModelBase
     {
         _registrarUseCase = registrarUseCase;
         _repository = repository;
-        _ = CargarProveedoresAsync();
+        _ = CargarInicialAsync(); // Fire and forget controlado
+    }
+
+    private async Task CargarInicialAsync()
+    {
+        try
+        {
+            await CargarProveedoresAsync();
+        }
+        catch (Exception ex)
+        {
+            // Fallos de base de datos o inicialización
+            MessageBox.Show($"Error crítico al cargar datos: {ex.Message}", "Error de Persistencia", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     [RelayCommand]
@@ -37,9 +50,9 @@ public partial class ProveedoresViewModel : ViewModelBase
             var request = new RegistrarProveedorRequest
             {
                 Nombre = Nombre,
-                Ruc = string.IsNullOrWhiteSpace(Ruc) ? null : Ruc,
-                Telefono = string.IsNullOrWhiteSpace(Telefono) ? null : Telefono,
-                Direccion = string.IsNullOrWhiteSpace(Direccion) ? null : Direccion
+                Ruc = Ruc,
+                Telefono = Telefono,
+                Direccion = Direccion
             };
 
             await _registrarUseCase.ExecuteAsync(request);
@@ -48,9 +61,17 @@ public partial class ProveedoresViewModel : ViewModelBase
             LimpiarFormulario();
             await CargarProveedoresAsync();
         }
-        catch (Exception ex)
+        catch (ArgumentException ex) // Errores de Validación (Inputs)
         {
-            MessageBox.Show(ex.Message, "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(ex.Message, "Validación de Campos", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (InvalidOperationException ex) // Errores de Negocio (Duplicados)
+        {
+            MessageBox.Show(ex.Message, "Regla de Negocio", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex) // Errores no controlados o base de datos
+        {
+            MessageBox.Show($"Ocurrió un error al guardar: {ex.Message}", "Error de Persistencia", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

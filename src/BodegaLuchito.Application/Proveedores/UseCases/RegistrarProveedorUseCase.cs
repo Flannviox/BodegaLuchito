@@ -16,53 +16,48 @@ public class RegistrarProveedorUseCase
 
     public async Task<Proveedor> ExecuteAsync(RegistrarProveedorRequest request)
     {
-        // Validar Nombre: Requerido, máximo 150 caracteres y SOLO letras/espacios
-        if (string.IsNullOrWhiteSpace(request.Nombre))
+        // 1. Normalización de campos
+        var nombreNorm = request.Nombre?.Trim() ?? string.Empty;
+        var rucNorm = string.IsNullOrWhiteSpace(request.Ruc) ? null : request.Ruc.Trim();
+        var telefonoNorm = string.IsNullOrWhiteSpace(request.Telefono) ? null : request.Telefono.Trim();
+        var direccionNorm = string.IsNullOrWhiteSpace(request.Direccion) ? null : request.Direccion.Trim();
+
+        // 2. Validación de Nombre
+        if (string.IsNullOrWhiteSpace(nombreNorm))
             throw new ArgumentException("El nombre del proveedor es requerido.");
 
-        if (request.Nombre.Length > 150)
+        if (nombreNorm.Length > 150)
             throw new ArgumentException("El nombre no puede exceder los 150 caracteres.");
 
-        if (!Regex.IsMatch(request.Nombre, @"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"))
-            throw new ArgumentException("El nombre solo puede contener letras y espacios (no números).");
-
-        // Validar RUC: Opcional, pero si existe deben ser EXACTAMENTE 11 números
-        if (!string.IsNullOrWhiteSpace(request.Ruc))
+        // 3. Validación de RUC
+        if (rucNorm != null)
         {
-            if (!Regex.IsMatch(request.Ruc, @"^\d{11}$"))
+            if (!Regex.IsMatch(rucNorm, @"^[0-9]{11}$"))
                 throw new ArgumentException("El RUC debe contener exactamente 11 dígitos numéricos.");
 
-            if (await _repository.ExisteRucAsync(request.Ruc))
+            if (await _repository.ExisteRucAsync(rucNorm))
                 throw new InvalidOperationException("El RUC ya se encuentra registrado.");
         }
 
-        // Validar Teléfono: Opcional, pero si existe deben ser EXACTAMENTE 9 números
-        if (!string.IsNullOrWhiteSpace(request.Telefono))
+        // 4. Validación de Teléfono
+        if (telefonoNorm != null && !Regex.IsMatch(telefonoNorm, @"^[0-9]{9}$"))
         {
-            if (!Regex.IsMatch(request.Telefono, @"^\d{9}$"))
-                throw new ArgumentException("El teléfono debe contener exactamente 9 dígitos numéricos.");
+            throw new ArgumentException("El teléfono debe contener exactamente 9 dígitos numéricos.");
         }
 
-        // Validar Dirección: Letras, números y caracteres comunes
-        if (!string.IsNullOrWhiteSpace(request.Direccion))
-        {
-            if (!Regex.IsMatch(request.Direccion, @"^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,#-]+$"))
-                throw new ArgumentException("La dirección contiene caracteres no permitidos.");
-        }
-
-        // Mapeo
+        // 5. Mapeo
         var proveedor = new Proveedor
         {
-            Nombre = request.Nombre,
-            Ruc = request.Ruc,
-            Telefono = request.Telefono,
-            Direccion = request.Direccion,
+            Nombre = nombreNorm,
+            Ruc = rucNorm,
+            Telefono = telefonoNorm,
+            Direccion = direccionNorm,
             Activo = true,
             FechaCreacion = DateTime.Now,
-            FechaActualizacion = DateTime.Now
+            FechaActualizacion = null // Se asignará solo al modificar
         };
 
-        // Persistencia
+        // 6. Persistencia
         await _repository.RegistrarAsync(proveedor);
 
         return proveedor;

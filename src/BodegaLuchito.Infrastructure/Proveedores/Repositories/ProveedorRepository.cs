@@ -7,27 +7,30 @@ namespace BodegaLuchito.Infrastructure.Proveedores.Repositories;
 
 public class ProveedorRepository : IProveedorRepository
 {
-    private readonly BodegaLuchitoDbContext _context;
+    private readonly IDbContextFactory<BodegaLuchitoDbContext> _contextFactory;
 
-    public ProveedorRepository(BodegaLuchitoDbContext context)
+    public ProveedorRepository(IDbContextFactory<BodegaLuchitoDbContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     public async Task RegistrarAsync(Proveedor proveedor)
     {
-        _context.Set<Proveedor>().Add(proveedor);
-        await _context.SaveChangesAsync();
+        await using var context = await _contextFactory.CreateDbContextAsync();
+        context.Set<Proveedor>().Add(proveedor);
+        await context.SaveChangesAsync();
     }
 
     public async Task<bool> ExisteRucAsync(string ruc)
     {
-        return await _context.Set<Proveedor>().AnyAsync(p => p.Ruc == ruc);
+        await using var context = await _contextFactory.CreateDbContextAsync();
+        return await context.Set<Proveedor>().AnyAsync(p => p.Ruc == ruc);
     }
 
     public async Task<List<Proveedor>> ListarActivosAsync()
     {
-        return await _context.Set<Proveedor>()
+        await using var context = await _contextFactory.CreateDbContextAsync();
+        return await context.Set<Proveedor>()
             .Where(p => p.Activo)
             .OrderByDescending(p => p.Id)
             .ToListAsync();

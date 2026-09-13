@@ -69,11 +69,12 @@ public sealed class IniciarSesionUseCase
 
         _sesionUsuario.IniciarSesion(
             new UsuarioSesion
-            {
-                IdUsuario = usuario.Id,
-                NombreUsuario = usuario.NombreUsuario,
-                NombreRol = usuario.Rol.ToString()
-            });
+        {
+            IdUsuario = usuario.Id,
+            NombreCompleto = usuario.NombreCompleto,
+            NombreUsuario = usuario.NombreUsuario,
+            Rol = usuario.Rol
+        });
 
         return IniciarSesionResult.Correcto();
     }

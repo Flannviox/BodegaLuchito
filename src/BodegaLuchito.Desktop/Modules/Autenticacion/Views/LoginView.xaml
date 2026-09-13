@@ -1,0 +1,139 @@
+<UserControl x:Class="BodegaLuchito.Desktop.Modules.Autenticacion.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+
+    <UserControl.Resources>
+
+        <Style x:Key="FieldLabelStyle"
+               TargetType="TextBlock">
+            <Setter Property="FontSize"
+                    Value="14" />
+            <Setter Property="FontWeight"
+                    Value="SemiBold" />
+            <Setter Property="Foreground"
+                    Value="#17365D" />
+            <Setter Property="Margin"
+                    Value="0,0,0,7" />
+        </Style>
+
+        <Style x:Key="InputTextBoxStyle"
+               TargetType="TextBox">
+            <Setter Property="Height"
+                    Value="48" />
+            <Setter Property="FontSize"
+                    Value="15" />
+            <Setter Property="Padding"
+                    Value="14,0" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="BorderBrush"
+                    Value="#CBD5E1" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Background"
+                    Value="White" />
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+
+        <Border Width="500"
+                Padding="42"
+                Background="White"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="14">
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="22"
+                                  ShadowDepth="4"
+                                  Opacity="0.12" />
+            </Border.Effect>
+
+            <StackPanel>
+
+                <!-- Icono -->
+                <Border Width="70"
+                        Height="70"
+                        HorizontalAlignment="Center"
+                        Background="#0F6CBD"
+                        CornerRadius="35">
+
+                    <TextBlock Text="▣"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="30"
+                               FontWeight="Bold"
+                               Foreground="White" />
+
+                </Border>
+
+                <TextBlock Text="Bienvenido a Bodega Luchito"
+                           Margin="0,20,0,0"
+                           HorizontalAlignment="Center"
+                           FontSize="25"
+                           FontWeight="Bold"
+                           Foreground="#15345B" />
+
+                <TextBlock Text="Inicia sesión para continuar"
+                           Margin="0,8,0,32"
+                           HorizontalAlignment="Center"
+                           FontSize="15"
+                           Foreground="#64748B" />
+
+                <!-- Usuario -->
+
+                <TextBlock Text="Usuario"
+                           Style="{StaticResource FieldLabelStyle}" />
+
+                <TextBox Text="{Binding NombreUsuario,
+                                        UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource InputTextBoxStyle}" />
+
+                <!-- Contraseña -->
+
+                <TextBlock Text="Contraseña"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Margin="0,22,0,7" />
+
+                <PasswordBox x:Name="PasswordInput"
+                             Height="48"
+                             Padding="14,0"
+                             FontSize="15"
+                             VerticalContentAlignment="Center"
+                             BorderBrush="#CBD5E1"
+                             BorderThickness="1"
+                             PasswordChanged="PasswordInput_OnPasswordChanged" />
+
+                <!-- Error -->
+
+                <TextBlock Text="{Binding MensajeError}"
+                           Margin="0,14,0,0"
+                           Foreground="#C62828"
+                           FontSize="13"
+                           TextWrapping="Wrap" />   
+                <!-- Botón -->
+
+                <Button Margin="0,24,0,0"
+                        Height="50"
+                        Command="{Binding IniciarSesionCommand}"
+                        Background="#0866E5"
+                        Foreground="White"
+                        BorderThickness="0"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Cursor="Hand">
+
+                    <TextBlock Text="Iniciar sesión" />
+
+                </Button>
+
+            </StackPanel>
+
+        </Border>
+
+    </Grid>
+
+</UserControl>

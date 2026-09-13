@@ -2,24 +2,29 @@ using BodegaLuchito.Application.Autenticacion.Interfaces;
 using BodegaLuchito.Domain.Autenticacion.Entities;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using BodegaLuchito.Domain.Autenticacion.Enums;
 
 namespace BodegaLuchito.Infrastructure.Autenticacion.Repositories;
 
 public sealed class UsuarioRepository : IUsuarioRepository
 {
-    private readonly BodegaLuchitoDbContext _context;
+    private readonly IDbContextFactory<BodegaLuchitoDbContext> _contextFactory;
 
     public UsuarioRepository(
-        BodegaLuchitoDbContext context)
+        IDbContextFactory<BodegaLuchitoDbContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     public async Task<Usuario?> ObtenerPorIdAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Usuario>()
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<Usuario>()
+            .AsNoTracking()
             .SingleOrDefaultAsync(
                 x => x.Id == id,
                 cancellationToken);
@@ -29,7 +34,11 @@ public sealed class UsuarioRepository : IUsuarioRepository
         string nombreUsuario,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Usuario>()
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<Usuario>()
+            .AsNoTracking()
             .SingleOrDefaultAsync(
                 x => x.NombreUsuario == nombreUsuario,
                 cancellationToken);
@@ -40,7 +49,10 @@ public sealed class UsuarioRepository : IUsuarioRepository
         int? excluirUsuarioId = null,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Usuario>()
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<Usuario>()
             .AnyAsync(
                 x => x.NombreUsuario == nombreUsuario
                      && (!excluirUsuarioId.HasValue
@@ -51,7 +63,10 @@ public sealed class UsuarioRepository : IUsuarioRepository
     public async Task<bool> ExisteAlgunUsuarioAsync(
         CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Usuario>()
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<Usuario>()
             .AnyAsync(cancellationToken);
     }
 
@@ -59,15 +74,49 @@ public sealed class UsuarioRepository : IUsuarioRepository
         Usuario usuario,
         CancellationToken cancellationToken = default)
     {
-        await _context.Set<Usuario>()
-            .AddAsync(usuario, cancellationToken);
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Set<Usuario>().Add(usuario);
+
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task GuardarCambiosAsync(
+    public async Task ActualizarAsync(
+        Usuario usuario,
         CancellationToken cancellationToken = default)
     {
-        await _context.SaveChangesAsync(cancellationToken);
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        context.Set<Usuario>().Update(usuario);
+
+        await context.SaveChangesAsync(cancellationToken);
+    }
+    public async Task<IReadOnlyList<Usuario>> ObtenerTodosAsync(
+    CancellationToken cancellationToken = default)
+    {
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(
+                cancellationToken);
+
+        return await context.Set<Usuario>()
+            .AsNoTracking()
+            .OrderBy(x => x.NombreCompleto)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> ContarAdministradorasActivasAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await using var context =
+            await _contextFactory.CreateDbContextAsync(
+                cancellationToken);
+
+        return await context.Set<Usuario>()
+            .CountAsync(
+                x => x.Rol == RolUsuario.Administradora
+                     && x.Activo,
+                cancellationToken);
     }
 }

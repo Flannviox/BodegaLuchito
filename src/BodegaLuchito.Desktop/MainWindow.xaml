@@ -121,13 +121,12 @@
 
                     <StackPanel Grid.Column="1">
 
-                        <TextBlock Text="{Binding NombreUsuario}"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Right" />
+                        <TextBlock Text="{Binding NombreCompleto}"
+                            FontWeight="SemiBold" />
 
                         <TextBlock Text="{Binding NombreRol}"
-                                   FontSize="12"
-                                   HorizontalAlignment="Right" />
+                            Foreground="#64748B"
+                            FontSize="13" />
 
                     </StackPanel>
 

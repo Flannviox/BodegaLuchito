@@ -12,6 +12,9 @@ public interface IUsuarioRepository
         string nombreUsuario,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<Usuario>> ObtenerTodosAsync(
+        CancellationToken cancellationToken = default);
+
     Task<bool> ExisteNombreUsuarioAsync(
         string nombreUsuario,
         int? excluirUsuarioId = null,
@@ -20,10 +23,14 @@ public interface IUsuarioRepository
     Task<bool> ExisteAlgunUsuarioAsync(
         CancellationToken cancellationToken = default);
 
+    Task<int> ContarAdministradorasActivasAsync(
+        CancellationToken cancellationToken = default);
+
     Task AgregarAsync(
         Usuario usuario,
         CancellationToken cancellationToken = default);
 
-    Task GuardarCambiosAsync(
+    Task ActualizarAsync(
+        Usuario usuario,
         CancellationToken cancellationToken = default);
 }

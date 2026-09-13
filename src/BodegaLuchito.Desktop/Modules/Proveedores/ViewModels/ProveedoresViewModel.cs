@@ -6,10 +6,11 @@ using BodegaLuchito.Application.Proveedores.UseCases;
 using BodegaLuchito.Domain.Proveedores.Entities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using BodegaLuchito.Desktop.Common.ViewModels;
 
 namespace BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
 
-public partial class ProveedoresViewModel : ObservableObject
+public partial class ProveedoresViewModel : ViewModelBase
 {
     private readonly RegistrarProveedorUseCase _registrarUseCase;
     private readonly IProveedorRepository _repository;

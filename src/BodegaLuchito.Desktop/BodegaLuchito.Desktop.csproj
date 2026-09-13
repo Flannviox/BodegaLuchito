@@ -22,8 +22,4 @@
     <ProjectReference Include="..\BodegaLuchito.Infrastructure\BodegaLuchito.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Modules\Proveedores\Views\" />
-  </ItemGroup>
-
 </Project>

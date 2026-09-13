@@ -1,13 +1,13 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Proveedores.Views.ProveedoresView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="20">
+    <Grid Margin="20"> 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="350"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Formulario -->
+        <!-- Formulario  -->
         <Border Grid.Column="0" Background="White" Padding="20" Margin="0,0,20,0" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
             <StackPanel>
                 <TextBlock Text="Nuevo Proveedor" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,20"/>

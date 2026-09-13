@@ -52,12 +52,12 @@ public class RegistrarProductoUseCaseTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public async Task EjecutarAsync_NombreVacio_LanzaArgumentException(string nombreInvalido)
+    public async Task EjecutarAsync_NombreVacio_LanzaArgumentException(string? nombreInvalido)
     {
         var repository = new FakeProductoRepository();
         var useCase = new RegistrarProductoUseCase(repository);
         var request = new RegistrarProductoRequest(
-            nombreInvalido, "Abarrotes", "123", 1m, UnidadVenta.Unidad, false, 0, 0);
+            nombreInvalido!, "Abarrotes", "123", 1m, UnidadVenta.Unidad, false, 0, 0);
 
         var exception = await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
         Assert.Contains("El nombre del producto es obligatorio", exception.Message);
@@ -109,5 +109,19 @@ public class RegistrarProductoUseCaseTests
         Assert.Equal(0m, guardado.StockActual);
         Assert.Equal(0m, guardado.StockMinimo);
         Assert.Null(guardado.CodigoBarras);
+    }
+
+    [Fact]
+    public async Task EjecutarAsync_ControlaInventarioSinCodigo_LanzaArgumentException()
+    {
+        var repository = new FakeProductoRepository();
+        var useCase = new RegistrarProductoUseCase(repository);
+
+        // ControlaInventario = true, pero CodigoBarras = null
+        var request = new RegistrarProductoRequest(
+            "Galletas", "Snacks", null, 1.50m, UnidadVenta.Unidad, true, 10, 5);
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
+        Assert.Contains("código de barras es obligatorio", exception.Message);
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using BodegaLuchito.Application.Productos.DTOs;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Domain.Productos.Entities;
@@ -38,6 +40,7 @@ public class RegistrarProductoUseCase
         {
             if (stockActual < 0) throw new ArgumentException("El stock actual no puede ser negativo.");
             if (stockMinimo < 0) throw new ArgumentException("El stock mínimo no puede ser negativo.");
+            if (string.IsNullOrWhiteSpace(codigoBarras)) throw new ArgumentException("El código de barras es obligatorio para productos inventariables.");
         }
 
         // Regla: Validar código duplicado solo si se ha ingresado uno

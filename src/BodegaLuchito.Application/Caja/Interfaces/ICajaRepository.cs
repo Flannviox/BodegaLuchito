@@ -7,11 +7,11 @@ namespace BodegaLuchito.Application.Caja.Interfaces
 {
     public interface ICajaRepository
     {
-        Task<SesionCaja> ObtenerSesionAbiertaAsync(CancellationToken cancellation = default);
+        Task<SesionCaja?> ObtenerSesionAbiertaAsync(CancellationToken cancellation = default);
 
         Task AgregarSesionAsync(SesionCaja sesion, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyCollection<MovimientoCaja>> ObtenerMovimientosPorSesionAsync(
+        Task<IReadOnlyList<MovimientoCaja>> ObtenerMovimientosPorSesionAsync(
             int sesionCajaId, CancellationToken cancellationToken = default);
 
         Task GuardarCambiosAsync(CancellationToken cancellationToken = default);

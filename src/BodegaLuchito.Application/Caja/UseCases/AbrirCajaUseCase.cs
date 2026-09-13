@@ -42,6 +42,7 @@ namespace BodegaLuchito.Application.Caja.UseCases
             };
 
             await _cajaRepository.AgregarSesionAsync(sesion, cancellationToken);
+            await _cajaRepository.GuardarCambiosAsync(cancellationToken);
 
             return new AbrirCajaResult(sesion.Id, sesion.FechaApertura, sesion.FondoInicial);
 

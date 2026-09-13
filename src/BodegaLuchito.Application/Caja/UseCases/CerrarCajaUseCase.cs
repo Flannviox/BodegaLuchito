@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using BodegaLuchito.Application.Caja.DTOs;
 using BodegaLuchito.Application.Caja.Interfaces;
+using BodegaLuchito.Domain.Caja.Entities;
 using BodegaLuchito.Domain.Caja.Enums;
 using BodegaLuchito.Domain.Shared.Enums;
-using static System.Collections.Specialized.BitVector32;
 
 namespace BodegaLuchito.Application.Caja.UseCases
 {
@@ -19,12 +17,19 @@ namespace BodegaLuchito.Application.Caja.UseCases
             _cajaRepository = cajaRepository;
         }
 
+
+        
         public async Task<CerrarCajaResult> EjecutarAsync(
 
             CerrarCajaRequest request,
             CancellationToken cancellationToken = default
 
         ){
+
+            if(request.EfectivoReal < 0 || request.YapeReal < 0 || request.PlinReal < 0)
+            {
+                throw new ArgumentException("Los montos reales no pueden ser negativos.");
+            }
 
 
             var sesion = await _cajaRepository.ObtenerSesionAbiertaAsync(cancellationToken)
@@ -38,8 +43,9 @@ namespace BodegaLuchito.Application.Caja.UseCases
 
             decimal CalcularEsperado(
 
+                IEnumerable<MovimientoCaja>movimientoCajas,
                 MetodoPago metodoPago,
-                bool incluirFondoInicial
+                decimal fondoInicial =0
 
             ){
 
@@ -55,14 +61,23 @@ namespace BodegaLuchito.Application.Caja.UseCases
                     .Where(m => m.MetodoPago == metodoPago && m.Tipo == TipoMovimientoCaja.ReversionVenta)
                     .Sum(m => m.Monto);
 
-                var esperado = ingresos - egresos - reversiones;
-                return incluirFondoInicial ? esperado + sesion.FondoInicial : esperado;
+                return fondoInicial + ingresos - egresos - reversiones;
+
 
             }
 
-            var efectivoEsperado = CalcularEsperado(MetodoPago.Efectivo, incluirFondoInicial: true);
-            var yapeEsperado = CalcularEsperado(MetodoPago.Yape, incluirFondoInicial: false);
-            var plinEsperado = CalcularEsperado(MetodoPago.Plin, incluirFondoInicial: false);
+            var efectivoEsperado = CalcularEsperado(
+                movimientos,
+                MetodoPago.Efectivo,
+                sesion.FondoInicial);
+
+            var yapeEsperado = CalcularEsperado(
+                movimientos,
+                MetodoPago.Yape);
+
+            var plinEsperado = CalcularEsperado(
+                movimientos,
+                MetodoPago.Plin);
 
             sesion.EfectivoEsperado = efectivoEsperado;
             sesion.EfectivoReal = request.EfectivoReal;

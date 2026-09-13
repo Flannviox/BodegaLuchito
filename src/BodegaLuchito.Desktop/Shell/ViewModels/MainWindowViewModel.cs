@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Desktop.Common.ViewModels;
+using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
@@ -27,34 +28,18 @@ public partial class MainWindowViewModel : ViewModelBase
         _sesionUsuario.SesionCambiada +=
             OnSesionCambiada;
 
-        MenuItems =
-        [
-            new NavigationItemViewModel(
-                "Inicio",
-                IrAInicioCommand),
-
-            new NavigationItemViewModel(
-                "Productos",
-                IrAProductosCommand),
-
-            new NavigationItemViewModel(
-                "Ventas",
-                IrAVentasCommand)
-        ];
+        ConstruirMenu();
 
         _navigationService.NavigateTo<InicioViewModel>();
     }
 
-    public string Titulo =>
-        "Bodega Luchito";
+    public string Titulo => "Bodega Luchito";
 
     public ViewModelBase? CurrentViewModel =>
         _navigationService.CurrentViewModel;
 
-    public ObservableCollection<NavigationItemViewModel> MenuItems
-    {
-        get;
-    }
+    public ObservableCollection<NavigationItemViewModel> MenuItems { get; }
+        = new();
 
     public string NombreUsuario =>
         _sesionUsuario.UsuarioActual?.NombreUsuario
@@ -67,6 +52,34 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool EstaAutenticado =>
         _sesionUsuario.EstaAutenticado;
 
+    private void ConstruirMenu()
+    {
+        MenuItems.Clear();
+
+        MenuItems.Add(
+            new NavigationItemViewModel(
+                "Inicio",
+                IrAInicioCommand));
+
+        if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
+        {
+            MenuItems.Add(
+                new NavigationItemViewModel(
+                    "Productos",
+                    IrAProductosCommand));
+
+            MenuItems.Add(
+                new NavigationItemViewModel(
+                    "Usuarios",
+                    IrAUsuariosCommand));
+        }
+
+        MenuItems.Add(
+            new NavigationItemViewModel(
+                "Ventas",
+                IrAVentasCommand));
+    }
+
     private void OnCurrentViewModelChanged()
     {
         OnPropertyChanged(nameof(CurrentViewModel));
@@ -77,6 +90,9 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(NombreUsuario));
         OnPropertyChanged(nameof(NombreRol));
         OnPropertyChanged(nameof(EstaAutenticado));
+        OnPropertyChanged(nameof(NombreCompleto));
+
+        ConstruirMenu();
 
         CerrarSesionCommand.NotifyCanExecuteChanged();
     }
@@ -94,6 +110,17 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void IrAUsuarios()
+    {
+        if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
+        {
+            return;
+        }
+
+        _navigationService.NavigateTo<UsuariosViewModel>();
+    }
+
+    [RelayCommand]
     private void IrAVentas()
     {
         _navigationService.NavigateTo<VentasViewModel>();
@@ -108,7 +135,18 @@ public partial class MainWindowViewModel : ViewModelBase
     private void CerrarSesion()
     {
         _sesionUsuario.CerrarSesion();
+    }
+    public void InicializarParaSesionActual()
+    {
+        ConstruirMenu();
+
+        OnPropertyChanged(nameof(NombreUsuario));
+        OnPropertyChanged(nameof(NombreRol));
+        OnPropertyChanged(nameof(EstaAutenticado));
 
         _navigationService.NavigateTo<InicioViewModel>();
     }
+    public string NombreCompleto =>
+    _sesionUsuario.UsuarioActual?.NombreCompleto
+    ?? string.Empty;
 }

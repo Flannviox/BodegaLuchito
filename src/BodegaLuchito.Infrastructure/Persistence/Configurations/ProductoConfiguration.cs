@@ -10,7 +10,7 @@ public sealed class ProductoConfiguration
     public void Configure(
         EntityTypeBuilder<Producto> builder)
     {
-        builder.ToTable("Productos");
+        builder.ToTable("Producto");
 
         builder.HasKey(x => x.Id);
 

@@ -1,15 +1,14 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-
     xmlns:inicioVm="clr-namespace:BodegaLuchito.Desktop.Modules.Inicio.ViewModels"
     xmlns:inicioViews="clr-namespace:BodegaLuchito.Desktop.Modules.Inicio.Views"
-
     xmlns:productosVm="clr-namespace:BodegaLuchito.Desktop.Modules.Productos.ViewModels"
     xmlns:productosViews="clr-namespace:BodegaLuchito.Desktop.Modules.Productos.Views"
-
     xmlns:ventasVm="clr-namespace:BodegaLuchito.Desktop.Modules.Ventas.ViewModels"
-    xmlns:ventasViews="clr-namespace:BodegaLuchito.Desktop.Modules.Ventas.Views">
+    xmlns:ventasViews="clr-namespace:BodegaLuchito.Desktop.Modules.Ventas.Views"
+    xmlns:authVm="clr-namespace:BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels"
+    xmlns:authViews="clr-namespace:BodegaLuchito.Desktop.Modules.Autenticacion.Views">
 
     <DataTemplate DataType="{x:Type inicioVm:InicioViewModel}">
         <inicioViews:InicioView />
@@ -21,6 +20,10 @@
 
     <DataTemplate DataType="{x:Type ventasVm:VentasViewModel}">
         <ventasViews:VentasView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type authVm:UsuariosViewModel}">
+        <authViews:UsuariosView />
     </DataTemplate>
 
 </ResourceDictionary>

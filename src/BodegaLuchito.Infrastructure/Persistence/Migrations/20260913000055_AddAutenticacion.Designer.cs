@@ -3,6 +3,7 @@ using System;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BodegaLuchito.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(BodegaLuchitoDbContext))]
-    partial class BodegaLuchitoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913000055_AddAutenticacion")]
+    partial class AddAutenticacion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");

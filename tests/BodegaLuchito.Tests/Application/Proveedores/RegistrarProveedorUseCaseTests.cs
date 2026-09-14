@@ -53,6 +53,10 @@ public class RegistrarProveedorUseCaseTests : IDisposable
         Assert.Equal("Distribuidora 3 Hermanos S.A.C.", result.Nombre);
         Assert.True(result.Activo);
         Assert.Null(result.FechaActualizacion);
+
+        using var context = _factory.CreateDbContext();
+        var guardado = await context.Set<Proveedor>().SingleAsync(p => p.Id == result.Id);
+        Assert.Equal(result.Nombre, guardado.Nombre);
     }
 
     [Fact]
@@ -102,6 +106,36 @@ public class RegistrarProveedorUseCaseTests : IDisposable
 
         Assert.Equal(2, count);
         Assert.Null(result2.Ruc);
+    }
+
+    [Theory]
+    [InlineData("1234567890")]
+    [InlineData("123456789012")]
+    [InlineData("1234567890A")]
+    [InlineData("1234567890١")]
+    public async Task Registrar_RucInvalido_LanzaExcepcion(string ruc)
+    {
+        var request = new RegistrarProveedorRequest { Nombre = "Proveedor", Ruc = ruc };
+        await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(request));
+    }
+
+    [Fact]
+    public async Task Registrar_TelefonoInvalido_LanzaExcepcion()
+    {
+        var request = new RegistrarProveedorRequest { Nombre = "Proveedor", Telefono = "12345678" };
+        await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(request));
+    }
+
+    [Fact]
+    public async Task Registrar_DireccionMayorA200Caracteres_LanzaExcepcion()
+    {
+        var request = new RegistrarProveedorRequest
+        {
+            Nombre = "Proveedor",
+            Direccion = new string('A', 201)
+        };
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(request));
     }
 
     [Fact]

@@ -45,6 +45,9 @@ public class RegistrarProveedorUseCase
             throw new ArgumentException("El teléfono debe contener exactamente 9 dígitos numéricos.");
         }
 
+        if (direccionNorm?.Length > 200)
+            throw new ArgumentException("La dirección no puede exceder los 200 caracteres.");
+
         // 5. Mapeo
         var proveedor = new Proveedor
         {

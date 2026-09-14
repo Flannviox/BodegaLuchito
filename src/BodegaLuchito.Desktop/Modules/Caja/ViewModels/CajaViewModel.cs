@@ -6,6 +6,7 @@ using BodegaLuchito.Application.Caja.UseCases;
 using BodegaLuchito.Desktop.Common.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using BodegaLuchito.Application.Common.Session;
 
 namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
 {
@@ -14,19 +15,21 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private readonly AbrirCajaUseCase _abrirCajaUseCase;
         private readonly CerrarCajaUseCase _cerrarCajaUseCase;
         private readonly ICajaRepository _cajaRepository;
+        private readonly ISesionUsuario _sesionUsuario;
 
         //reemplazar cuando autenticacion este listo
-     
-        private const int UsuarioActualId = 1;
+
 
         public CajaViewModel(
             AbrirCajaUseCase abrirCajaUseCase,
             CerrarCajaUseCase cerrarCajaUseCase,
-            ICajaRepository cajaRepository)
+            ICajaRepository cajaRepository,
+            ISesionUsuario sesionUsuario)
         {
             _abrirCajaUseCase = abrirCajaUseCase;
             _cerrarCajaUseCase = cerrarCajaUseCase;
             _cajaRepository = cajaRepository;
+            _sesionUsuario = sesionUsuario;
         }
 
 
@@ -133,11 +136,20 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private async Task AbrirCajaAsync()
         {
             MensajeError = null;
+            var usuarioActual = _sesionUsuario.UsuarioActual;
+
+            if (usuarioActual is null)
+            {
+                MensajeError = "No existe un usuario autenticado.";
+                return;
+            }
 
             try
             {
+               
+
                 var request = new AbrirCajaRequest(
-                    UsuarioActualId,
+                    usuarioActual.IdUsuario,
                     FondoInicialInput);
 
                 var resultado =
@@ -179,10 +191,18 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         {
             MensajeError = null;
 
+            var usuarioActual = _sesionUsuario.UsuarioActual;
+
+            if (usuarioActual is null)
+            {
+                MensajeError = "No existe un usuario autenticado.";
+                return;
+            }
+
             try
             {
                 var request = new CerrarCajaRequest(
-                    UsuarioActualId,
+                    usuarioActual.IdUsuario,
                     EfectivoRealInput,
                     YapeRealInput,
                     PlinRealInput,
@@ -194,6 +214,10 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 LimpiarFormularioCierre();
 
                 EstadoVista = EstadoVistaCaja.ResultadoCierre;
+            }
+            catch (ArgumentException ex)
+            {
+                MensajeError = ex.Message;
             }
             catch (InvalidOperationException ex)
             {

@@ -31,13 +31,15 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
             await _context.Set<SesionCaja>().AddAsync(sesion, cancellationToken);
         }
 
-        public Task<IReadOnlyList<MovimientoCaja>> ObtenerMovimientosPorSesionAsync(
+        public async Task<IReadOnlyList<MovimientoCaja>> ObtenerMovimientosPorSesionAsync(
             int sesionCajaId, CancellationToken cancellationToken = default)
         {
-            return _context.Set<MovimientoCaja>()
-                .Where(m => m.SesionCajaId == sesionCajaId)
-                .ToListAsync(cancellationToken)
-                .ContinueWith(t => (IReadOnlyList<MovimientoCaja>)t.Result, cancellationToken);
+            var movimientos = await _context
+                    .Set<MovimientoCaja>()
+                    .Where(m => m.SesionCajaId == sesionCajaId)
+                    .ToListAsync(cancellationToken);
+
+            return movimientos;
         }
 
         public Task GuardarCambiosAsync(CancellationToken cancellationToken = default)

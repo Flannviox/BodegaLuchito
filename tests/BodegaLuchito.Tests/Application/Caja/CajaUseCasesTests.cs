@@ -42,15 +42,25 @@ namespace BodegaLuchito.Tests.Application.Caja
             var repositorio = new CajaRepository(context);
             var useCase = new AbrirCajaUseCase(repositorio);
 
-            var request = new AbrirCajaRequest(UsuarioAperturaId: 1, FondoInicial: 100m);
+            var request = new AbrirCajaRequest(
+                UsuarioAperturaId: 1,
+                FondoInicial: 100m);
 
             var resultado = await useCase.EjecutarAsync(request);
 
             Assert.True(resultado.SesionCajaId > 0);
             Assert.Equal(100m, resultado.FondoInicial);
 
-            var sesionGuardada = await context.Set<SesionCaja>().SingleAsync();
-            Assert.Equal(EstadoSesionCaja.Abierta, sesionGuardada.Estado);
+            var sesionGuardada =
+                await context.Set<SesionCaja>().SingleAsync();
+
+            Assert.Equal(
+                EstadoSesionCaja.Abierta,
+                sesionGuardada.Estado);
+
+            Assert.Equal(
+                request.UsuarioAperturaId,
+                sesionGuardada.UsuarioAperturaId);
         }
 
 
@@ -152,13 +162,32 @@ namespace BodegaLuchito.Tests.Application.Caja
 
             var useCase = new CerrarCajaUseCase(repositorio);
             var request = new CerrarCajaRequest(
-                UsuarioCierreId: 2, EfectivoReal: 100m, YapeReal: 0m, PlinReal: 0m, ObservacionCierre: "Cierre normal");
+                UsuarioCierreId: 2,
+                EfectivoReal: 100m,
+                YapeReal: 0m,
+                PlinReal: 0m,
+                ObservacionCierre: "Cierre normal");
 
-           
+
             var resultado = await useCase.EjecutarAsync(request);
 
-            
-            Assert.Equal(EstadoSesionCaja.Cerrada, (await context.Set<SesionCaja>().SingleAsync()).Estado);
+            var sesionGuardada =
+                await context.Set<SesionCaja>().SingleAsync();
+
+            Assert.Equal(
+                EstadoSesionCaja.Cerrada,
+                sesionGuardada.Estado);
+
+            Assert.Equal(
+                request.UsuarioCierreId,
+                sesionGuardada.UsuarioCierreId);
+
+            Assert.NotNull(sesionGuardada.FechaCierre);
+
+            Assert.Equal(100m, sesionGuardada.EfectivoEsperado);
+            Assert.Equal(100m, sesionGuardada.EfectivoReal);
+            Assert.Equal(0m, sesionGuardada.DiferenciaEfectivo);
+
             Assert.Equal(0m, resultado.DiferenciaEfectivo);
         }
 
@@ -183,6 +212,7 @@ namespace BodegaLuchito.Tests.Application.Caja
             await context.SaveChangesAsync();
 
             context.Set<MovimientoCaja>().AddRange(
+
                 new MovimientoCaja
                 {
                     SesionCajaId = sesion.Id,
@@ -192,6 +222,7 @@ namespace BodegaLuchito.Tests.Application.Caja
                     Monto = 50m,
                     FechaHora = DateTime.Now
                 },
+
                 new MovimientoCaja
                 {
                     SesionCajaId = sesion.Id,
@@ -200,10 +231,51 @@ namespace BodegaLuchito.Tests.Application.Caja
                     MetodoPago = MetodoPago.Efectivo,
                     Monto = 20m,
                     FechaHora = DateTime.Now
+                },
+
+                new MovimientoCaja
+                {
+                    SesionCajaId = sesion.Id,
+                    UsuarioId = 1,
+                    Tipo = TipoMovimientoCaja.IngresoVenta,
+                    MetodoPago = MetodoPago.Yape,
+                    Monto = 80m,
+                    FechaHora = DateTime.Now
+                },
+
+                new MovimientoCaja
+                {
+                    SesionCajaId = sesion.Id,
+                    UsuarioId = 1,
+                    Tipo = TipoMovimientoCaja.EgresoAbastecimiento,
+                    MetodoPago = MetodoPago.Yape,
+                    Monto = 15m,
+                    FechaHora = DateTime.Now
+                },
+
+                new MovimientoCaja
+                {
+                    SesionCajaId = sesion.Id,
+                    UsuarioId = 1,
+                    Tipo = TipoMovimientoCaja.IngresoVenta,
+                    MetodoPago = MetodoPago.Plin,
+                    Monto = 40m,
+                    FechaHora = DateTime.Now
+                },
+
+                new MovimientoCaja
+                {
+                    SesionCajaId = sesion.Id,
+                    UsuarioId = 1,
+                    Tipo = TipoMovimientoCaja.ReversionVenta,
+                    MetodoPago = MetodoPago.Plin,
+                    Monto = 10m,
+                    FechaHora = DateTime.Now
                 });
+
             await context.SaveChangesAsync();
 
-            
+
             var useCase = new CerrarCajaUseCase(repositorio);
             var request = new CerrarCajaRequest(
                 UsuarioCierreId: 2, EfectivoReal: 125m, YapeReal: 0m, PlinReal: 0m, ObservacionCierre: null);

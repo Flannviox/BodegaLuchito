@@ -49,16 +49,22 @@ namespace BodegaLuchito.Application.Caja.UseCases
 
             ){
 
-                var ingresos = movimientos
-                    .Where(m => m.MetodoPago == metodoPago && m.Tipo == TipoMovimientoCaja.IngresoVenta)
+                var ingresos = movimientoCajas
+                    .Where(m =>
+                        m.MetodoPago == metodoPago &&
+                        m.Tipo == TipoMovimientoCaja.IngresoVenta)
                     .Sum(m => m.Monto);
 
-                var egresos = movimientos
-                .Where(m => m.MetodoPago == metodoPago && m.Tipo == TipoMovimientoCaja.EgresoAbastecimiento)
-                .Sum(m => m.Monto);
+                var egresos = movimientoCajas
+                    .Where(m =>
+                        m.MetodoPago == metodoPago &&
+                        m.Tipo == TipoMovimientoCaja.EgresoAbastecimiento)
+                    .Sum(m => m.Monto);
 
-                var reversiones = movimientos
-                    .Where(m => m.MetodoPago == metodoPago && m.Tipo == TipoMovimientoCaja.ReversionVenta)
+                var reversiones = movimientoCajas
+                    .Where(m =>
+                        m.MetodoPago == metodoPago &&
+                        m.Tipo == TipoMovimientoCaja.ReversionVenta)
                     .Sum(m => m.Monto);
 
                 return fondoInicial + ingresos - egresos - reversiones;

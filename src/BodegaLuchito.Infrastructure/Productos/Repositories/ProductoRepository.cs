@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Domain.Productos.Entities;
 using BodegaLuchito.Infrastructure.Persistence;
@@ -7,29 +11,34 @@ namespace BodegaLuchito.Infrastructure.Productos.Repositories;
 
 public class ProductoRepository : IProductoRepository
 {
-    private readonly BodegaLuchitoDbContext _context;
+    private readonly IDbContextFactory<BodegaLuchitoDbContext> _contextFactory;
 
-    public ProductoRepository(BodegaLuchitoDbContext context)
+    public ProductoRepository(IDbContextFactory<BodegaLuchitoDbContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
-    public async Task AgregarAsync(Producto producto)
+    public async Task AgregarAsync(Producto producto, CancellationToken cancellationToken = default)
     {
-        await _context.Set<Producto>().AddAsync(producto);
-        await _context.SaveChangesAsync();
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        await context.Set<Producto>().AddAsync(producto, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> ExisteCodigoBarrasAsync(string codigoBarras)
+    public async Task<bool> ExisteCodigoBarrasAsync(string codigoBarras, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Producto>()
-            .AnyAsync(p => p.CodigoBarras == codigoBarras);
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        return await context.Set<Producto>()
+            .AsNoTracking()
+            .AnyAsync(p => p.CodigoBarras == codigoBarras, cancellationToken);
     }
 
-    public async Task<IEnumerable<Producto>> ObtenerActivosAsync()
+    public async Task<IEnumerable<Producto>> ObtenerActivosAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Producto>()
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        return await context.Set<Producto>()
+            .AsNoTracking()
             .Where(p => p.Activo)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }

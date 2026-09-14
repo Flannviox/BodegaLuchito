@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Threading;
 using BodegaLuchito.Application.Autenticacion.UseCases;
 using BodegaLuchito.Application.Common.Session;
+using BodegaLuchito.Application.Productos.UseCases;
 using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
 using BodegaLuchito.Desktop.Modules.Autenticacion.Views;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
@@ -76,6 +77,11 @@ public partial class App : System.Windows.Application
         services.AddTransient<InicioViewModel>();
         services.AddTransient<ProductosViewModel>();
         services.AddTransient<VentasViewModel>();
+
+        //Productos - Caso de uso y ViewModel
+
+        services.AddTransient<RegistrarProductoUseCase>();
+        services.AddTransient<RegistrarProductoViewModel>();
 
     }
 

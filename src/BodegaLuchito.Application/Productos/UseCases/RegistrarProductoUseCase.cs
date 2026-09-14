@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using BodegaLuchito.Application.Productos.DTOs;
 using BodegaLuchito.Application.Productos.Interfaces;
@@ -15,12 +16,16 @@ public class RegistrarProductoUseCase
         _productoRepository = productoRepository;
     }
 
-    public async Task EjecutarAsync(RegistrarProductoRequest request)
+    public async Task EjecutarAsync(RegistrarProductoRequest request, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(request.Nombre))
+        var nombre = request.Nombre?.Trim();
+        var categoria = request.Categoria?.Trim();
+        var codigoBarras = string.IsNullOrWhiteSpace(request.CodigoBarras) ? null : request.CodigoBarras.Trim();
+
+        if (string.IsNullOrWhiteSpace(nombre))
             throw new ArgumentException("El nombre del producto es obligatorio.");
 
-        if (string.IsNullOrWhiteSpace(request.Categoria))
+        if (string.IsNullOrWhiteSpace(categoria))
             throw new ArgumentException("La categoría es obligatoria.");
 
         if (request.PrecioVenta <= 0)
@@ -28,9 +33,7 @@ public class RegistrarProductoUseCase
 
         decimal stockActual = request.StockActual;
         decimal stockMinimo = request.StockMinimo;
-        string? codigoBarras = request.CodigoBarras;
 
-        // Regla: Si no controla inventario, stocks van a 0
         if (!request.ControlaInventario)
         {
             stockActual = 0;
@@ -40,22 +43,20 @@ public class RegistrarProductoUseCase
         {
             if (stockActual < 0) throw new ArgumentException("El stock actual no puede ser negativo.");
             if (stockMinimo < 0) throw new ArgumentException("El stock mínimo no puede ser negativo.");
-            if (string.IsNullOrWhiteSpace(codigoBarras)) throw new ArgumentException("El código de barras es obligatorio para productos inventariables.");
         }
 
-        // Regla: Validar código duplicado solo si se ha ingresado uno
-        if (!string.IsNullOrWhiteSpace(codigoBarras))
+        if (codigoBarras != null)
         {
-            bool existe = await _productoRepository.ExisteCodigoBarrasAsync(codigoBarras);
+            bool existe = await _productoRepository.ExisteCodigoBarrasAsync(codigoBarras, cancellationToken);
             if (existe)
                 throw new InvalidOperationException($"El código de barras '{codigoBarras}' ya se encuentra registrado.");
         }
 
         var producto = new Producto
         {
-            Nombre = request.Nombre,
-            Categoria = request.Categoria,
-            CodigoBarras = string.IsNullOrWhiteSpace(codigoBarras) ? null : codigoBarras,
+            Nombre = nombre,
+            Categoria = categoria,
+            CodigoBarras = codigoBarras,
             PrecioVenta = request.PrecioVenta,
             UnidadVenta = request.UnidadVenta,
             ControlaInventario = request.ControlaInventario,
@@ -65,6 +66,6 @@ public class RegistrarProductoUseCase
             FechaCreacion = DateTime.Now
         };
 
-        await _productoRepository.AgregarAsync(producto);
+        await _productoRepository.AgregarAsync(producto, cancellationToken);
     }
 }

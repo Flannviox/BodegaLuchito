@@ -1,7 +1,9 @@
 using BodegaLuchito.Application.Autenticacion.Interfaces;
+using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Infrastructure.Autenticacion.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Security;
 using BodegaLuchito.Infrastructure.Persistence;
+using BodegaLuchito.Infrastructure.Productos.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +22,8 @@ public static class DependencyInjection
         services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
+
+        services.AddScoped<IProductoRepository, ProductoRepository>();
 
         return services;
     }

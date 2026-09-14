@@ -8,7 +8,11 @@
     xmlns:ventasVm="clr-namespace:BodegaLuchito.Desktop.Modules.Ventas.ViewModels"
     xmlns:ventasViews="clr-namespace:BodegaLuchito.Desktop.Modules.Ventas.Views"
     xmlns:authVm="clr-namespace:BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels"
-    xmlns:authViews="clr-namespace:BodegaLuchito.Desktop.Modules.Autenticacion.Views">
+    xmlns:authViews="clr-namespace:BodegaLuchito.Desktop.Modules.Autenticacion.Views"
+    xmlns:proveedoresVm="clr-namespace:BodegaLuchito.Desktop.Modules.Proveedores.ViewModels"
+    xmlns:proveedoresViews="clr-namespace:BodegaLuchito.Desktop.Modules.Proveedores.Views"
+    xmlns:cajaVm="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.ViewModels"
+    xmlns:cajaViews="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views">
 
     <DataTemplate DataType="{x:Type inicioVm:InicioViewModel}">
         <inicioViews:InicioView />
@@ -24,6 +28,14 @@
 
     <DataTemplate DataType="{x:Type authVm:UsuariosViewModel}">
         <authViews:UsuariosView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type proveedoresVm:ProveedoresViewModel}">
+        <proveedoresViews:ProveedoresView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type cajaVm:CajaViewModel}">
+        <cajaViews:CajaView />
     </DataTemplate>
 
 </ResourceDictionary>

@@ -3,14 +3,20 @@ using System.Windows.Threading;
 using BodegaLuchito.Application.Autenticacion.UseCases;
 using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Application.Productos.UseCases;
+using BodegaLuchito.Application.Proveedores.UseCases;
+using BodegaLuchito.Application.Caja.UseCases;
 using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
 using BodegaLuchito.Desktop.Modules.Autenticacion.Views;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
+using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
+using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using BodegaLuchito.Desktop.Shell.ViewModels;
 using BodegaLuchito.Infrastructure;
+using BodegaLuchito.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BodegaLuchito.Desktop;
@@ -77,6 +83,11 @@ public partial class App : System.Windows.Application
         services.AddTransient<InicioViewModel>();
         services.AddTransient<ProductosViewModel>();
         services.AddTransient<VentasViewModel>();
+        services.AddTransient<ProveedoresViewModel>();
+        services.AddTransient<CajaViewModel>();
+        services.AddTransient<RegistrarProveedorUseCase>();
+        services.AddTransient<AbrirCajaUseCase>();
+        services.AddTransient<CerrarCajaUseCase>();
 
         //Productos - Caso de uso y ViewModel
 
@@ -89,6 +100,23 @@ public partial class App : System.Windows.Application
      StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        try
+        {
+            var contextFactory = _serviceProvider.GetRequiredService<IDbContextFactory<BodegaLuchitoDbContext>>();
+            await using var context = await contextFactory.CreateDbContextAsync();
+            await context.Database.MigrateAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"No se pudo preparar la base de datos: {ex.Message}",
+                "Bodega Luchito",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown();
+            return;
+        }
 
         await MostrarAutenticacionAsync();
     }

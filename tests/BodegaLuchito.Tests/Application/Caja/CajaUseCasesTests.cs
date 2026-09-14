@@ -278,7 +278,7 @@ namespace BodegaLuchito.Tests.Application.Caja
 
             var useCase = new CerrarCajaUseCase(repositorio);
             var request = new CerrarCajaRequest(
-                UsuarioCierreId: 2, EfectivoReal: 125m, YapeReal: 0m, PlinReal: 0m, ObservacionCierre: null);
+                UsuarioCierreId: 2, EfectivoReal: 125m, YapeReal: 60m, PlinReal: 35m, ObservacionCierre: null);
 
             
             var resultado = await useCase.EjecutarAsync(request);
@@ -286,7 +286,15 @@ namespace BodegaLuchito.Tests.Application.Caja
             
             Assert.Equal(130m, resultado.EfectivoEsperado);
             Assert.Equal(125m, resultado.EfectivoReal);
-            Assert.Equal(-5m, resultado.DiferenciaEfectivo); 
+            Assert.Equal(-5m, resultado.DiferenciaEfectivo);
+
+            Assert.Equal(65m, resultado.YapeEsperado);
+            Assert.Equal(60m, resultado.YapeReal);
+            Assert.Equal(-5m, resultado.DiferenciaYape);
+
+            Assert.Equal(30m, resultado.PlinEsperado);
+            Assert.Equal(35m, resultado.PlinReal);
+            Assert.Equal(5m, resultado.DiferenciaPlin);
         }
 
         [Fact]

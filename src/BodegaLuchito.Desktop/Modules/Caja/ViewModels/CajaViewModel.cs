@@ -17,7 +17,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private readonly ICajaRepository _cajaRepository;
         private readonly ISesionUsuario _sesionUsuario;
 
-        //reemplazar cuando autenticacion este listo
 
 
         public CajaViewModel(

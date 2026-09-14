@@ -2,10 +2,12 @@ using BodegaLuchito.Desktop.Common.ViewModels;
 
 namespace BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 
-public class ProductosViewModel : ViewModelBase
+public partial class ProductosViewModel : ViewModelBase
 {
-    public string Titulo => "Productos";
+    public RegistrarProductoViewModel Registro { get; }
 
-    public string Descripcion =>
-        "Aquí se realizará la gestión de productos.";
+    public ProductosViewModel(RegistrarProductoViewModel registro)
+    {
+        Registro = registro;
+    }
 }

@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace BodegaLuchito.Desktop.Modules.Productos.Views
+namespace BodegaLuchito.Desktop.Modules.Proveedores.Views
 {
     /// <summary>
-    /// Lógica de interacción para ProductosView.xaml
+    /// Lógica de interacción para ProveedoresView.xaml
     /// </summary>
-    public partial class ProductosView : UserControl
+    public partial class ProveedoresView : UserControl
     {
-        public ProductosView()
+        public ProveedoresView()
         {
             InitializeComponent();
         }

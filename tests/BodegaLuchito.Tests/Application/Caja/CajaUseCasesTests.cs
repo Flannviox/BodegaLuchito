@@ -123,7 +123,7 @@ namespace BodegaLuchito.Tests.Application.Caja
         [Fact]
         public async Task CerrarCaja_SinSesionAbierta_DebeSerRechazado()
         {
-           
+
             var (connection, options) = await CrearBaseEnMemoriaAsync();
             await using var connectionDispose = connection;
 
@@ -133,17 +133,17 @@ namespace BodegaLuchito.Tests.Application.Caja
             var request = new CerrarCajaRequest(
                 UsuarioCierreId: 1, EfectivoReal: 0m, YapeReal: 0m, PlinReal: 0m, ObservacionCierre: null);
 
-            
+
             var action = async () => await useCase.EjecutarAsync(request);
 
-            
+
             await Assert.ThrowsAsync<InvalidOperationException>(action);
         }
 
         [Fact]
         public async Task CerrarCaja_ConSesionAbierta_DebeCerrarlaCorrectamente()
         {
-            
+
             var (connection, options) = await CrearBaseEnMemoriaAsync();
             await using var connectionDispose = connection;
 
@@ -194,7 +194,7 @@ namespace BodegaLuchito.Tests.Application.Caja
         [Fact]
         public async Task CerrarCaja_DebeCalcularDiferenciasCorrectamente()
         {
-           
+
             var (connection, options) = await CrearBaseEnMemoriaAsync();
             await using var connectionDispose = connection;
 
@@ -280,10 +280,10 @@ namespace BodegaLuchito.Tests.Application.Caja
             var request = new CerrarCajaRequest(
                 UsuarioCierreId: 2, EfectivoReal: 125m, YapeReal: 60m, PlinReal: 35m, ObservacionCierre: null);
 
-            
+
             var resultado = await useCase.EjecutarAsync(request);
 
-            
+
             Assert.Equal(130m, resultado.EfectivoEsperado);
             Assert.Equal(125m, resultado.EfectivoReal);
             Assert.Equal(-5m, resultado.DiferenciaEfectivo);

@@ -18,7 +18,7 @@ namespace BodegaLuchito.Application.Caja.UseCases
         }
 
 
-        
+
         public async Task<CerrarCajaResult> EjecutarAsync(
 
             CerrarCajaRequest request,

@@ -58,7 +58,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
 
         [ObservableProperty]
         private string? _observacionInput;
-        
+
         [ObservableProperty]
         private CerrarCajaResult? _resultadoUltimoCierre;
 
@@ -85,7 +85,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                   + ResultadoUltimoCierre.DiferenciaYape
                   + ResultadoUltimoCierre.DiferenciaPlin;
 
-        
+
         partial void OnEstadoVistaChanged(EstadoVistaCaja value)
         {
             OnPropertyChanged(nameof(MostrarApertura));
@@ -133,7 +133,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             }
             try
             {
-               
+
 
                 var request = new AbrirCajaRequest(
                     usuarioActual.IdUsuario,
@@ -154,7 +154,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = ex.Message;
             }
         }
-        
+
 
         [RelayCommand]
         private void AbrirFormularioCierre()
@@ -170,7 +170,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             EstadoVista = EstadoVistaCaja.EnOperacion;
         }
 
-        
+
 
         [RelayCommand]
         private async Task CerrarCajaAsync()

@@ -11,7 +11,5 @@ namespace BodegaLuchito.Application.Caja.DTOs
         decimal YapeReal,
         decimal PlinReal,
         string? ObservacionCierre
-
     );
-    
 }

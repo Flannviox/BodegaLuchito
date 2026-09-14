@@ -108,9 +108,6 @@ namespace BodegaLuchito.Application.Caja.UseCases
                 efectivoEsperado, request.EfectivoReal, sesion.DiferenciaEfectivo.Value,
                 yapeEsperado, request.YapeReal, sesion.DiferenciaYape.Value,
                 plinEsperado, request.PlinReal, sesion.DiferenciaPlin.Value);
-
         }
-
-
     }
 }

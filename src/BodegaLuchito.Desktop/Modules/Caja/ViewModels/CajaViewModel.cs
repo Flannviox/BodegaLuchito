@@ -18,7 +18,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private readonly ISesionUsuario _sesionUsuario;
 
 
-
         public CajaViewModel(
             AbrirCajaUseCase abrirCajaUseCase,
             CerrarCajaUseCase cerrarCajaUseCase,
@@ -32,14 +31,11 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         }
 
 
-
         [ObservableProperty]
         private EstadoVistaCaja _estadoVista = EstadoVistaCaja.Apertura;
 
         [ObservableProperty]
         private string? _mensajeError;
-
-
 
         [ObservableProperty]
         private decimal _fondoInicialInput;
@@ -50,8 +46,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
 
         [ObservableProperty]
         private decimal _fondoInicialActual;
-
-        
 
         [ObservableProperty]
         private decimal _efectivoRealInput;
@@ -64,12 +58,9 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
 
         [ObservableProperty]
         private string? _observacionInput;
-
         
         [ObservableProperty]
         private CerrarCajaResult? _resultadoUltimoCierre;
-
-        
 
         public bool MostrarApertura =>
             EstadoVista == EstadoVistaCaja.Apertura;
@@ -109,7 +100,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             OnPropertyChanged(nameof(DiferenciaTotal));
         }
 
-        
 
         public async Task InicializarAsync()
         {
@@ -129,7 +119,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             EstadoVista = EstadoVistaCaja.EnOperacion;
         }
 
-        
 
         [RelayCommand]
         private async Task AbrirCajaAsync()
@@ -142,7 +131,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = "No existe un usuario autenticado.";
                 return;
             }
-
             try
             {
                
@@ -166,7 +154,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = ex.Message;
             }
         }
-
         
 
         [RelayCommand]
@@ -197,7 +184,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = "No existe un usuario autenticado.";
                 return;
             }
-
             try
             {
                 var request = new CerrarCajaRequest(
@@ -224,8 +210,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             }
         }
 
-        
-
         [RelayCommand]
         private void NuevaApertura()
         {
@@ -237,9 +221,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
 
             EstadoVista = EstadoVistaCaja.Apertura;
         }
-
-        
-
         private void LimpiarFormularioCierre()
         {
             EfectivoRealInput = 0m;

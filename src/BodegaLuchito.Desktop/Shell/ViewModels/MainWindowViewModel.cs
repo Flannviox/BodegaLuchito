@@ -4,6 +4,8 @@ using BodegaLuchito.Desktop.Common.ViewModels;
 using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
+using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
+using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using CommunityToolkit.Mvvm.Input;
@@ -70,6 +72,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
             MenuItems.Add(
                 new NavigationItemViewModel(
+                    "Proveedores",
+                    IrAProveedoresCommand));
+
+            MenuItems.Add(
+                new NavigationItemViewModel(
                     "Usuarios",
                     IrAUsuariosCommand));
         }
@@ -78,6 +85,11 @@ public partial class MainWindowViewModel : ViewModelBase
             new NavigationItemViewModel(
                 "Ventas",
                 IrAVentasCommand));
+
+        MenuItems.Add(
+            new NavigationItemViewModel(
+                "Caja",
+                IrACajaCommand));
     }
 
     private void OnCurrentViewModelChanged()
@@ -110,6 +122,17 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void IrAProveedores()
+    {
+        if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
+        {
+            return;
+        }
+
+        _navigationService.NavigateTo<ProveedoresViewModel>();
+    }
+
+    [RelayCommand]
     private void IrAUsuarios()
     {
         if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
@@ -124,6 +147,17 @@ public partial class MainWindowViewModel : ViewModelBase
     private void IrAVentas()
     {
         _navigationService.NavigateTo<VentasViewModel>();
+    }
+
+    [RelayCommand]
+    private void IrACaja()
+    {
+        if (!_sesionUsuario.EstaAutenticado)
+        {
+            return;
+        }
+
+        _navigationService.NavigateTo<CajaViewModel>();
     }
 
     private bool PuedeCerrarSesion()

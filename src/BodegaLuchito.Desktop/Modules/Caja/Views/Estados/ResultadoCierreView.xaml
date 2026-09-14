@@ -1,0 +1,242 @@
+<UserControl x:Class="BodegaLuchito.Desktop.Modules.Caja.Views.Estados.ResultadoCierreView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1000"
+             d:DesignHeight="520">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CajaStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel>
+
+        <Border Background="{StaticResource ColorExitoClaro}"
+                CornerRadius="12"
+                Padding="18"
+                Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Width="42"
+                        Height="42"
+                        CornerRadius="21"
+                        Background="White"
+                        Margin="0,0,14,0">
+
+                    <TextBlock Text="✓"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource ColorExito}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <StackPanel Grid.Column="1"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Caja cerrada correctamente"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorExito}" />
+                    <TextBlock
+                        Text="Los montos fueron registrados y las diferencias se calcularon correctamente."
+                        FontSize="12"
+                        Foreground="{StaticResource ColorTextoSecundario}"
+                        Margin="0,3,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Style="{StaticResource Tarjeta}">
+            <StackPanel>
+                <TextBlock Text="Resumen del cierre"
+                           FontSize="19"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource ColorTextoPrincipal}" />
+                <TextBlock
+                    Text="Comparación entre los montos esperados y los registrados al finalizar la jornada."
+                    FontSize="13"
+                    Foreground="{StaticResource ColorTextoSecundario}"
+                    Margin="0,6,0,24" />
+
+                <Grid Margin="0,0,0,10">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="MEDIO DE PAGO"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Grid.Column="1"
+                               Text="ESPERADO"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Grid.Column="2"
+                               Text="REGISTRADO"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Grid.Column="3"
+                               Text="DIFERENCIA"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+                </Grid>
+
+                <Separator Background="{StaticResource ColorBorde}" />
+
+                <Grid Margin="0,16">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Efectivo"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding ResultadoUltimoCierre.EfectivoEsperado,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding ResultadoUltimoCierre.EfectivoReal,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding ResultadoUltimoCierre.DiferenciaEfectivo,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                </Grid>
+
+                <Separator Background="{StaticResource ColorBorde}" />
+
+                <Grid Margin="0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Yape"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding ResultadoUltimoCierre.YapeEsperado,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding ResultadoUltimoCierre.YapeReal,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding ResultadoUltimoCierre.DiferenciaYape,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                </Grid>
+
+                <Separator Background="{StaticResource ColorBorde}" />
+
+                <Grid Margin="0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Plin"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding ResultadoUltimoCierre.PlinEsperado,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding ResultadoUltimoCierre.PlinReal,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding ResultadoUltimoCierre.DiferenciaPlin,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                </Grid>
+
+                <Separator Background="{StaticResource ColorBorde}" />
+
+                <Grid Margin="0,20,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Diferencia total"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource ColorTextoPrincipal}" />
+                        <TextBlock
+                            Text="Resultado acumulado de los medios de pago."
+                            FontSize="12"
+                            Foreground="{StaticResource ColorTextoSecundario}"
+                            Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding DiferenciaTotal,
+                                              StringFormat=S/ \{0:N2\}}"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource ColorTextoPrincipal}"
+                               VerticalAlignment="Center" />
+                </Grid>
+
+                <Button Content="Iniciar nueva jornada"
+                        Command="{Binding NuevaAperturaCommand}"
+                        Style="{StaticResource BotonPrimario}"
+                        Width="200"
+                        HorizontalAlignment="Right" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,132 @@
+<UserControl x:Class="BodegaLuchito.Desktop.Modules.Caja.Views.Estados.CajaEnOperacionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1000"
+             d:DesignHeight="430">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../Resources/CajaStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <Grid Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Style="{StaticResource Tarjeta}"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="FONDO INICIAL"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+                    <TextBlock Text="{Binding FondoInicialActual,
+                                             StringFormat=S/ \{0:N2\}}"
+                               FontSize="23"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}"
+                               Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Style="{StaticResource Tarjeta}"
+                    Padding="20">
+                <StackPanel>
+
+                    <TextBlock Text="APERTURA"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Text="{Binding FechaApertura,
+                                             StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                               FontSize="19"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}"
+                               Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4"
+                    Style="{StaticResource Tarjeta}"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="ESTADO"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,10,0,0">
+                        <Ellipse Width="9"
+                                 Height="9"
+                                 Fill="{StaticResource ColorExito}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,8,0" />
+                        <TextBlock Text="En operación"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource ColorExito}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Style="{StaticResource Tarjeta}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Sesión de caja activa"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                    <TextBlock
+                        Text="La caja está abierta y lista para operar. Cuando finalice la jornada, realiza el cierre para registrar los montos encontrados."
+                        FontSize="13"
+                        Foreground="{StaticResource ColorTextoSecundario}"
+                        TextWrapping="Wrap"
+                        MaxWidth="650"
+                        HorizontalAlignment="Left"
+                        Margin="0,8,0,18" />
+                    <Border Background="{StaticResource ColorAcentoClaro}"
+                            CornerRadius="8"
+                            Padding="14"
+                            MaxWidth="650"
+                            HorizontalAlignment="Left">
+                        <TextBlock
+                            Text="El fondo inicial permanecerá asociado a esta sesión hasta realizar el cierre."
+                            FontSize="12"
+                            Foreground="{StaticResource ColorAcento}"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="Cerrar caja"
+                        Command="{Binding AbrirFormularioCierreCommand}"
+                        Style="{StaticResource BotonSecundario}"
+                        Width="150"
+                        Margin="30,0,0,0"
+                        VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

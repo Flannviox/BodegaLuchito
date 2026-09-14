@@ -1,0 +1,44 @@
+<UserControl x:Class="BodegaLuchito.Desktop.Modules.Caja.Views.Controles.CampoEntrada"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Raiz">
+
+    <StackPanel Margin="0,0,0,14">
+        <TextBlock Text="{Binding Etiqueta, ElementName=Raiz}"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="#0D2B4E"
+                   Margin="0,0,0,7" />
+        <Border x:Name="BordeCampo"
+                Background="White"
+                BorderBrush="#E3E7EC"
+                BorderThickness="1"
+                CornerRadius="8">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="S/"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="#5D6B7A"
+                           Margin="13,0,9,0"
+                           VerticalAlignment="Center" />
+
+                <TextBox Grid.Column="1"
+                         Text="{Binding Valor,
+                                        ElementName=Raiz,
+                                        UpdateSourceTrigger=PropertyChanged}"
+                         FontSize="14"
+                         Foreground="#0D2B4E"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Padding="0,11,12,11"
+                         VerticalContentAlignment="Center" />
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

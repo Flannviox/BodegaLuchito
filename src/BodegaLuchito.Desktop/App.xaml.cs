@@ -1,19 +1,23 @@
 using System.Windows;
+using System.Windows.Threading;
+using BodegaLuchito.Application.Autenticacion.UseCases;
+using BodegaLuchito.Application.Common.Session;
+using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
+using BodegaLuchito.Desktop.Modules.Autenticacion.Views;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using BodegaLuchito.Desktop.Shell.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
-using BodegaLuchito.Application.Common.Session;
-using System.Windows.Threading;
 using BodegaLuchito.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BodegaLuchito.Desktop;
 
 public partial class App : System.Windows.Application
 {
     private readonly ServiceProvider _serviceProvider;
+    private AutenticacionWindow? _autenticacionWindow;
 
     public App()
     {
@@ -23,6 +27,12 @@ public partial class App : System.Windows.Application
 
         _serviceProvider =
             services.BuildServiceProvider();
+
+        var sesionUsuario =
+            _serviceProvider.GetRequiredService<ISesionUsuario>();
+
+        sesionUsuario.SesionCambiada +=
+            OnSesionCambiada;
 
         DispatcherUnhandledException +=
             OnDispatcherUnhandledException;
@@ -34,46 +44,47 @@ public partial class App : System.Windows.Application
         // Infrastructure
         services.AddInfrastructure();
 
-        //Sesion
+        // Sesion
         services.AddSingleton<ISesionUsuario, SesionUsuario>();
 
-        // Navegación
+        // Navegacion
         services.AddSingleton<INavigationService, NavigationService>();
 
         // Shell
         services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<MainWindow>();
+        services.AddTransient<MainWindow>();
 
-        // Módulos
+        // Autenticacion
+        services.AddTransient<RequiereConfiguracionInicialUseCase>();
+        services.AddTransient<IniciarSesionUseCase>();
+        services.AddTransient<CrearAdministradorInicialUseCase>();
+
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<ConfiguracionInicialViewModel>();
+        services.AddTransient<AutenticacionWindowViewModel>();
+
+        services.AddTransient<RegistrarUsuarioUseCase>();
+        services.AddTransient<ListarUsuariosUseCase>();
+        services.AddTransient<ModificarUsuarioUseCase>();
+        services.AddTransient<CambiarEstadoUsuarioUseCase>();
+        services.AddTransient<RestablecerPasswordUsuarioUseCase>();
+        services.AddTransient<UsuariosViewModel>();
+
+        services.AddTransient<AutenticacionWindow>();
+
+        // Modulos
         services.AddTransient<InicioViewModel>();
         services.AddTransient<ProductosViewModel>();
         services.AddTransient<VentasViewModel>();
+
     }
 
-    protected override void OnStartup(
-    StartupEventArgs e)
+    protected override async void OnStartup(
+     StartupEventArgs e)
     {
         base.OnStartup(e);
 
-#if DEBUG
-
-        var sesion =
-            _serviceProvider.GetRequiredService<ISesionUsuario>();
-
-        sesion.IniciarSesion(
-            new UsuarioSesion
-            {
-                IdUsuario = 1,
-                NombreUsuario = "Usuario Desarrollo",
-                NombreRol = "Administrador"
-            });
-
-#endif
-
-        var mainWindow =
-            _serviceProvider.GetRequiredService<MainWindow>();
-
-        mainWindow.Show();
+        await MostrarAutenticacionAsync();
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -102,4 +113,69 @@ public partial class App : System.Windows.Application
 
 #endif
     }
+    private async Task MostrarAutenticacionAsync()
+    {
+        if (_autenticacionWindow is not null)
+        {
+            _autenticacionWindow.Activate();
+            return;
+        }
+
+        var autenticacionWindow =
+            _serviceProvider
+                .GetRequiredService<AutenticacionWindow>();
+
+        _autenticacionWindow =
+            autenticacionWindow;
+
+        var viewModel =
+            (AutenticacionWindowViewModel)
+                autenticacionWindow.DataContext;
+
+        viewModel.AutenticacionCompletada += () =>
+        {
+            var mainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+
+            mainWindowViewModel.InicializarParaSesionActual();
+            var mainWindow =
+                _serviceProvider.GetRequiredService<MainWindow>();
+
+            MainWindow = mainWindow;
+
+            mainWindow.Show();
+
+            autenticacionWindow.Close();
+
+            _autenticacionWindow = null;
+        };
+
+        autenticacionWindow.Closed += (_, _) =>
+        {
+            _autenticacionWindow = null;
+        };
+
+        await autenticacionWindow.InicializarAsync();
+
+        autenticacionWindow.Show();
+    }
+    private async void OnSesionCambiada()
+    {
+        var sesionUsuario =
+            _serviceProvider.GetRequiredService<ISesionUsuario>();
+
+        if (sesionUsuario.EstaAutenticado)
+        {
+            return;
+        }
+
+        if (MainWindow is not null)
+        {
+            MainWindow.Close();
+            MainWindow = null;
+        }
+
+        await MostrarAutenticacionAsync();
+    }
+
+
 }

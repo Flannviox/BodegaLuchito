@@ -27,7 +27,8 @@
                 <TextBox Text="{Binding CodigoBarras, UpdateSourceTrigger=PropertyChanged}" Margin="0,5"/>
 
                 <TextBlock Text="Precio de Venta:" Margin="0,5"/>
-                <TextBox Text="{Binding PrecioVenta, UpdateSourceTrigger=PropertyChanged}" Margin="0,5"/>
+                <TextBox Text="{Binding PrecioVenta, UpdateSourceTrigger=LostFocus,
+                        ConverterCulture=en-US}" Margin="0,5"/>
 
                 <TextBlock Text="Unidad de Venta:" Margin="0,5"/>
                 <ComboBox ItemsSource="{Binding UnidadesDeVenta}" SelectedItem="{Binding UnidadVenta}" Margin="0,5"/>
@@ -36,10 +37,12 @@
                 <CheckBox IsChecked="{Binding ControlaInventario}" Margin="0,5"/>
 
                 <TextBlock Text="Stock Actual:" Margin="0,5"/>
-                <TextBox Text="{Binding StockActual, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding ControlaInventario}" Margin="0,5"/>
+                <TextBox Text="{Binding StockActual, UpdateSourceTrigger=LostFocus,
+                        ConverterCulture=en-US}" IsEnabled="{Binding ControlaInventario}" Margin="0,5"/>
 
                 <TextBlock Text="Stock Mínimo:" Margin="0,5"/>
-                <TextBox Text="{Binding StockMinimo, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding ControlaInventario}" Margin="0,5"/>
+                <TextBox Text="{Binding StockMinimo, UpdateSourceTrigger=LostFocus,
+                        ConverterCulture=en-US}" IsEnabled="{Binding ControlaInventario}" Margin="0,5"/>
             </UniformGrid>
 
             <Button Content="Registrar" Command="{Binding RegistrarCommand}" Width="150" HorizontalAlignment="Left" Margin="0,20,0,0" Padding="5"/>

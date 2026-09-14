@@ -23,7 +23,7 @@ public static class DependencyInjection
 
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 
-        services.AddScoped<IProductoRepository, ProductoRepository>();
+        services.AddTransient<IProductoRepository, ProductoRepository>();
 
         return services;
     }

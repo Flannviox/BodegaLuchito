@@ -44,7 +44,7 @@
 
                 <StackPanel Grid.Column="1"
                             VerticalAlignment="Center">
-                    <TextBlock Text="Caja cerrada correctamente"
+                    <TextBlock Text="La sesión fue cerrada. Revisa las diferencias obtenidas antes de iniciar una nueva jornada."
                                FontSize="17"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorExito}" />
@@ -64,7 +64,7 @@
                            FontWeight="SemiBold"
                            Foreground="{StaticResource ColorTextoPrincipal}" />
                 <TextBlock
-                    Text="Comparación entre los montos esperados y los registrados al finalizar la jornada."
+                    Text="Comparación entre los montos calculados por el sistema y los montos verificados al cierre."
                     FontSize="13"
                     Foreground="{StaticResource ColorTextoSecundario}"
                     Margin="0,6,0,24" />
@@ -84,13 +84,13 @@
                                Foreground="{StaticResource ColorTextoSecundario}" />
 
                     <TextBlock Grid.Column="1"
-                               Text="ESPERADO"
+                               Text="SEGÚN SISTEMA"
                                FontSize="11"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoSecundario}" />
 
                     <TextBlock Grid.Column="2"
-                               Text="REGISTRADO"
+                               Text="VERIFICADO"
                                FontSize="11"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoSecundario}" />
@@ -211,12 +211,12 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
-                        <TextBlock Text="Diferencia total"
+                        <TextBlock Text="Diferencia neta del cierre"
                                    FontSize="15"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource ColorTextoPrincipal}" />
                         <TextBlock
-                            Text="Resultado acumulado de los medios de pago."
+                            Text="Suma de las diferencias de efectivo, Yape y Plin. No representa el dinero disponible en caja."
                             FontSize="12"
                             Foreground="{StaticResource ColorTextoSecundario}"
                             Margin="0,4,0,0" />

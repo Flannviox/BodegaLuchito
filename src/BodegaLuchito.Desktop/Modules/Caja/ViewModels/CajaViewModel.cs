@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using BodegaLuchito.Application.Caja.DTOs;
 using BodegaLuchito.Application.Caja.Interfaces;
@@ -38,8 +39,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private string? _mensajeError;
 
         [ObservableProperty]
-        private decimal _fondoInicialInput;
-
+        private string _fondoInicialInput = "0";
 
         [ObservableProperty]
         private DateTime? _fechaApertura;
@@ -48,14 +48,13 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private decimal _fondoInicialActual;
 
         [ObservableProperty]
-        private decimal _efectivoRealInput;
+        private string _efectivoRealInput = "0";
 
         [ObservableProperty]
-        private decimal _yapeRealInput;
+        private string _yapeRealInput = "0";
 
         [ObservableProperty]
-        private decimal _plinRealInput;
-
+        private string _plinRealInput = "0";
         [ObservableProperty]
         private string? _observacionInput;
 
@@ -131,13 +130,18 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = "No existe un usuario autenticado.";
                 return;
             }
+            if (!TryParseMonto(FondoInicialInput, out var fondoInicial))
+            {
+                MensajeError =
+                    "Ingresa un monto válido para el fondo inicial.";
+
+                return;
+            }
             try
             {
-
-
                 var request = new AbrirCajaRequest(
                     usuarioActual.IdUsuario,
-                    FondoInicialInput);
+                    fondoInicial);
 
                 var resultado =
                     await _abrirCajaUseCase.EjecutarAsync(request);
@@ -145,7 +149,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 FechaApertura = resultado.FechaApertura;
                 FondoInicialActual = resultado.FondoInicial;
 
-                FondoInicialInput = 0m;
+                FondoInicialInput = "0";
 
                 EstadoVista = EstadoVistaCaja.EnOperacion;
             }
@@ -154,7 +158,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = ex.Message;
             }
         }
-
 
         [RelayCommand]
         private void AbrirFormularioCierre()
@@ -170,8 +173,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             EstadoVista = EstadoVistaCaja.EnOperacion;
         }
 
-
-
         [RelayCommand]
         private async Task CerrarCajaAsync()
         {
@@ -184,13 +185,38 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = "No existe un usuario autenticado.";
                 return;
             }
+
+            if (!TryParseMonto(EfectivoRealInput, out var efectivoReal))
+            {
+                MensajeError =
+                    "Ingresa un monto válido para el efectivo.";
+
+                return;
+            }
+
+            if (!TryParseMonto(YapeRealInput, out var yapeReal))
+            {
+                MensajeError =
+                    "Ingresa un monto válido para Yape.";
+
+                return;
+            }
+
+            if (!TryParseMonto(PlinRealInput, out var plinReal))
+            {
+                MensajeError =
+                    "Ingresa un monto válido para Plin.";
+
+                return;
+            }
+
             try
             {
                 var request = new CerrarCajaRequest(
                     usuarioActual.IdUsuario,
-                    EfectivoRealInput,
-                    YapeRealInput,
-                    PlinRealInput,
+                    efectivoReal,
+                    yapeReal,
+                    plinReal,
                     ObservacionInput);
 
                 ResultadoUltimoCierre =
@@ -223,10 +249,23 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         }
         private void LimpiarFormularioCierre()
         {
-            EfectivoRealInput = 0m;
-            YapeRealInput = 0m;
-            PlinRealInput = 0m;
+            EfectivoRealInput = "0";
+            YapeRealInput = "0";
+            PlinRealInput = "0";
             ObservacionInput = null;
+        }
+
+        private static bool TryParseMonto(string texto, out decimal monto)
+        {
+            var textoNormalizado = texto
+                .Trim()
+                .Replace(',', '.');
+
+            return decimal.TryParse(
+                textoNormalizado,
+                NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out monto);
         }
     }
 }

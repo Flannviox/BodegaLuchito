@@ -10,15 +10,12 @@ namespace BodegaLuchito.Desktop.Modules.Caja.Views.Controles
             InitializeComponent();
         }
 
-
         public static readonly DependencyProperty EtiquetaProperty =
             DependencyProperty.Register(
                 nameof(Etiqueta),
                 typeof(string),
                 typeof(CampoEntrada),
                 new PropertyMetadata(string.Empty));
-
-
 
         public string Etiqueta
         {

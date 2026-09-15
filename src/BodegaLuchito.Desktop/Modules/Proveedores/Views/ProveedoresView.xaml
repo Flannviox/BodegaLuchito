@@ -1,47 +1,86 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Proveedores.Views.ProveedoresView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="20">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="350"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#f4f6f9">
 
-        <!-- Formulario  -->
-        <Border Grid.Column="0" Background="White" Padding="20" Margin="0,0,20,0" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
-            <StackPanel>
-                <TextBlock Text="Nuevo Proveedor" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,20"/>
+    <UserControl.Resources>
+        <!-- Convertidor nativo para mostrar/ocultar los Grid -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
 
-                <TextBlock Text="Nombre *" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,15"/>
+    <Grid Margin="30">
 
-                <TextBlock Text="RUC (11 dígitos opcional)" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding Ruc, UpdateSourceTrigger=PropertyChanged}" MaxLength="11" Padding="5" Margin="0,0,0,15"/>
+        <!-- ================= PANTALLA 1: LISTADO DE PROVEEDORES ================= -->
+        <Grid Visibility="{Binding IsListaVisible, Converter={StaticResource BoolToVis}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                <TextBlock Text="Teléfono" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,15"/>
+            <!-- Cabecera -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Gestión de proveedores" FontSize="26" FontWeight="Bold" Foreground="#0b366a"/>
+                    <TextBlock Text="Administra los datos de contacto y el estado de los proveedores." FontSize="14" Foreground="Gray" Margin="0,5,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="+ Nuevo proveedor" Command="{Binding MostrarFormularioNuevoCommand}" 
+                        Background="#0b5ed7" Foreground="White" Padding="20,10" FontSize="14" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"/>
+            </Grid>
 
-                <TextBlock Text="Dirección" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding Direccion, UpdateSourceTrigger=PropertyChanged}" Padding="5" Margin="0,0,0,20"/>
-
-                <Button Content="Registrar" Command="{Binding RegistrarCommand}" 
-                        Background="#2b5797" Foreground="White" Padding="10" FontWeight="Bold" BorderThickness="0"/>
+            <!-- Barra de Acciones (Botones que se activan al seleccionar fila) -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
+                <Button Content="Editar" Command="{Binding MostrarFormularioEditarCommand}" Padding="15,6" Margin="0,0,10,0" Background="White" BorderBrush="#dee2e6"/>
+                <Button Content="{Binding TextoBotonEstado}" Command="{Binding CambiarEstadoCommand}" Padding="15,6" Margin="0,0,10,0" Background="White" BorderBrush="#dee2e6"/>
+                <Button Content="Eliminar" Command="{Binding EliminarCommand}" Padding="15,6" Background="#fee2e2" Foreground="#dc2626" BorderBrush="#fca5a5"/>
             </StackPanel>
-        </Border>
 
-        <!-- Lista -->
-        <Border Grid.Column="1" Background="White" Padding="20" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
-            <StackPanel>
-                <TextBlock Text="Proveedores Activos" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,20"/>
-                <DataGrid ItemsSource="{Binding ListaProveedores}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="White" BorderThickness="1">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
-                        <DataGridTextColumn Header="RUC" Binding="{Binding Ruc}" Width="100"/>
-                        <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="100"/>
-                        <DataGridTextColumn Header="Dirección" Binding="{Binding Direccion}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </StackPanel>
-        </Border>
+            <!-- Tabla DataGrid -->
+            <DataGrid Grid.Row="2" ItemsSource="{Binding ListaProveedores}" SelectedItem="{Binding ProveedorSeleccionado}"
+                      AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
+                      HeadersVisibility="Column" Background="White" BorderBrush="#dee2e6" BorderThickness="1" RowHeight="45" FontSize="13">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*"/>
+                    <DataGridTextColumn Header="RUC" Binding="{Binding Ruc}" Width="130"/>
+                    <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="120"/>
+                    <DataGridTextColumn Header="Dirección" Binding="{Binding Direccion}" Width="2*"/>
+                    <DataGridTextColumn Header="Activo" Binding="{Binding Activo}" Width="80"/>
+                    <DataGridTextColumn Header="Creado" Binding="{Binding FechaCreacion, StringFormat=dd/MM/yyyy}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- ================= PANTALLA 2: FORMULARIO (NUEVO / EDITAR) ================= -->
+        <Grid Visibility="{Binding IsFormularioVisible, Converter={StaticResource BoolToVis}}">
+            <Border Background="White" BorderBrush="#dee2e6" BorderThickness="1" CornerRadius="8" Padding="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="500">
+                <StackPanel>
+                    <TextBlock Text="{Binding TituloFormulario}" FontSize="22" FontWeight="Bold" Foreground="#0b366a" Margin="0,0,0,25"/>
+
+                    <TextBlock Text="Nombre *" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                    <!-- Bloqueado en edición -->
+                    <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsEdicion}" Padding="8" Margin="0,0,0,15"/>
+
+                    <TextBlock Text="RUC (11 dígitos) *" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                    <!-- Bloqueado en edición -->
+                    <TextBox Text="{Binding Ruc, UpdateSourceTrigger=PropertyChanged}" MaxLength="11" IsReadOnly="{Binding IsEdicion}" Padding="8" Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Teléfono (máx. 10 dígitos)" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" Padding="8" Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Dirección" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding Direccion, UpdateSourceTrigger=PropertyChanged}" Padding="8" Margin="0,0,0,30"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Cancelar" Command="{Binding CancelarFormularioCommand}" Padding="20,8" Margin="0,0,10,0" Background="White" BorderBrush="#dee2e6" Cursor="Hand"/>
+                        <Button Content="Guardar cambios" Command="{Binding GuardarCommand}" Padding="20,8" Background="#0b5ed7" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
     </Grid>
 </UserControl>

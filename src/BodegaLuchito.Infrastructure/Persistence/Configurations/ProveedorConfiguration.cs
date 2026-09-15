@@ -12,23 +12,12 @@ public sealed class ProveedorConfiguration : IEntityTypeConfiguration<Proveedor>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Nombre)
-            .IsRequired()
-            .HasMaxLength(150);
+        builder.Property(x => x.Nombre).IsRequired().HasMaxLength(150);
+        builder.Property(x => x.Ruc).IsRequired().HasMaxLength(11); 
+        builder.HasIndex(x => x.Ruc).IsUnique();
 
-        builder.Property(x => x.Ruc)
-            .HasMaxLength(11);
-
-        // RUC único cuando tenga valor. En SQLite/EF Core, esto ignora los nulls por defecto.
-        builder.HasIndex(x => x.Ruc)
-            .IsUnique();
-
-        builder.Property(x => x.Telefono)
-            .HasMaxLength(20);
-
-        builder.Property(x => x.Direccion)
-            .HasMaxLength(200);
-
+        builder.Property(x => x.Telefono).HasMaxLength(11);
+        builder.Property(x => x.Direccion).HasMaxLength(200);
         builder.Property(x => x.Activo).IsRequired();
         builder.Property(x => x.FechaCreacion).IsRequired();
         builder.Property(x => x.FechaActualizacion);

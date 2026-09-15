@@ -18,11 +18,20 @@ public partial class ProveedoresViewModel : ViewModelBase
     private readonly EliminarProveedorUseCase _eliminarUseCase;
     private readonly IProveedorRepository _repository;
 
-    // Control de Vistas
-    [ObservableProperty] private bool _isListaVisible = true;
-    [ObservableProperty] private bool _isFormularioVisible = false;
+    // Control de Modal y Vistas
+    [ObservableProperty] private bool _isFormularioVisible;
     [ObservableProperty] private bool _isEdicion;
-    [ObservableProperty] private string _tituloFormulario = "Nuevo Proveedor";
+    [ObservableProperty] private string _tituloFormulario = "Nuevo proveedor";
+
+    // Notificaciones (Snackbar)
+    [ObservableProperty] private bool _isNotificacionVisible;
+    [ObservableProperty] private string _mensajeNotificacion = string.Empty;
+
+    // Búsqueda y Listas
+    private List<Proveedor> _todosLosProveedores = new();
+    public ObservableCollection<Proveedor> ListaProveedores { get; } = new();
+
+    [ObservableProperty] private string _textoBusqueda = string.Empty;
 
     // Selección de Tabla
     [ObservableProperty]
@@ -37,8 +46,6 @@ public partial class ProveedoresViewModel : ViewModelBase
     [ObservableProperty] private string? _ruc;
     [ObservableProperty] private string? _telefono;
     [ObservableProperty] private string? _direccion;
-
-    public ObservableCollection<Proveedor> ListaProveedores { get; } = new();
 
     public string TextoBotonEstado => ProveedorSeleccionado?.Activo == true ? "Inhabilitar" : "Activar";
 
@@ -66,23 +73,49 @@ public partial class ProveedoresViewModel : ViewModelBase
 
     private async Task CargarProveedoresAsync()
     {
-        var proveedores = await _repository.ObtenerTodosAsync(); // <- ¡Aquí solucionamos tu error!
+        _todosLosProveedores = await _repository.ObtenerTodosAsync();
+        FiltrarProveedores();
+        ProveedorSeleccionado = null;
+    }
+
+    partial void OnTextoBusquedaChanged(string value)
+    {
+        FiltrarProveedores();
+    }
+
+    private void FiltrarProveedores()
+    {
+        var busqueda = TextoBusqueda?.ToLowerInvariant() ?? string.Empty;
+
+        var filtrados = string.IsNullOrWhiteSpace(busqueda)
+            ? _todosLosProveedores
+            : _todosLosProveedores.Where(p =>
+                (p.Nombre != null && p.Nombre.ToLowerInvariant().Contains(busqueda)) ||
+                (p.Ruc != null && p.Ruc.Contains(busqueda))).ToList();
+
         ListaProveedores.Clear();
-        foreach (var p in proveedores) ListaProveedores.Add(p);
-        ProveedorSeleccionado = null; // Reiniciar selección
+        foreach (var p in filtrados) ListaProveedores.Add(p);
+    }
+
+    // --- Lógica de Notificación Flotante ---
+    private async Task MostrarNotificacionAsync(string mensaje)
+    {
+        MensajeNotificacion = mensaje;
+        IsNotificacionVisible = true;
+        await Task.Delay(3000); // Se oculta después de 3 segundos
+        IsNotificacionVisible = false;
     }
 
     [RelayCommand]
     private void MostrarFormularioNuevo()
     {
         IsEdicion = false;
-        TituloFormulario = "Nuevo Proveedor";
+        TituloFormulario = "Nuevo proveedor";
         Nombre = string.Empty;
         Ruc = string.Empty;
         Telefono = string.Empty;
         Direccion = string.Empty;
 
-        IsListaVisible = false;
         IsFormularioVisible = true;
     }
 
@@ -94,13 +127,12 @@ public partial class ProveedoresViewModel : ViewModelBase
         if (ProveedorSeleccionado == null) return;
 
         IsEdicion = true;
-        TituloFormulario = "Editar Proveedor";
+        TituloFormulario = "Editar proveedor";
         Nombre = ProveedorSeleccionado.Nombre;
         Ruc = ProveedorSeleccionado.Ruc;
         Telefono = ProveedorSeleccionado.Telefono;
         Direccion = ProveedorSeleccionado.Direccion;
 
-        IsListaVisible = false;
         IsFormularioVisible = true;
     }
 
@@ -108,7 +140,6 @@ public partial class ProveedoresViewModel : ViewModelBase
     private void CancelarFormulario()
     {
         IsFormularioVisible = false;
-        IsListaVisible = true;
     }
 
     [RelayCommand]
@@ -119,7 +150,7 @@ public partial class ProveedoresViewModel : ViewModelBase
             if (IsEdicion)
             {
                 await _editarUseCase.ExecuteAsync(ProveedorSeleccionado!.Id, Telefono, Direccion);
-                MessageBox.Show("Proveedor actualizado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = MostrarNotificacionAsync("✓ Proveedor actualizado correctamente.");
             }
             else
             {
@@ -131,17 +162,15 @@ public partial class ProveedoresViewModel : ViewModelBase
                     Direccion = Direccion
                 };
                 await _registrarUseCase.ExecuteAsync(request);
-                MessageBox.Show("Proveedor registrado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = MostrarNotificacionAsync("✓ Proveedor registrado correctamente.");
             }
 
             IsFormularioVisible = false;
-            IsListaVisible = true;
             await CargarProveedoresAsync();
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        catch (ArgumentException ex) { MessageBox.Show(ex.Message, "Validación", MessageBoxButton.OK, MessageBoxImage.Warning); }
+        catch (InvalidOperationException ex) { MessageBox.Show(ex.Message, "Regla de Negocio", MessageBoxButton.OK, MessageBoxImage.Warning); }
+        catch (Exception ex) { MessageBox.Show($"Error al guardar: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
     }
 
     [RelayCommand(CanExecute = nameof(PuedeModificar))]
@@ -153,6 +182,10 @@ public partial class ProveedoresViewModel : ViewModelBase
             bool nuevoEstado = !ProveedorSeleccionado.Activo;
             await _cambiarEstadoUseCase.ExecuteAsync(ProveedorSeleccionado.Id, nuevoEstado);
             await CargarProveedoresAsync();
+
+            _ = MostrarNotificacionAsync(nuevoEstado
+                ? "✓ Proveedor activado correctamente."
+                : "✓ Proveedor desactivado correctamente.");
         }
         catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
     }
@@ -169,6 +202,7 @@ public partial class ProveedoresViewModel : ViewModelBase
             {
                 await _eliminarUseCase.ExecuteAsync(ProveedorSeleccionado.Id);
                 await CargarProveedoresAsync();
+                _ = MostrarNotificacionAsync("✓ Proveedor eliminado correctamente.");
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }

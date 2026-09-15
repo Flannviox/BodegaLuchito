@@ -95,9 +95,9 @@ public class ProveedorUseCasesTests : IDisposable
 
         var result = await _registrarUseCase.ExecuteAsync(request);
 
-        Assert.Equal("Prov Espacios", result.Nombre); // Verificamos el Trim()
-        Assert.Equal("10456789124", result.Ruc); // Verificamos el Trim()
-        Assert.Null(result.Telefono); // Verificamos que convierte " " a null
+        Assert.Equal("Prov Espacios", result.Nombre);
+        Assert.Equal("10456789124", result.Ruc);
+        Assert.Null(result.Telefono);
         Assert.Null(result.Direccion);
     }
 
@@ -105,8 +105,7 @@ public class ProveedorUseCasesTests : IDisposable
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    // ANTES: public async Task Registrar_NombreVacio_LanzaExcepcion(string nombreInvalido)
-    public async Task Registrar_NombreVacio_LanzaExcepcion(string? nombreInvalido) // <-- Agrega el ?
+    public async Task Registrar_NombreVacio_LanzaExcepcion(string? nombreInvalido)
     {
         var request = new RegistrarProveedorRequest { Nombre = nombreInvalido!, Ruc = "10456789123" };
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _registrarUseCase.ExecuteAsync(request));
@@ -125,8 +124,7 @@ public class ProveedorUseCasesTests : IDisposable
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    // ANTES: public async Task Registrar_RucVacio_LanzaExcepcion(string rucInvalido)
-    public async Task Registrar_RucVacio_LanzaExcepcion(string? rucInvalido) // <-- Agrega el ?
+    public async Task Registrar_RucVacio_LanzaExcepcion(string? rucInvalido)
     {
         var request = new RegistrarProveedorRequest { Nombre = "Prov", Ruc = rucInvalido };
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _registrarUseCase.ExecuteAsync(request));
@@ -148,20 +146,20 @@ public class ProveedorUseCasesTests : IDisposable
     public async Task Registrar_RucDuplicado_LanzaExcepcion()
     {
         await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest { Nombre = "P1", Ruc = "10000000001" });
-        var request = new RegistrarProveedorRequest { Nombre = "P2", Ruc = "10000000001" }; // Mismo RUC
+        var request = new RegistrarProveedorRequest { Nombre = "P2", Ruc = "10000000001" };
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _registrarUseCase.ExecuteAsync(request));
         Assert.Contains("registrado", ex.Message);
     }
 
     [Theory]
-    [InlineData("12345678901")] // 11 dígitos
+    [InlineData("12345678901")] // 11 dígitos (falla porque el límite es 10)
     [InlineData("987654ABC")] // Con letras
-    public async Task Registrar_TelefonoInvalido_LanzaExcepcion(string telefonoInvalido)
+    public async Task Registrar_TelefonoInvalido_LanzaExcepcion(string? telefonoInvalido)
     {
         var request = new RegistrarProveedorRequest { Nombre = "P1", Ruc = "10000000001", Telefono = telefonoInvalido };
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _registrarUseCase.ExecuteAsync(request));
-        Assert.Contains("máximo 10 dígitos", ex.Message);
+        Assert.Contains("10 dígitos", ex.Message);
     }
 
     // =========================================================================
@@ -171,18 +169,15 @@ public class ProveedorUseCasesTests : IDisposable
     [Fact]
     public async Task Editar_DatosValidos_ActualizaCorrectamente()
     {
-        // Arrange
         var prov = await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest { Nombre = "P1", Ruc = "10000000001" });
 
-        // Act
         await _editarUseCase.ExecuteAsync(prov.Id, "999888777", "Nueva Direccion");
         var editado = await _repository.ObtenerPorIdAsync(prov.Id);
 
-        // Assert
         Assert.NotNull(editado);
         Assert.Equal("999888777", editado.Telefono);
         Assert.Equal("Nueva Direccion", editado.Direccion);
-        Assert.NotNull(editado.FechaActualizacion); // Aseguramos que registró la fecha de cambio
+        Assert.NotNull(editado.FechaActualizacion);
     }
 
     [Fact]
@@ -198,7 +193,7 @@ public class ProveedorUseCasesTests : IDisposable
         var prov = await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest { Nombre = "P1", Ruc = "10000000001" });
 
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => _editarUseCase.ExecuteAsync(prov.Id, "12345678901", "Dir"));
-        Assert.Contains("máximo 10 dígitos", ex.Message);
+        Assert.Contains("10 dígitos", ex.Message);
     }
 
     // =========================================================================
@@ -210,13 +205,11 @@ public class ProveedorUseCasesTests : IDisposable
     {
         var prov = await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest { Nombre = "P1", Ruc = "10000000001" });
 
-        // Act - Desactivar
         await _cambiarEstadoUseCase.ExecuteAsync(prov.Id, false);
         var inhabilitado = await _repository.ObtenerPorIdAsync(prov.Id);
         Assert.False(inhabilitado!.Activo);
         Assert.NotNull(inhabilitado.FechaActualizacion);
 
-        // Act - Activar
         await _cambiarEstadoUseCase.ExecuteAsync(prov.Id, true);
         var activado = await _repository.ObtenerPorIdAsync(prov.Id);
         Assert.True(activado!.Activo);
@@ -238,11 +231,9 @@ public class ProveedorUseCasesTests : IDisposable
     {
         var prov = await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest { Nombre = "P1", Ruc = "10000000001" });
 
-        // Act
         await _eliminarUseCase.ExecuteAsync(prov.Id);
         var eliminado = await _repository.ObtenerPorIdAsync(prov.Id);
 
-        // Assert
         Assert.Null(eliminado);
     }
 

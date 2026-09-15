@@ -4,14 +4,173 @@
              Background="#f4f6f9">
 
     <UserControl.Resources>
-        <!-- Convertidor nativo para mostrar/ocultar los Grid -->
+        <!-- Convertidor para mostrar/ocultar elementos -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- ESTILO DE TEXTBOX REDONDEADO -->
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#1e293b"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#cbd5e1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsReadOnly" Value="True">
+                    <Setter Property="Background" Value="#e2e8f0"/>
+                    <Setter Property="Foreground" Value="#94a3b8"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ESTILO DE BOTÓN PRINCIPAL -->
+        <Style x:Key="BotonPrimario" TargetType="Button">
+            <Setter Property="Background" Value="#0b5ed7"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ESTILO DE BOTÓN SECUNDARIO -->
+        <Style x:Key="BotonSecundario" TargetType="Button" BasedOn="{StaticResource BotonPrimario}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="BorderBrush" Value="#cbd5e1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- DATA GRID PRINCIPAL -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#e2e8f0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowHeight" Value="50"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#f1f5f9"/>
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+        </Style>
+
+        <!-- CABECERAS DE TABLA CON FLECHAS -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#f8fafc"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="BorderBrush" Value="#e2e8f0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridColumnHeader">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                                <Path x:Name="SortArrow" Visibility="Collapsed" Data="M0,0 L4,4 L8,0 Z" Fill="#94a3b8" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="SortDirection" Value="Ascending">
+                                <Setter TargetName="SortArrow" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SortArrow" Property="Data" Value="M0,4 L4,0 L8,4 Z"/>
+                            </Trigger>
+                            <Trigger Property="SortDirection" Value="Descending">
+                                <Setter TargetName="SortArrow" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SortArrow" Property="Data" Value="M0,0 L4,4 L8,0 Z"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- SELECCIÓN Y HOVER DE FILA -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#f1f5f9"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#e0f2fe"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ESTILO DE CELDAS -->
+        <!-- ESTILO DE CELDAS CORREGIDO (Área de clic en todo el cuadro) -->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <!-- Captura el clic en toda la celda -->
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                            <!-- El texto se centra por dentro, pero la celda ocupa todo el alto -->
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Foreground" Value="#0369a1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
+
+
     </UserControl.Resources>
 
-    <Grid Margin="30">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <Grid>
 
-        <!-- ================= PANTALLA 1: LISTADO DE PROVEEDORES ================= -->
-        <Grid Visibility="{Binding IsListaVisible, Converter={StaticResource BoolToVis}}">
+        <!-- CAPA BASE: CONTENIDO PRINCIPAL -->
+        <Grid Margin="40,30">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -19,68 +178,128 @@
             </Grid.RowDefinitions>
 
             <!-- Cabecera -->
-            <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid Grid.Row="0" Margin="0,0,0,25">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="Gestión de proveedores" FontSize="26" FontWeight="Bold" Foreground="#0b366a"/>
-                    <TextBlock Text="Administra los datos de contacto y el estado de los proveedores." FontSize="14" Foreground="Gray" Margin="0,5,0,0"/>
+                    <TextBlock Text="Gestión de proveedores" FontSize="28" FontWeight="Bold" Foreground="#0f172a"/>
+                    <TextBlock Text="Administra los datos de contacto y el estado de los proveedores." FontSize="15" Foreground="#64748b" Margin="0,5,0,0"/>
                 </StackPanel>
-                <Button Grid.Column="1" Content="+ Nuevo proveedor" Command="{Binding MostrarFormularioNuevoCommand}" 
-                        Background="#0b5ed7" Foreground="White" Padding="20,10" FontSize="14" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"/>
+
+                <Button Grid.Column="1" Content="+ Nuevo proveedor" Command="{Binding MostrarFormularioNuevoCommand}" Style="{StaticResource BotonPrimario}" VerticalAlignment="Top"/>
             </Grid>
 
-            <!-- Barra de Acciones (Botones que se activan al seleccionar fila) -->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
-                <Button Content="Editar" Command="{Binding MostrarFormularioEditarCommand}" Padding="15,6" Margin="0,0,10,0" Background="White" BorderBrush="#dee2e6"/>
-                <Button Content="{Binding TextoBotonEstado}" Command="{Binding CambiarEstadoCommand}" Padding="15,6" Margin="0,0,10,0" Background="White" BorderBrush="#dee2e6"/>
-                <Button Content="Eliminar" Command="{Binding EliminarCommand}" Padding="15,6" Background="#fee2e2" Foreground="#dc2626" BorderBrush="#fca5a5"/>
-            </StackPanel>
+            <!-- Buscador y Acciones -->
+            <Grid Grid.Row="1" Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="0,0,20,0">
+                    <TextBox x:Name="TxtBuscar" Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+                    <TextBlock Text="Buscar por RUC o razón social..." Foreground="#94a3b8" FontSize="14" VerticalAlignment="Center" Margin="12,0,0,0" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text.Length, ElementName=TxtBuscar}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Editar" Command="{Binding MostrarFormularioEditarCommand}" Style="{StaticResource BotonSecundario}" Margin="0,0,10,0"/>
+                    <Button Content="{Binding TextoBotonEstado}" Command="{Binding CambiarEstadoCommand}" Style="{StaticResource BotonSecundario}" Margin="0,0,10,0"/>
+                    <Button Content="Eliminar" Command="{Binding EliminarCommand}" Style="{StaticResource BotonSecundario}" Background="#fef2f2" Foreground="#dc2626" BorderBrush="#fecaca"/>
+                </StackPanel>
+            </Grid>
 
             <!-- Tabla DataGrid -->
-            <DataGrid Grid.Row="2" ItemsSource="{Binding ListaProveedores}" SelectedItem="{Binding ProveedorSeleccionado}"
-                      AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
-                      HeadersVisibility="Column" Background="White" BorderBrush="#dee2e6" BorderThickness="1" RowHeight="45" FontSize="13">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*"/>
-                    <DataGridTextColumn Header="RUC" Binding="{Binding Ruc}" Width="130"/>
-                    <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="120"/>
-                    <DataGridTextColumn Header="Dirección" Binding="{Binding Direccion}" Width="2*"/>
-                    <DataGridTextColumn Header="Activo" Binding="{Binding Activo}" Width="80"/>
-                    <DataGridTextColumn Header="Creado" Binding="{Binding FechaCreacion, StringFormat=dd/MM/yyyy}" Width="100"/>
-                </DataGrid.Columns>
-            </DataGrid>
+            <Border Grid.Row="2" CornerRadius="8" Background="White" BorderBrush="#e2e8f0" BorderThickness="1" ClipToBounds="True">
+                <DataGrid ItemsSource="{Binding ListaProveedores}" SelectedItem="{Binding ProveedorSeleccionado}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Razón Social" Binding="{Binding Nombre}" Width="2*"/>
+                        <DataGridTextColumn Header="RUC" Binding="{Binding Ruc}" Width="150"/>
+                        <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="130"/>
+                        <DataGridTextColumn Header="Dirección" Binding="{Binding Direccion}" Width="2*"/>
+
+                        <!-- Columna de Activo/Inactivo personalizada -->
+                        <DataGridTemplateColumn Header="Estado" Width="100" SortMemberPath="Activo">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="Inactivo" />
+                                                <Setter Property="Foreground" Value="#dc2626" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Activo}" Value="True">
+                                                        <Setter Property="Text" Value="Activo" />
+                                                        <Setter Property="Foreground" Value="#16a34a" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="Creado" Binding="{Binding FechaCreacion, StringFormat=dd/MM/yyyy}" Width="120"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
         </Grid>
 
-        <!-- ================= PANTALLA 2: FORMULARIO (NUEVO / EDITAR) ================= -->
-        <Grid Visibility="{Binding IsFormularioVisible, Converter={StaticResource BoolToVis}}">
-            <Border Background="White" BorderBrush="#dee2e6" BorderThickness="1" CornerRadius="8" Padding="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="500">
+        <!-- CAPA MODAL: FORMULARIO SUPERPUESTO (Fondo semitransparente) -->
+        <Grid Visibility="{Binding IsFormularioVisible, Converter={StaticResource BoolToVis}}" Background="#880f172a">
+            <Border Background="White" BorderThickness="0" CornerRadius="12" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" Width="500">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" BlurRadius="20" Opacity="0.15" ShadowDepth="4"/>
+                </Border.Effect>
+
                 <StackPanel>
-                    <TextBlock Text="{Binding TituloFormulario}" FontSize="22" FontWeight="Bold" Foreground="#0b366a" Margin="0,0,0,25"/>
+                    <TextBlock Text="{Binding TituloFormulario}" FontSize="24" FontWeight="Bold" Foreground="#0f172a" Margin="0,0,0,30"/>
 
-                    <TextBlock Text="Nombre *" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
-                    <!-- Bloqueado en edición -->
-                    <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsEdicion}" Padding="8" Margin="0,0,0,15"/>
+                    <TextBlock Text="Razón social *" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsEdicion}" Margin="0,0,0,20"/>
 
-                    <TextBlock Text="RUC (11 dígitos) *" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
-                    <!-- Bloqueado en edición -->
-                    <TextBox Text="{Binding Ruc, UpdateSourceTrigger=PropertyChanged}" MaxLength="11" IsReadOnly="{Binding IsEdicion}" Padding="8" Margin="0,0,0,15"/>
+                    <TextBlock Text="RUC (11 dígitos) *" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <TextBox Text="{Binding Ruc, UpdateSourceTrigger=PropertyChanged}" MaxLength="11" IsReadOnly="{Binding IsEdicion}" Margin="0,0,0,20"/>
 
-                    <TextBlock Text="Teléfono (máx. 10 dígitos)" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
-                    <TextBox Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" Padding="8" Margin="0,0,0,15"/>
+                    <TextBlock Text="Teléfono (máx. 10 dígitos)" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <TextBox Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" Margin="0,0,0,20"/>
 
-                    <TextBlock Text="Dirección" FontWeight="SemiBold" Foreground="#333" Margin="0,0,0,5"/>
-                    <TextBox Text="{Binding Direccion, UpdateSourceTrigger=PropertyChanged}" Padding="8" Margin="0,0,0,30"/>
+
+                    <TextBlock Text="Dirección" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <TextBox Text="{Binding Direccion, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,40"/>
+
+                    <Rectangle Height="1" Fill="#e2e8f0" Margin="-40,0,-40,25"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Cancelar" Command="{Binding CancelarFormularioCommand}" Padding="20,8" Margin="0,0,10,0" Background="White" BorderBrush="#dee2e6" Cursor="Hand"/>
-                        <Button Content="Guardar cambios" Command="{Binding GuardarCommand}" Padding="20,8" Background="#0b5ed7" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                        <Button Content="Cancelar" Command="{Binding CancelarFormularioCommand}" Style="{StaticResource BotonSecundario}" Margin="0,0,15,0"/>
+                        <Button Content="Guardar" Command="{Binding GuardarCommand}" Style="{StaticResource BotonPrimario}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
+
+        <!-- SNACKBAR DE NOTIFICACIÓN -->
+        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30"
+                Background="#ecfdf5" BorderBrush="#10b981" BorderThickness="1" CornerRadius="6" Padding="20,15"
+                Visibility="{Binding IsNotificacionVisible, Converter={StaticResource BoolToVis}}">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" BlurRadius="10" Opacity="0.1" ShadowDepth="2"/>
+            </Border.Effect>
+            <TextBlock Text="{Binding MensajeNotificacion}" FontSize="15" Foreground="#065f46" FontWeight="SemiBold"/>
+        </Border>
 
     </Grid>
 </UserControl>

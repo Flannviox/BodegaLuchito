@@ -31,7 +31,7 @@ public class RegistrarProveedorUseCase
         if (await _repository.ExisteRucAsync(rucNorm))
             throw new InvalidOperationException("El RUC ya se encuentra registrado.");
 
-        // Teléfono ahora es MÁXIMO 11 DÍGITOS numéricos
+        // Teléfono ahora es MÁXIMO 10 DÍGITOS numéricos
         if (telefonoNorm != null && !Regex.IsMatch(telefonoNorm, @"^[0-9]{1,10}$"))
             throw new ArgumentException("El teléfono debe contener solo números (máximo 10 dígitos).");
 

@@ -41,4 +41,19 @@ public class ProductoRepository : IProductoRepository
             .Where(p => p.Activo)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<Producto?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        return await context.Set<Producto>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+    }
+
+    public async Task ActualizarAsync(Producto producto, CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        context.Set<Producto>().Update(producto);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }

@@ -92,6 +92,8 @@ public partial class App : System.Windows.Application
         //Productos - Caso de uso y ViewModel
 
         services.AddTransient<RegistrarProductoUseCase>();
+        services.AddTransient<ModificarProductoUseCase>();
+        services.AddTransient<EliminarProductoUseCase>();
         services.AddTransient<RegistrarProductoViewModel>();
 
     }

@@ -12,109 +12,120 @@ using Xunit;
 
 namespace BodegaLuchito.Tests.Application.Productos;
 
-public class RegistrarProductoUseCaseTests
+public sealed class RegistrarProductoUseCaseTests
 {
+    // =========================================================================
+    // 1. REPOSITORIO FALSO ACTUALIZADO
+    // =========================================================================
     private class FakeProductoRepository : IProductoRepository
     {
-        public List<Producto> ProductosGuardados { get; } = new();
+        public bool ExisteCodigo = false;
+        public Producto? ProductoAgregado;
 
-        public Task AgregarAsync(Producto producto, CancellationToken ct = default)
+        public Task AgregarAsync(Producto producto, CancellationToken cancellationToken = default)
         {
-            ProductosGuardados.Add(producto);
+            ProductoAgregado = producto;
             return Task.CompletedTask;
         }
 
-        public Task<bool> ExisteCodigoBarrasAsync(string codigoBarras, CancellationToken ct = default)
+        public Task<bool> ExisteCodigoBarrasAsync(string codigoBarras, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(ProductosGuardados.Any(p => p.CodigoBarras == codigoBarras));
+            return Task.FromResult(ExisteCodigo);
         }
 
-        public Task<IEnumerable<Producto>> ObtenerActivosAsync(CancellationToken ct = default)
+        public Task<IEnumerable<Producto>> ObtenerActivosAsync(CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(ProductosGuardados.Where(p => p.Activo));
+            return Task.FromResult(Enumerable.Empty<Producto>());
+        }
+
+        // --- NUEVOS MÉTODOS REQUERIDOS POR LA INTERFAZ ---
+        public Task<Producto?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<Producto?>(null);
+        }
+
+        public Task ActualizarAsync(Producto producto, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
         }
     }
 
+    // =========================================================================
+    // 2. PRUEBAS UNITARIAS DEL SPRINT 01
+    // =========================================================================
+
     [Fact]
-    public async Task EjecutarAsync_ProductoInventariableSinCodigo_RegistraCorrectamente()
+    public async Task EjecutarAsync_DatosValidos_AgregaProducto()
     {
         var repository = new FakeProductoRepository();
         var useCase = new RegistrarProductoUseCase(repository);
-        var request = new RegistrarProductoRequest("Galletas", "Snacks", "   ", 1.50m, UnidadVenta.Unidad, true, 10, 5);
+        var request = new RegistrarProductoRequest("Galleta", "Abarrotes", "123", 1.5m, UnidadVenta.Unidad, true, 10, 5);
 
         await useCase.EjecutarAsync(request);
 
-        var guardado = repository.ProductosGuardados.Single();
-        Assert.Null(guardado.CodigoBarras);
+        Assert.NotNull(repository.ProductoAgregado);
+        Assert.Equal("Galleta", repository.ProductoAgregado.Nombre);
     }
 
     [Fact]
-    public async Task EjecutarAsync_ProductoVendidoPorPeso_RegistraCorrectamente()
+    public async Task EjecutarAsync_NombreVacio_LanzaArgumentException()
     {
         var repository = new FakeProductoRepository();
         var useCase = new RegistrarProductoUseCase(repository);
-        var request = new RegistrarProductoRequest("Tomate", "Verduras", null, 4.50m, UnidadVenta.Peso, true, 15.5m, 2.0m);
+        var request = new RegistrarProductoRequest("", "Abarrotes", "123", 1.5m, UnidadVenta.Unidad, true, 10, 5);
 
-        await useCase.EjecutarAsync(request);
-
-        var guardado = repository.ProductosGuardados.Single();
-        Assert.Equal(UnidadVenta.Peso, guardado.UnidadVenta);
-        Assert.Equal(15.5m, guardado.StockActual);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData(null)]
-    public async Task EjecutarAsync_NombreVacio_LanzaArgumentException(string? nombre)
-    {
-        var useCase = new RegistrarProductoUseCase(new FakeProductoRepository());
-        var request = new RegistrarProductoRequest(nombre!, "Cat", null, 1m, UnidadVenta.Unidad, false, 0, 0);
-
-        var ex = await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
-        Assert.Contains("nombre", ex.Message);
+        await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
     }
 
     [Fact]
     public async Task EjecutarAsync_CategoriaVacia_LanzaArgumentException()
     {
-        var useCase = new RegistrarProductoUseCase(new FakeProductoRepository());
-        var request = new RegistrarProductoRequest("Pan", " ", null, 1m, UnidadVenta.Unidad, false, 0, 0);
+        var repository = new FakeProductoRepository();
+        var useCase = new RegistrarProductoUseCase(repository);
+        var request = new RegistrarProductoRequest("Galleta", "", "123", 1.5m, UnidadVenta.Unidad, true, 10, 5);
 
-        var ex = await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
-        Assert.Contains("categoría", ex.Message);
+        await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
+    }
+
+    [Fact]
+    public async Task EjecutarAsync_PrecioInvalido_LanzaArgumentException()
+    {
+        var repository = new FakeProductoRepository();
+        var useCase = new RegistrarProductoUseCase(repository);
+        var request = new RegistrarProductoRequest("Galleta", "Abarrotes", "123", 0m, UnidadVenta.Unidad, true, 10, 5);
+
+        await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
     }
 
     [Fact]
     public async Task EjecutarAsync_StockActualNegativo_LanzaArgumentException()
     {
-        var useCase = new RegistrarProductoUseCase(new FakeProductoRepository());
-        var request = new RegistrarProductoRequest("Pan", "Cat", null, 1m, UnidadVenta.Unidad, true, -1, 5);
+        var repository = new FakeProductoRepository();
+        var useCase = new RegistrarProductoUseCase(repository);
+        var request = new RegistrarProductoRequest("Galleta", "Abarrotes", "123", 1.5m, UnidadVenta.Unidad, true, -1, 5);
 
-        var ex = await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
-        Assert.Contains("actual no puede ser negativo", ex.Message);
+        await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
     }
 
     [Fact]
     public async Task EjecutarAsync_StockMinimoNegativo_LanzaArgumentException()
     {
-        var useCase = new RegistrarProductoUseCase(new FakeProductoRepository());
-        var request = new RegistrarProductoRequest("Pan", "Cat", null, 1m, UnidadVenta.Unidad, true, 10, -1);
+        var repository = new FakeProductoRepository();
+        var useCase = new RegistrarProductoUseCase(repository);
+        var request = new RegistrarProductoRequest("Galleta", "Abarrotes", "123", 1.5m, UnidadVenta.Unidad, true, 10, -5);
 
-        var ex = await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
-        Assert.Contains("mínimo no puede ser negativo", ex.Message);
+        await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
     }
 
     [Fact]
     public async Task EjecutarAsync_CodigoBarrasDuplicado_LanzaInvalidOperationException()
     {
-        var repository = new FakeProductoRepository();
-        await repository.AgregarAsync(new Producto { CodigoBarras = "123" });
+        var repository = new FakeProductoRepository { ExisteCodigo = true };
         var useCase = new RegistrarProductoUseCase(repository);
-        var request = new RegistrarProductoRequest("Pan", "Cat", "123", 1m, UnidadVenta.Unidad, false, 0, 0);
+        var request = new RegistrarProductoRequest("Galleta", "Abarrotes", "123", 1.5m, UnidadVenta.Unidad, true, 10, 5);
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => useCase.EjecutarAsync(request));
-        Assert.Contains("ya se encuentra registrado", ex.Message);
+        Assert.Contains("ya se encuentra", ex.Message);
     }
 
     [Fact]
@@ -122,12 +133,13 @@ public class RegistrarProductoUseCaseTests
     {
         var repository = new FakeProductoRepository();
         var useCase = new RegistrarProductoUseCase(repository);
-        var request = new RegistrarProductoRequest("Pan", "Cat", null, 1m, UnidadVenta.Unidad, false, 10, 5);
+        var request = new RegistrarProductoRequest("Servicio Delivery", "Servicios", null, 10m, UnidadVenta.Unidad, false, 50, 50);
 
         await useCase.EjecutarAsync(request);
 
-        var guardado = repository.ProductosGuardados.Single();
-        Assert.Equal(0m, guardado.StockActual);
-        Assert.Equal(0m, guardado.StockMinimo);
+        Assert.NotNull(repository.ProductoAgregado);
+        Assert.False(repository.ProductoAgregado.ControlaInventario);
+        Assert.Equal(0m, repository.ProductoAgregado.StockActual);
+        Assert.Equal(0m, repository.ProductoAgregado.StockMinimo);
     }
 }

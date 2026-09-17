@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BodegaLuchito.Application.Productos.DTOs;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Domain.Productos.Entities;
+using BodegaLuchito.Domain.Productos.Enums;
 
 namespace BodegaLuchito.Application.Productos.UseCases;
 
@@ -43,6 +44,15 @@ public class RegistrarProductoUseCase
         {
             if (stockActual < 0) throw new ArgumentException("El stock actual no puede ser negativo.");
             if (stockMinimo < 0) throw new ArgumentException("El stock mínimo no puede ser negativo.");
+            if (request.UnidadVenta == UnidadVenta.Unidad)
+            {
+                if (request.StockActual % 1 != 0)
+                    throw new ArgumentException("El stock actual debe ser un número entero para productos por unidad.", nameof(request.StockActual));
+
+                if (request.StockMinimo % 1 != 0)
+                    throw new ArgumentException("El stock mínimo debe ser un número entero para productos por unidad.", nameof(request.StockMinimo));
+            }
+
         }
 
         if (codigoBarras != null)

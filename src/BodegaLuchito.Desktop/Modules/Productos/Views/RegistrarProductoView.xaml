@@ -1,62 +1,220 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Productos.Views.RegistrarProductoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800"
-             Background="White">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+             Background="#F8FAFC">
 
-        <StackPanel Grid.Row="0" Orientation="Vertical">
-            <TextBlock Text="Registro de Productos" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+    <!-- Grid Principal que contendrá todo (Vista Base + Modal) -->
+    <Grid>
 
-            <UniformGrid Columns="2" HorizontalAlignment="Left" Width="400">
-                <TextBlock Text="Nombre:" Margin="0,5"/>
-                <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" Margin="0,5"/>
+        <!-- ================= CAPA 1: VISTA PRINCIPAL ================= -->
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Encabezado -->
+                <RowDefinition Height="Auto"/>
+                <!-- Buscador y Botones -->
+                <RowDefinition Height="*"/>
+                <!-- DataGrid -->
+            </Grid.RowDefinitions>
 
-                <TextBlock Text="Categoría:" Margin="0,5"/>
-                <TextBox Text="{Binding Categoria, UpdateSourceTrigger=PropertyChanged}" Margin="0,5"/>
+            <!-- Encabezado y Botón Principal -->
+            <Grid Grid.Row="0" Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Código de Barras:" Margin="0,5"/>
-                <TextBox Text="{Binding CodigoBarras, UpdateSourceTrigger=PropertyChanged}" Margin="0,5"/>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Gestión de productos" FontSize="26" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,4"/>
+                    <TextBlock Text="Administra el catálogo y el inventario del sistema." FontSize="14" Foreground="#64748B"/>
+                </StackPanel>
 
-                <TextBlock Text="Precio de Venta:" Margin="0,5"/>
-                <TextBox Text="{Binding PrecioVenta, UpdateSourceTrigger=LostFocus,
-                        ConverterCulture=en-US}" Margin="0,5"/>
+                <!-- Abre el modal -->
+                <Button Grid.Column="1" Content="+ Nuevo producto" Command="{Binding AbrirModalNuevoCommand}" 
+                        Background="#0D6EFD" Foreground="White" FontWeight="SemiBold" FontSize="14" 
+                        Padding="20,0" Height="40" BorderThickness="0" Cursor="Hand" VerticalAlignment="Top">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </Grid>
 
-                <TextBlock Text="Unidad de Venta:" Margin="0,5"/>
-                <ComboBox ItemsSource="{Binding UnidadesDeVenta}" SelectedItem="{Binding UnidadVenta}" Margin="0,5"/>
+            <!-- Buscador y Acciones -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="350"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Controla Inventario:" Margin="0,5"/>
-                <CheckBox IsChecked="{Binding ControlaInventario}" Margin="0,5"/>
+                <!-- Barra de búsqueda (Funcional) -->
+                <TextBox Grid.Column="0" Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" Foreground="#334155" Height="36" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
 
-                <TextBlock Text="Stock Actual:" Margin="0,5"/>
-                <TextBox Text="{Binding StockActual, UpdateSourceTrigger=LostFocus,
-                        ConverterCulture=en-US}" IsEnabled="{Binding ControlaInventario}" Margin="0,5"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="Editar" Command="{Binding EditarCommand}" Width="80" Height="36" Background="#F1F5F9" Foreground="#64748B" BorderBrush="#CBD5E1" Margin="0,0,8,0">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button Content="Eliminar" Command="{Binding EliminarCommand}" Width="80" Height="36" Background="#F1F5F9" Foreground="#EF4444" BorderBrush="#FECACA">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
 
-                <TextBlock Text="Stock Mínimo:" Margin="0,5"/>
-                <TextBox Text="{Binding StockMinimo, UpdateSourceTrigger=LostFocus,
-                        ConverterCulture=en-US}" IsEnabled="{Binding ControlaInventario}" Margin="0,5"/>
-            </UniformGrid>
+            <!-- Tabla de Datos -->
+            <DataGrid Grid.Row="2" ItemsSource="{Binding Productos}" 
+                      SelectedItem="{Binding ProductoSeleccionado, Mode=TwoWay}"
+                      AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                      HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="#E2E8F0" BorderBrush="#E2E8F0" BorderThickness="1"
+                      Background="White" RowBackground="White" AlternatingRowBackground="#F8FAFC"
+                      RowHeight="42">
+                <DataGrid.Resources>
+                    <!-- Estilo de la Cabecera Restaurado -->
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#F8FAFC"/>
+                        <Setter Property="Foreground" Value="#64748B"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="12,12"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                    </Style>
 
-            <Button Content="Registrar" Command="{Binding RegistrarCommand}" Width="150" HorizontalAlignment="Left" Margin="0,20,0,0" Padding="5"/>
-        </StackPanel>
+                    <!-- Estilo de Celda con el Trigger para texto blanco -->
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Padding" Value="12,0"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="Foreground" Value="#334155"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <!-- Trigger para la selección -->
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*"/>
+                    <DataGridTextColumn Header="Categoría" Binding="{Binding Categoria}" Width="1.5*"/>
+                    <DataGridTextColumn Header="Cód. Barras" Binding="{Binding CodigoBarras}" Width="1.2*"/>
+                    <DataGridTextColumn Header="Unidad" Binding="{Binding UnidadVenta}" Width="*"/>
+                    <DataGridTextColumn Header="Precio" Binding="{Binding PrecioVenta, StringFormat=S/ \{0:F2\}}" Width="*"/>
+                    <DataGridTextColumn Header="Stock" Binding="{Binding StockActual}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
 
-        <TextBlock Grid.Row="1" Text="Productos Registrados" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
+        <!-- ================= CAPA 2: OVERLAY MODAL (Oculto por defecto) ================= -->
+        <Grid Background="#80000000" Visibility="{Binding ModalVisible}">
+            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="24" 
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Width="400">
+                <!-- DropShadowEffect para darle profundidad al modal -->
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" Opacity="0.15" BlurRadius="15" ShadowDepth="4"/>
+                </Border.Effect>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding ProductosRegistrados}" AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
-                <DataGridTextColumn Header="Categoría" Binding="{Binding Categoria}" Width="*"/>
-                <DataGridTextColumn Header="Precio" Binding="{Binding PrecioVenta}" Width="100"/>
-                <DataGridTextColumn Header="Stock" Binding="{Binding StockActual}" Width="100"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                <StackPanel>
+                    <!-- El título ahora es dinámico -->
+                    <TextBlock Text="{Binding TituloModal}" FontSize="20" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Nombre" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
+                    <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" Height="36" Margin="0,0,0,12" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+
+                    <TextBlock Text="Categoría" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
+                    <TextBox Text="{Binding Categoria, UpdateSourceTrigger=PropertyChanged}" Height="36" Margin="0,0,0,12" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+
+                    <TextBlock Text="Código de Barras" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
+                    <TextBox Text="{Binding CodigoBarras, UpdateSourceTrigger=PropertyChanged}" Height="36" Margin="0,0,0,12" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Precio (S/)" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
+                            <TextBox Text="{Binding PrecioVenta, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarSoloNumerosDecimales" Height="36" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Unidad" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
+                            <ComboBox ItemsSource="{Binding UnidadesVenta}" SelectedItem="{Binding UnidadVenta}" Height="36" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <CheckBox Content="Controla Inventario" IsChecked="{Binding ControlaInventario}" Foreground="#334155" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                    <Grid Margin="0,0,0,24" IsEnabled="{Binding ControlaInventario}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Stock Actual con sufijo y validación dinámica -->
+                        <StackPanel Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Stock Actual " Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="{Binding SufijoUnidad}" Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
+                            </StackPanel>
+                            <TextBox Text="{Binding StockActual, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarEntradaStock" Height="36" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                        </StackPanel>
+
+                        <!-- Stock Mínimo con sufijo y validación dinámica -->
+                        <StackPanel Grid.Column="2">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Stock Mínimo " Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="{Binding SufijoUnidad}" Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
+                            </StackPanel>
+                            <TextBox Text="{Binding StockMinimo, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarEntradaStock" Height="36" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Botones de Acción del Modal -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Cancelar" Command="{Binding CerrarModalCommand}" 
+                                Height="40" Background="White" Foreground="#64748B" FontWeight="SemiBold" BorderBrush="#CBD5E1" Cursor="Hand">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <Button Grid.Column="2" Content="Guardar" Command="{Binding GuardarCommand}" 
+                                Height="40" Background="#0D6EFD" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

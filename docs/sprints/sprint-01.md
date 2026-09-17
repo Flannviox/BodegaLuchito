@@ -308,7 +308,7 @@
 
 ##### 
 
-##### Ruc: string?
+##### Ruc: string
 
 ##### 
 
@@ -360,11 +360,11 @@
 
 ##### 
 
-##### RUC opcional.
+##### RUC obligatorio (regla actualizada el 16/09/2026).
 
 ##### 
 
-##### Cuando exista, RUC debe contener exactamente 11 dígitos.
+##### RUC debe contener exactamente 11 dígitos; teléfono opcional de máximo 10 dígitos.
 
 ##### 
 

@@ -6,7 +6,8 @@
         Width="1200"
         MinHeight="600"
         MinWidth="1000"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
 
     <Grid>
 

@@ -31,6 +31,7 @@
                 <TextBox Grid.Column="1"
                          Text="{Binding Valor,
                                         ElementName=Raiz,
+                                        Mode=TwoWay,
                                         UpdateSourceTrigger=PropertyChanged}"
                          FontSize="14"
                          Foreground="#0D2B4E"

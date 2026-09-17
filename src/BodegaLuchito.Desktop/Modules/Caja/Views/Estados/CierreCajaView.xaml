@@ -33,25 +33,41 @@
                            FontWeight="SemiBold"
                            Foreground="{StaticResource ColorTextoPrincipal}" />
                 <TextBlock
-                    Text="Registra los montos encontrados al finalizar la jornada."
+                    Text="Registra los montos totales que verificas al finalizar la jornada."
                     FontSize="13"
                     Foreground="{StaticResource ColorTextoSecundario}"
                     Margin="0,6,0,22" />
-                <TextBlock Text="Conteo final"
+
+                <Border Background="{StaticResource ColorAcentoClaro}"
+                        CornerRadius="8"
+                        Padding="12"
+                        Margin="0,0,0,22">
+
+                    <TextBlock
+                        Text=" Importante: Debe registrar el total disponible al cierre, no únicamente las ventas realizadas durante la jornada. Elefectivo debe incluir tambien el fondo inicial"
+                        FontSize="12"
+                        Foreground="{StaticResource ColorAcento}"
+                        TextWrapping="Wrap"
+
+                        />
+
+
+                </Border>
+                <TextBlock Text="Verificacion final"
                            FontSize="14"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource ColorTextoPrincipal}"
                            Margin="0,0,0,14" />
                 <controles:CampoEntrada
-                    Etiqueta="Efectivo contado (S/)"
+                    Etiqueta="Efectivo total contado en caja"
                     Valor="{Binding EfectivoRealInput}" />
 
                 <controles:CampoEntrada
-                    Etiqueta="Yape registrado (S/)"
+                    Etiqueta="Total verificado en Yape"
                     Valor="{Binding YapeRealInput}" />
 
                 <controles:CampoEntrada
-                    Etiqueta="Plin registrado (S/)"
+                    Etiqueta="Total verificado en Plin"
                     Valor="{Binding PlinRealInput}" />
 
                 <TextBlock Text="Observación del cierre (opcional)"
@@ -155,7 +171,7 @@
                                    Foreground="{StaticResource ColorAdvertencia}"
                                    Margin="0,0,0,5" />
                         <TextBlock
-                            Text="El sistema comparará los montos esperados con los registrados y calculará sus diferencias."
+                            Text="El sistema comparará los montos calculados según el fondo inicial y los movimientos de la sesión con los montos verificados al cierre."
                             FontSize="12"
                             Foreground="{StaticResource ColorAdvertencia}"
                             TextWrapping="Wrap" />

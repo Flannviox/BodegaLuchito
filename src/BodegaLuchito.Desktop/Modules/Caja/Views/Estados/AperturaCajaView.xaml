@@ -34,13 +34,13 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Border Width="50"
+                <Border Width="150"
                         Height="50"
                         CornerRadius="10"
                         HorizontalAlignment="Left"
                         Background="{StaticResource ColorAcentoClaro}"
                         Margin="0,0,0,16">
-                    <TextBlock Text="S/"
+                    <TextBlock Text="Bienvenido"
                                FontSize="18"
                                FontWeight="Bold"
                                Foreground="{StaticResource ColorAcento}"

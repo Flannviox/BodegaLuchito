@@ -24,6 +24,9 @@ public class EditarProveedorUseCase
         if (telefonoNorm != null && !Regex.IsMatch(telefonoNorm, @"^[0-9]{1,10}$"))
             throw new ArgumentException("El teléfono debe contener solo números (máximo 10 dígitos).");
 
+        if (direccionNorm?.Length > 200)
+            throw new ArgumentException("La direccion no puede exceder los 200 caracteres.");
+
         proveedor.Telefono = telefonoNorm;
         proveedor.Direccion = direccionNorm;
         proveedor.FechaActualizacion = DateTime.Now;

@@ -5,7 +5,6 @@ using BodegaLuchito.Infrastructure.Persistence;
 using BodegaLuchito.Infrastructure.Proveedores.Repositories;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Xunit;
 
 namespace BodegaLuchito.Tests.Application.Proveedores;
@@ -37,16 +36,14 @@ public class ProveedorUseCasesTests : IDisposable
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
-        // IMPORTANTE: Silenciamos la advertencia de migraciones pendientes para las pruebas
         _options = new DbContextOptionsBuilder<BodegaLuchitoDbContext>()
             .UseSqlite(_connection)
-            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
             .Options;
 
         // 2. Crear esquema temporal
         using (var context = new BodegaLuchitoDbContext(_options))
         {
-            context.Database.EnsureCreated();
+            context.Database.Migrate();
         }
 
         // 3. Inicializar Repositorio y Casos de Uso
@@ -135,6 +132,7 @@ public class ProveedorUseCasesTests : IDisposable
     [InlineData("1234567890")] // 10 dígitos
     [InlineData("123456789012")] // 12 dígitos
     [InlineData("10456789ABC")] // Con letras
+    [InlineData("1234567890١")] // Solo se aceptan digitos ASCII
     public async Task Registrar_RucFormatoInvalido_LanzaExcepcion(string rucInvalido)
     {
         var request = new RegistrarProveedorRequest { Nombre = "Prov", Ruc = rucInvalido };
@@ -247,6 +245,69 @@ public class ProveedorUseCasesTests : IDisposable
     // =========================================================================
     // LIMPIEZA DE CONEXIÓN
     // =========================================================================
+    [Theory]
+    [InlineData("1")]
+    [InlineData("987654321")]
+    [InlineData("1234567890")]
+    public async Task RegistrarYEditar_TelefonoHasta10Digitos_Persiste(string telefono)
+    {
+        var proveedor = await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest
+        {
+            Nombre = "Proveedor limite",
+            Ruc = "10456789123",
+            Telefono = $" {telefono} ",
+            Direccion = new string('D', 200)
+        });
+
+        var guardado = await _repository.ObtenerPorIdAsync(proveedor.Id);
+        Assert.Equal(telefono, guardado!.Telefono);
+        Assert.Equal(200, guardado.Direccion!.Length);
+
+        await _editarUseCase.ExecuteAsync(proveedor.Id, null, null);
+        await _editarUseCase.ExecuteAsync(proveedor.Id, $" {telefono} ", new string('E', 200));
+        var editado = await _repository.ObtenerPorIdAsync(proveedor.Id);
+        Assert.Equal(telefono, editado!.Telefono);
+        Assert.Equal(200, editado.Direccion!.Length);
+    }
+
+    [Fact]
+    public async Task Registrar_DireccionMayorA200_NoGuardaProveedor()
+    {
+        var request = new RegistrarProveedorRequest
+        {
+            Nombre = "Proveedor",
+            Ruc = "10456789123",
+            Direccion = new string('D', 201)
+        };
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _registrarUseCase.ExecuteAsync(request));
+        Assert.Empty(await _repository.ObtenerTodosAsync());
+    }
+
+    [Fact]
+    public async Task Editar_DireccionMayorA200_ConservaDatosAnteriores()
+    {
+        var proveedor = await _registrarUseCase.ExecuteAsync(new RegistrarProveedorRequest
+        {
+            Nombre = "Proveedor",
+            Ruc = "10456789123",
+            Telefono = "987654321",
+            Direccion = "Direccion original"
+        });
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _editarUseCase.ExecuteAsync(proveedor.Id, "1234567890", new string('D', 201)));
+
+        var guardado = await _repository.ObtenerPorIdAsync(proveedor.Id);
+        Assert.Equal("Direccion original", guardado!.Direccion);
+        Assert.Equal("987654321", guardado.Telefono);
+        Assert.Null(guardado.FechaActualizacion);
+    }
+
+    // =========================================================================
+    // LIMPIEZA DE CONEXIÓN
+    // =========================================================================
+
     public void Dispose()
     {
         _connection.Close();

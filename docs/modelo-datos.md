@@ -145,7 +145,7 @@ Representa a una persona o empresa que suministra productos a la bodega.
 |---|---|---:|---|
 | Id | int | Sí | Identificador único |
 | Nombre | string | Sí | Nombre o razón comercial |
-| Ruc | string? | No | RUC del proveedor |
+| Ruc | string | Sí | RUC del proveedor, obligatorio y de 11 dígitos |
 | Telefono | string? | No | Número de contacto |
 | Direccion | string? | No | Dirección |
 | Activo | bool | Sí | Indica si está disponible |
@@ -155,9 +155,12 @@ Representa a una persona o empresa que suministra productos a la bodega.
 ### Restricciones
 
 - `Nombre` es obligatorio.
-- `Ruc` es opcional.
-- Cuando exista, el RUC debe contener exactamente 11 dígitos.
-- Cuando exista, el RUC debe ser único.
+- `Ruc` es obligatorio.
+- El RUC debe contener exactamente 11 dígitos numéricos (0-9).
+- El RUC debe ser único.
+- El teléfono es opcional; cuando se informa debe contener de 1 a 10 dígitos numéricos.
+- La dirección es opcional y admite hasta 200 caracteres.
+- Antes de aplicar la migración de RUC obligatorio, completar con datos reales los proveedores existentes con RUC nulo. La migración no inventa RUC ni elimina estos registros; si falta ese dato, la actualización se rechaza y puede reintentarse tras corregirlo.
 - Un proveedor con abastecimientos históricos no debe eliminarse físicamente.
 - Para deshabilitarlo se utiliza `Activo = false`.
 

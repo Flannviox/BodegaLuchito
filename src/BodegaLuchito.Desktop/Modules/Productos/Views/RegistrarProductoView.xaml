@@ -142,7 +142,15 @@
                     <TextBox Text="{Binding Categoria, UpdateSourceTrigger=PropertyChanged}" Height="36" Margin="0,0,0,12" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
 
                     <TextBlock Text="Código de Barras" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
-                    <TextBox Text="{Binding CodigoBarras, UpdateSourceTrigger=PropertyChanged}" Height="36" Margin="0,0,0,12" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                    <TextBox x:Name="TxtCodigoBarras" 
+                         PreviewTextInput="TxtCodigoBarras_PreviewTextInput"
+                         PreviewKeyDown="TxtCodigoBarras_PreviewKeyDown"
+                         KeyDown="TxtCodigoBarras_KeyDown"
+                         ContextMenu="{x:Null}"
+                         Text="{Binding CodigoBarras, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="36" Margin="0,0,0,12" Padding="8,0" 
+                         VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"
+                    />     
 
                     <Grid Margin="0,0,0,12">
                         <Grid.ColumnDefinitions>
@@ -152,7 +160,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Precio (S/)" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
-                            <TextBox Text="{Binding PrecioVenta, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarSoloNumerosDecimales" Height="36" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                            <TextBox x:Name="TxtPrecioVenta" Text="{Binding PrecioVenta, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarSoloNumerosDecimales" Height="36" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Unidad" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>

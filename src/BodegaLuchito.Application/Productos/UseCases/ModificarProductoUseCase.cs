@@ -63,6 +63,7 @@ public sealed class ModificarProductoUseCase
         //Actualizar la entidad
         producto.Nombre = nombreLimpio;
         producto.CategoriaId = request.CategoriaId;
+        producto.Categoria = null!; // Desvinculamos el objeto viejo para que EF Core obedezca al nuevo CategoriaId
         producto.CodigoBarras = codigoBarrasLimpio;
         producto.PrecioVenta = request.PrecioVenta;
         producto.UnidadVenta = request.UnidadVenta;

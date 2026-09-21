@@ -18,9 +18,10 @@ public sealed class ProductoConfiguration
             .IsRequired()
             .HasMaxLength(150);
 
-        builder.Property(x => x.Categoria)
-            .IsRequired()
-            .HasMaxLength(100);
+        builder.HasOne(x => x.Categoria)
+            .WithMany()
+            .HasForeignKey(x => x.CategoriaId)
+            .OnDelete(DeleteBehavior.Restrict); // Restrict evita que borres una categoría si tiene productos asignados
 
         builder.Property(x => x.CodigoBarras)
             .HasMaxLength(50);

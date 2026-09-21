@@ -4,7 +4,7 @@ namespace BodegaLuchito.Application.Productos.DTOs;
 
 public record RegistrarProductoRequest(
     string Nombre,
-    string Categoria,
+    int CategoriaId,
     string? CodigoBarras,
     decimal PrecioVenta,
     UnidadVenta UnidadVenta,

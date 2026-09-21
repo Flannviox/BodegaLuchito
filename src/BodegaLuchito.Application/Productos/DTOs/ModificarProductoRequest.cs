@@ -5,7 +5,7 @@ namespace BodegaLuchito.Application.Productos.DTOs;
 public record ModificarProductoRequest(
     int Id,
     string Nombre,
-    string Categoria,
+    int CategoriaId,
     string? CodigoBarras,
     decimal PrecioVenta,
     UnidadVenta UnidadVenta,

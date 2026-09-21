@@ -9,8 +9,8 @@ public sealed class Producto
     public string Nombre { get; set; } =
         string.Empty;
 
-    public string Categoria { get; set; } =
-        string.Empty;
+    public int CategoriaId { get; set; }
+    public Categoria Categoria { get; set; } = null!;
 
     public string? CodigoBarras { get; set; }
 

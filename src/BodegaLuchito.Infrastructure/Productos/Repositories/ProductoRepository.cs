@@ -37,6 +37,7 @@ public class ProductoRepository : IProductoRepository
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.Set<Producto>()
+            .Include(p => p.Categoria) // <-- Agregamos el Include para cargar la categoría relacionada
             .AsNoTracking()
             .Where(p => p.Activo)
             .ToListAsync(cancellationToken);
@@ -46,6 +47,7 @@ public class ProductoRepository : IProductoRepository
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.Set<Producto>()
+            .Include(p => p.Categoria) 
             .AsNoTracking()
             .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
     }

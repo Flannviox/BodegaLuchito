@@ -22,8 +22,8 @@ public sealed class ModificarProductoUseCase
         if (string.IsNullOrWhiteSpace(request.Nombre))
             throw new ArgumentException("El nombre del producto no puede estar vacío.", nameof(request.Nombre));
 
-        if (string.IsNullOrWhiteSpace(request.Categoria))
-            throw new ArgumentException("La categoría no puede estar vacía.", nameof(request.Categoria));
+        if (request.CategoriaId <= 0)
+            throw new ArgumentException("La categoría es obligatoria.", nameof(request.CategoriaId));
 
         if (request.PrecioVenta <= 0)
             throw new ArgumentException("El precio de venta debe ser mayor a cero.", nameof(request.PrecioVenta));
@@ -50,7 +50,6 @@ public sealed class ModificarProductoUseCase
 
         //Normalizar strings
         var nombreLimpio = request.Nombre.Trim();
-        var categoriaLimpia = request.Categoria.Trim();
         var codigoBarrasLimpio = string.IsNullOrWhiteSpace(request.CodigoBarras) ? null : request.CodigoBarras.Trim();
 
         //Validar código de barras único (Solo si el usuario lo cambió)
@@ -63,7 +62,7 @@ public sealed class ModificarProductoUseCase
 
         //Actualizar la entidad
         producto.Nombre = nombreLimpio;
-        producto.Categoria = categoriaLimpia;
+        producto.CategoriaId = request.CategoriaId;
         producto.CodigoBarras = codigoBarrasLimpio;
         producto.PrecioVenta = request.PrecioVenta;
         producto.UnidadVenta = request.UnidadVenta;

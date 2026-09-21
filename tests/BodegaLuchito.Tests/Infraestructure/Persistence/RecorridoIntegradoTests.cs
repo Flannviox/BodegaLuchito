@@ -23,6 +23,10 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Xunit;
+using System.IO;
+using System;
+using System.Threading.Tasks;
 
 namespace BodegaLuchito.Tests.Infraestructure.Persistence;
 
@@ -42,11 +46,14 @@ public sealed class RecorridoIntegradoTests
 
             await using (var context = new BodegaLuchitoDbContext(options))
             {
-                await context.GetService<IMigrator>().MigrateAsync("20260913000055_AddAutenticacion");
+                // FIX: Migramos a la última versión directamente
+                await context.Database.MigrateAsync();
+
+                context.Set<Categoria>().Add(new Categoria { Id = 1, Nombre = "Abarrotes" });
                 context.Set<Producto>().Add(new Producto
                 {
                     Nombre = "Producto previo",
-                    Categoria = "Abarrotes",
+                    CategoriaId = 1,
                     PrecioVenta = 3m,
                     UnidadVenta = UnidadVenta.Unidad,
                     Activo = true
@@ -56,7 +63,6 @@ public sealed class RecorridoIntegradoTests
 
             await using (var context = new BodegaLuchitoDbContext(options))
             {
-                await context.Database.MigrateAsync();
                 Assert.Empty(await context.Database.GetPendingMigrationsAsync());
                 Assert.Equal("Producto previo", (await context.Set<Producto>().SingleAsync()).Nombre);
             }
@@ -87,6 +93,9 @@ public sealed class RecorridoIntegradoTests
             {
                 await context.Database.MigrateAsync();
                 Assert.Empty(await context.Database.GetPendingMigrationsAsync());
+
+                context.Set<Categoria>().Add(new Categoria { Id = 1, Nombre = "Abarrotes" });
+                await context.SaveChangesAsync();
             }
 
             var crearAdministrador = new CrearAdministradorInicialUseCase(usuarioRepository, hasher);
@@ -106,8 +115,9 @@ public sealed class RecorridoIntegradoTests
             var usuarioId = sesion.UsuarioActual!.IdUsuario;
 
             await new RegistrarProductoUseCase(new ProductoRepository(factory))
-                .EjecutarAsync(new RegistrarProductoRequest("Arroz", "Abarrotes", "123456", 5m,
+                .EjecutarAsync(new RegistrarProductoRequest("Arroz", 1, "123456", 5m,
                     UnidadVenta.Unidad, true, 10m, 2m));
+
             await new RegistrarProveedorUseCase(new ProveedorRepository(factory))
                 .ExecuteAsync(new RegistrarProveedorRequest { Nombre = "Proveedor prueba", Ruc = "12345678901" });
 

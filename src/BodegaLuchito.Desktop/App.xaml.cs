@@ -96,6 +96,9 @@ public partial class App : System.Windows.Application
         services.AddTransient<EliminarProductoUseCase>();
         services.AddTransient<RegistrarProductoViewModel>();
 
+        // Categorías - Casos de uso
+        services.AddTransient<ObtenerCategoriasActivasUseCase>(); 
+        services.AddTransient<CrearCategoriaUseCase>();          
     }
 
     protected override async void OnStartup(

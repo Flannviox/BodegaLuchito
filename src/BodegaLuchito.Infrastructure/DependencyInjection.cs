@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddTransient<CambiarEstadoProveedorUseCase>();
         services.AddTransient<EliminarProveedorUseCase>();
         services.AddTransient<ICajaRepository, CajaRepository>();
+        services.AddTransient<ICategoriaRepository, CategoriaRepository>();
 
 
         return services;

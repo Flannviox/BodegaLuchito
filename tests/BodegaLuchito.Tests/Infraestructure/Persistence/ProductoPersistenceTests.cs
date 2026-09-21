@@ -3,6 +3,7 @@ using BodegaLuchito.Domain.Productos.Enums;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace BodegaLuchito.Tests.Infrastructure.Persistence;
 
@@ -26,12 +27,16 @@ public sealed class ProductoPersistenceTests
                      new BodegaLuchitoDbContext(options))
         {
             await arrangeContext.Database.EnsureCreatedAsync();
+
+            // Insertar una categoría de prueba para evitar un error de llave foránea (FK)
+            arrangeContext.Categorias.Add(new Categoria { Id = 1, Nombre = "Bebidas" });
+            await arrangeContext.SaveChangesAsync();
         }
 
         var producto = new Producto
         {
             Nombre = "Coca Cola 500 ml",
-            Categoria = "Bebidas",
+            CategoriaId = 1, // Corregido a CategoriaId (int)
             CodigoBarras = "7751234567890",
             PrecioVenta = 3.50m,
             UnidadVenta = UnidadVenta.Unidad,
@@ -70,8 +75,8 @@ public sealed class ProductoPersistenceTests
             productoGuardado.Nombre);
 
         Assert.Equal(
-            "Bebidas",
-            productoGuardado.Categoria);
+            1, // Corregido: se verifica el ID (int)
+            productoGuardado.CategoriaId);
 
         Assert.Equal(
             "7751234567890",
@@ -99,6 +104,7 @@ public sealed class ProductoPersistenceTests
         Assert.True(
             productoGuardado.Activo);
     }
+
     [Fact]
     public async Task CodigoBarrasDuplicado_DebeFallar()
     {
@@ -118,10 +124,14 @@ public sealed class ProductoPersistenceTests
 
         await context.Database.EnsureCreatedAsync();
 
+        // Insertamos categoría falsa para la relación
+        context.Categorias.Add(new Categoria { Id = 1, Nombre = "Prueba" });
+        await context.SaveChangesAsync();
+
         var productoUno = new Producto
         {
             Nombre = "Producto A",
-            Categoria = "Prueba",
+            CategoriaId = 1, // Corregido
             CodigoBarras = "123456789",
             PrecioVenta = 2m,
             UnidadVenta = UnidadVenta.Unidad,
@@ -133,7 +143,7 @@ public sealed class ProductoPersistenceTests
         var productoDos = new Producto
         {
             Nombre = "Producto B",
-            Categoria = "Prueba",
+            CategoriaId = 1, // Corregido
             CodigoBarras = "123456789",
             PrecioVenta = 3m,
             UnidadVenta = UnidadVenta.Unidad,

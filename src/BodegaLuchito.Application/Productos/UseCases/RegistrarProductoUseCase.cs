@@ -20,13 +20,13 @@ public class RegistrarProductoUseCase
     public async Task EjecutarAsync(RegistrarProductoRequest request, CancellationToken cancellationToken = default)
     {
         var nombre = request.Nombre?.Trim();
-        var categoria = request.Categoria?.Trim();
         var codigoBarras = string.IsNullOrWhiteSpace(request.CodigoBarras) ? null : request.CodigoBarras.Trim();
 
         if (string.IsNullOrWhiteSpace(nombre))
             throw new ArgumentException("El nombre del producto es obligatorio.");
 
-        if (string.IsNullOrWhiteSpace(categoria))
+        // Validamos que se haya enviado un ID de categoría válido
+        if (request.CategoriaId <= 0)
             throw new ArgumentException("La categoría es obligatoria.");
 
         if (request.PrecioVenta <= 0)
@@ -52,7 +52,6 @@ public class RegistrarProductoUseCase
                 if (request.StockMinimo % 1 != 0)
                     throw new ArgumentException("El stock mínimo debe ser un número entero para productos por unidad.", nameof(request.StockMinimo));
             }
-
         }
 
         if (codigoBarras != null)
@@ -65,7 +64,7 @@ public class RegistrarProductoUseCase
         var producto = new Producto
         {
             Nombre = nombre,
-            Categoria = categoria,
+            CategoriaId = request.CategoriaId, // Asignamos el ID de la categoría
             CodigoBarras = codigoBarras,
             PrecioVenta = request.PrecioVenta,
             UnidadVenta = request.UnidadVenta,

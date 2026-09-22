@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              d:DesignWidth="1000"
-             d:DesignHeight="520">
+             d:DesignHeight="560">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -22,6 +22,7 @@
                 CornerRadius="12"
                 Padding="18"
                 Margin="0,0,0,20">
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -44,12 +45,15 @@
 
                 <StackPanel Grid.Column="1"
                             VerticalAlignment="Center">
-                    <TextBlock Text="La sesión fue cerrada. Revisa las diferencias obtenidas antes de iniciar una nueva jornada."
-                               FontSize="17"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorExito}" />
+
                     <TextBlock
-                        Text="Los montos fueron registrados y las diferencias se calcularon correctamente."
+                        Text="La sesión fue cerrada correctamente."
+                        FontSize="17"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource ColorExito}" />
+
+                    <TextBlock
+                        Text="Revisa la conciliación del efectivo y el resumen de los movimientos digitales de la jornada."
                         FontSize="12"
                         Foreground="{StaticResource ColorTextoSecundario}"
                         Margin="0,3,0,0" />
@@ -57,17 +61,36 @@
             </Grid>
         </Border>
 
+
         <Border Style="{StaticResource Tarjeta}">
+
             <StackPanel>
+
                 <TextBlock Text="Resumen del cierre"
                            FontSize="19"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource ColorTextoPrincipal}" />
+
                 <TextBlock
-                    Text="Comparación entre los montos calculados por el sistema y los montos verificados al cierre."
+                    Text="El efectivo se compara con el monto contado físicamente. Yape y Plin muestran los movimientos registrados automáticamente durante la sesión."
                     FontSize="13"
                     Foreground="{StaticResource ColorTextoSecundario}"
+                    TextWrapping="Wrap"
                     Margin="0,6,0,24" />
+
+
+                <TextBlock Text="Conciliación de efectivo"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource ColorTextoPrincipal}"
+                           Margin="0,0,0,4" />
+
+                <TextBlock
+                    Text="Comparación entre el efectivo calculado por el sistema y el efectivo contado al cierre."
+                    FontSize="12"
+                    Foreground="{StaticResource ColorTextoSecundario}"
+                    Margin="0,0,0,16" />
+
 
                 <Grid Margin="0,0,0,10">
 
@@ -90,7 +113,7 @@
                                Foreground="{StaticResource ColorTextoSecundario}" />
 
                     <TextBlock Grid.Column="2"
-                               Text="VERIFICADO"
+                               Text="CONTADO"
                                FontSize="11"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoSecundario}" />
@@ -100,11 +123,13 @@
                                FontSize="11"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoSecundario}" />
+
                 </Grid>
 
                 <Separator Background="{StaticResource ColorBorde}" />
 
-                <Grid Margin="0,16">
+
+                <Grid Margin="0,16,0,22">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*" />
@@ -136,11 +161,59 @@
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                </Grid>
+
+                <TextBlock Text="Movimientos digitales"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource ColorTextoPrincipal}"
+                           Margin="0,4,0,4" />
+
+                <TextBlock
+                    Text="Resumen de los ingresos y salidas registrados por Yape y Plin durante la sesión."
+                    FontSize="12"
+                    Foreground="{StaticResource ColorTextoSecundario}"
+                    Margin="0,0,0,16" />
+
+                <Grid Margin="0,0,0,10">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="MEDIO DE PAGO"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Grid.Column="1"
+                               Text="INGRESOS"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Grid.Column="2"
+                               Text="SALIDAS"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
+                    <TextBlock Grid.Column="3"
+                               Text="NETO"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoSecundario}" />
+
                 </Grid>
 
                 <Separator Background="{StaticResource ColorBorde}" />
 
                 <Grid Margin="0,16">
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*" />
                         <ColumnDefinition Width="*" />
@@ -152,27 +225,32 @@
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                     <TextBlock Grid.Column="1"
-                               Text="{Binding ResultadoUltimoCierre.YapeEsperado,
+                               Text="{Binding ResultadoUltimoCierre.YapeIngresos,
                                               StringFormat=S/ \{0:N2\}}"
                                FontSize="14"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                     <TextBlock Grid.Column="2"
-                               Text="{Binding ResultadoUltimoCierre.YapeReal,
+                               Text="{Binding ResultadoUltimoCierre.YapeSalidas,
                                               StringFormat=S/ \{0:N2\}}"
                                FontSize="14"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                     <TextBlock Grid.Column="3"
-                               Text="{Binding ResultadoUltimoCierre.DiferenciaYape,
+                               Text="{Binding ResultadoUltimoCierre.YapeNeto,
                                               StringFormat=S/ \{0:N2\}}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                 </Grid>
 
                 <Separator Background="{StaticResource ColorBorde}" />
 
-                <Grid Margin="0,16">
+                <Grid Margin="0,16,0,24">
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*" />
                         <ColumnDefinition Width="*" />
@@ -184,59 +262,38 @@
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                     <TextBlock Grid.Column="1"
-                               Text="{Binding ResultadoUltimoCierre.PlinEsperado,
+                               Text="{Binding ResultadoUltimoCierre.PlinIngresos,
                                               StringFormat=S/ \{0:N2\}}"
                                FontSize="14"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                     <TextBlock Grid.Column="2"
-                               Text="{Binding ResultadoUltimoCierre.PlinReal,
+                               Text="{Binding ResultadoUltimoCierre.PlinSalidas,
                                               StringFormat=S/ \{0:N2\}}"
                                FontSize="14"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                     <TextBlock Grid.Column="3"
-                               Text="{Binding ResultadoUltimoCierre.DiferenciaPlin,
+                               Text="{Binding ResultadoUltimoCierre.PlinNeto,
                                               StringFormat=S/ \{0:N2\}}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource ColorTextoPrincipal}" />
+
                 </Grid>
 
-                <Separator Background="{StaticResource ColorBorde}" />
-
-                <Grid Margin="0,20,0,24">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel>
-                        <TextBlock Text="Diferencia neta del cierre"
-                                   FontSize="15"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource ColorTextoPrincipal}" />
-                        <TextBlock
-                            Text="Suma de las diferencias de efectivo, Yape y Plin. No representa el dinero disponible en caja."
-                            FontSize="12"
-                            Foreground="{StaticResource ColorTextoSecundario}"
-                            Margin="0,4,0,0" />
-                    </StackPanel>
-
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding DiferenciaTotal,
-                                              StringFormat=S/ \{0:N2\}}"
-                               FontSize="22"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource ColorTextoPrincipal}"
-                               VerticalAlignment="Center" />
-                </Grid>
 
                 <Button Content="Iniciar nueva jornada"
                         Command="{Binding NuevaAperturaCommand}"
                         Style="{StaticResource BotonPrimario}"
                         Width="200"
                         HorizontalAlignment="Right" />
+
             </StackPanel>
         </Border>
+
     </StackPanel>
+
 </UserControl>

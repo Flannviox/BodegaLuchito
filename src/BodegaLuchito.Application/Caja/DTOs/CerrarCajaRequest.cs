@@ -8,8 +8,6 @@ namespace BodegaLuchito.Application.Caja.DTOs
 
         int UsuarioCierreId,
         decimal EfectivoReal,
-        decimal YapeReal,
-        decimal PlinReal,
         string? ObservacionCierre
     );
 }

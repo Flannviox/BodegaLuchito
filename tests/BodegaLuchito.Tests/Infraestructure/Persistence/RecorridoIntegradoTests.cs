@@ -134,7 +134,7 @@ public sealed class RecorridoIntegradoTests
                 Assert.Equal(100m, (await context.Set<SesionCaja>().SingleAsync()).FondoInicial);
 
                 await new CerrarCajaUseCase(new CajaRepository(context))
-                    .EjecutarAsync(new CerrarCajaRequest(usuarioId, 100m, 0m, 0m, null));
+                    .EjecutarAsync(new CerrarCajaRequest(usuarioId, 100m, null));
             }
 
             await using (var context = new BodegaLuchitoDbContext(options))

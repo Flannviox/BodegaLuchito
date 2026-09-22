@@ -24,11 +24,12 @@ namespace BodegaLuchito.Application.Caja.UseCases
             CerrarCajaRequest request,
             CancellationToken cancellationToken = default
 
-        ){
+        )
+        {
 
-            if(request.EfectivoReal < 0 || request.YapeReal < 0 || request.PlinReal < 0)
+            if (request.EfectivoReal < 0)
             {
-                throw new ArgumentException("Los montos reales no pueden ser negativos.");
+                throw new ArgumentException("El efectivo contado no puede ser negativo");
             }
 
 
@@ -41,14 +42,10 @@ namespace BodegaLuchito.Application.Caja.UseCases
                 cancellationToken
             );
 
-            decimal CalcularEsperado(
+            (decimal ingresos, decimal salidas, decimal neto)
 
-                IEnumerable<MovimientoCaja>movimientoCajas,
-                MetodoPago metodoPago,
-                decimal fondoInicial =0
-
-            ){
-
+             CalcularMovimientos(IEnumerable<MovimientoCaja> movimientoCajas, MetodoPago metodoPago)
+            {
                 var ingresos = movimientoCajas
                     .Where(m =>
                         m.MetodoPago == metodoPago &&
@@ -67,35 +64,40 @@ namespace BodegaLuchito.Application.Caja.UseCases
                         m.Tipo == TipoMovimientoCaja.ReversionVenta)
                     .Sum(m => m.Monto);
 
-                return fondoInicial + ingresos - egresos - reversiones;
+                var salidas = egresos + reversiones;
+                var neto = ingresos - salidas;
 
-
+                return (ingresos, salidas, neto);
             }
 
-            var efectivoEsperado = CalcularEsperado(
-                movimientos,
-                MetodoPago.Efectivo,
-                sesion.FondoInicial);
+            var efectivo =
+                CalcularMovimientos(
+                 movimientos,
+                 MetodoPago.Efectivo);
 
-            var yapeEsperado = CalcularEsperado(
-                movimientos,
-                MetodoPago.Yape);
+            var yape =
+                CalcularMovimientos(
+                    movimientos,
+                    MetodoPago.Yape);
 
-            var plinEsperado = CalcularEsperado(
-                movimientos,
-                MetodoPago.Plin);
+            var plin =
+                CalcularMovimientos(
+                    movimientos,
+                    MetodoPago.Plin);
+
+            var efectivoEsperado = sesion.FondoInicial + efectivo.neto;
 
             sesion.EfectivoEsperado = efectivoEsperado;
             sesion.EfectivoReal = request.EfectivoReal;
             sesion.DiferenciaEfectivo = request.EfectivoReal - efectivoEsperado;
 
-            sesion.YapeEsperado = yapeEsperado;
-            sesion.YapeReal = request.YapeReal;
-            sesion.DiferenciaYape = request.YapeReal - yapeEsperado;
+            sesion.YapeEsperado = yape.neto;
+            sesion.YapeReal = null;
+            sesion.DiferenciaYape = null;
 
-            sesion.PlinEsperado = plinEsperado;
-            sesion.PlinReal = request.PlinReal;
-            sesion.DiferenciaPlin = request.PlinReal - plinEsperado;
+            sesion.PlinEsperado = plin.neto;
+            sesion.PlinReal = null;
+            sesion.DiferenciaPlin = null;
 
             sesion.ObservacionCierre = request.ObservacionCierre;
             sesion.UsuarioCierreId = request.UsuarioCierreId;
@@ -105,9 +107,18 @@ namespace BodegaLuchito.Application.Caja.UseCases
             await _cajaRepository.GuardarCambiosAsync(cancellationToken);
 
             return new CerrarCajaResult(
-                efectivoEsperado, request.EfectivoReal, sesion.DiferenciaEfectivo.Value,
-                yapeEsperado, request.YapeReal, sesion.DiferenciaYape.Value,
-                plinEsperado, request.PlinReal, sesion.DiferenciaPlin.Value);
+                efectivoEsperado,
+                request.EfectivoReal,
+                sesion.DiferenciaEfectivo.Value,
+
+                yape.ingresos,
+                yape.salidas,
+                yape.neto,
+
+                plin.ingresos,
+                plin.salidas,
+                plin.neto
+            );
         }
     }
 }

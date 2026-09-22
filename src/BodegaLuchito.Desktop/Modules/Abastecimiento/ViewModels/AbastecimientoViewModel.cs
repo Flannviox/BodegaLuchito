@@ -251,12 +251,21 @@ public partial class AbastecimientoViewModel : ViewModelBase
             return;
         }
 
+        var usuarioActual = _sesionUsuario.UsuarioActual;
+
+        if(usuarioActual is null)
+        {
+            MostrarMensaje("No existe un usuario autenticado");
+            return;
+        }
+
+
         var request = new RegistrarAbastecimientoRequest
         {
             ProveedorId = ProveedorSeleccionado.Id,
             Total = TotalAbastecimiento,
             MetodoPago = MetodoPagoSeleccionado,
-            UsuarioId = 1, // Bypass temporal
+            UsuarioId = usuarioActual.IdUsuario,
             Detalles = Carrito.Select(c => new DetalleAbastecimientoRequest
             {
                 ProductoId = c.ProductoId,

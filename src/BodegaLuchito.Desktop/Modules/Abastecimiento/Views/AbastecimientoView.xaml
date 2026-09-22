@@ -1,0 +1,196 @@
+<UserControl x:Class="BodegaLuchito.Desktop.Modules.Abastecimiento.Views.AbastecimientoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <!-- ESTILOS MODERNOS PARA TODAS LAS TABLAS (DATAGRID) -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F8FAFC"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#F1F5F9"/>
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="RowHeight" Value="45"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" Background="Transparent">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="#0F172A"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F1F5F9"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E0F2FE"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER: Buscadores Reactivos y Formularios -->
+        <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.5*"/>
+                    <ColumnDefinition Width="3.5*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 1. Buscador de Proveedores -->
+                <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                    <TextBlock Text="1. Proveedor (RUC o Nombre)" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding TextoBusquedaProveedor, UpdateSourceTrigger=PropertyChanged}" Height="35" Padding="5" Margin="0,0,0,5" VerticalContentAlignment="Center" ToolTip="Escriba para filtrar al instante"/>
+                    <!-- Contenedor con esquinas redondeadas para el DataGrid -->
+                    <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" ClipToBounds="True">
+                        <DataGrid ItemsSource="{Binding ProveedoresFiltrados}" SelectedItem="{Binding ProveedorSeleccionado}" Height="130">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="RUC" Binding="{Binding Ruc}" Width="100"/>
+                                <DataGridTextColumn Header="Proveedor" Binding="{Binding Nombre}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+
+                <!-- 2. Buscador de Productos -->
+                <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                    <TextBlock Text="2. Producto (Cód. Barras o Nombre)" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding TextoBusquedaProducto, UpdateSourceTrigger=PropertyChanged}" Height="35" Padding="5" Margin="0,0,0,5" VerticalContentAlignment="Center" ToolTip="Escriba para filtrar al instante"/>
+                    <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" ClipToBounds="True">
+                        <DataGrid ItemsSource="{Binding ProductosFiltrados}" SelectedItem="{Binding ProductoSeleccionado}" Height="130">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Código" Binding="{Binding CodigoBarras}" Width="100"/>
+                                <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*"/>
+                                <DataGridTextColumn Header="Stock" Binding="{Binding StockActual}" Width="70"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+
+                <!-- 3. Formulario de Ingreso -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Top">
+                    <TextBlock Text="Cantidad" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding CantidadIngreso, UpdateSourceTrigger=PropertyChanged}" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,10"/>
+
+                    <TextBlock Text="Costo Unitario (S/)" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding PrecioCompra, UpdateSourceTrigger=PropertyChanged}" Height="35" Padding="5" VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+
+                    <Button Command="{Binding AgregarAlCarritoCommand}" Content="+ Añadir al Carrito" Height="40" Background="#10B981" Foreground="White" BorderThickness="0" FontWeight="Bold" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- BODY: Carrito de Compras Principal -->
+        <Border Grid.Row="1" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+            <DataGrid ItemsSource="{Binding Carrito}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Código" Binding="{Binding CodigoBarras}" Width="120"/>
+                    <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" Width="*"/>
+                    <DataGridTextColumn Header="Categoría" Binding="{Binding Categoria}" Width="150"/>
+                    <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="100"/>
+                    <DataGridTextColumn Header="Costo Unit." Binding="{Binding PrecioUnitario, StringFormat=C}" Width="120"/>
+                    <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C}" Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="#0F172A"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Acción" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <!-- Botón moderno estilo texto plano de advertencia -->
+                                <Button Content="Eliminar" Command="{Binding DataContext.QuitarDelCarritoCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="Transparent" Foreground="#EF4444" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- FOOTER: Totales y Confirmación -->
+        <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,15,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Pagar con:" FontSize="16" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding MetodosPago}" SelectedItem="{Binding MetodoPagoSeleccionado}" Width="150" Height="35" Padding="5" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Total a Pagar: " FontSize="20" FontWeight="SemiBold" Foreground="#475569" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalAbastecimiento, StringFormat=S/ {0:N2}}" FontSize="24" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,20,0" VerticalAlignment="Center"/>
+                    <Button Command="{Binding ConfirmarAbastecimientoCommand}" Content="Procesar Compra" Height="45" Width="160" Background="#3B82F6" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- SNACKBAR NOTIFICACIONES -->
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#333333" CornerRadius="4" Padding="20,10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Visibility="{Binding IsSnackbarActive, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="{Binding MensajeSnackbar}" Foreground="White" FontSize="14" FontWeight="SemiBold"/>
+        </Border>
+    </Grid>
+</UserControl>

@@ -7,6 +7,7 @@ using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
 using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
+using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using CommunityToolkit.Mvvm.Input;
 
@@ -77,6 +78,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
             MenuItems.Add(
                 new NavigationItemViewModel(
+                    "Abastecimiento",
+                    IrAAbastecimientoCommand));
+
+            MenuItems.Add(
+                new NavigationItemViewModel(
                     "Usuarios",
                     IrAUsuariosCommand));
         }
@@ -130,6 +136,17 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         _navigationService.NavigateTo<ProveedoresViewModel>();
+    }
+
+    [RelayCommand]
+    private void IrAAbastecimiento()
+    {
+        if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
+        {
+            return;
+        }
+
+        _navigationService.NavigateTo<AbastecimientoViewModel>();
     }
 
     [RelayCommand]

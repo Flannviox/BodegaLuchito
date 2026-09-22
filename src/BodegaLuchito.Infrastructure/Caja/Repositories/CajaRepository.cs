@@ -46,7 +46,11 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
         {
             return _context.SaveChangesAsync(cancellationToken);
         }
-
+        public async Task AgregarMovimientoAsync(MovimientoCaja movimiento, CancellationToken cancellationToken = default)
+        {
+            await _context.Set<MovimientoCaja>().AddAsync(movimiento, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
 
     }
 }

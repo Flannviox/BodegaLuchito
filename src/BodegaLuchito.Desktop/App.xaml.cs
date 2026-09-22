@@ -12,6 +12,8 @@ using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
 using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
+using BodegaLuchito.Desktop.Modules.Abastecimiento.Views; // Agregado
+using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels; // Agregado
 using BodegaLuchito.Desktop.Navigation;
 using BodegaLuchito.Desktop.Shell.ViewModels;
 using BodegaLuchito.Infrastructure;
@@ -88,6 +90,10 @@ public partial class App : System.Windows.Application
         services.AddTransient<RegistrarProveedorUseCase>();
         services.AddTransient<AbrirCajaUseCase>();
         services.AddTransient<CerrarCajaUseCase>();
+
+        // Abastecimiento
+        services.AddTransient<AbastecimientoView>();
+        services.AddTransient<AbastecimientoViewModel>();
 
         //Productos - Caso de uso y ViewModel
 

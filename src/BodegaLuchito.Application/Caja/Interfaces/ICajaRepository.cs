@@ -15,6 +15,8 @@ namespace BodegaLuchito.Application.Caja.Interfaces
             int sesionCajaId, CancellationToken cancellationToken = default);
 
         Task GuardarCambiosAsync(CancellationToken cancellationToken = default);
+
+        Task AgregarMovimientoAsync(MovimientoCaja movimiento, CancellationToken cancellationToken = default);
     }
 
 }

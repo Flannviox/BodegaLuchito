@@ -12,7 +12,10 @@
     xmlns:proveedoresVm="clr-namespace:BodegaLuchito.Desktop.Modules.Proveedores.ViewModels"
     xmlns:proveedoresViews="clr-namespace:BodegaLuchito.Desktop.Modules.Proveedores.Views"
     xmlns:cajaVm="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.ViewModels"
-    xmlns:cajaViews="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views">
+    xmlns:cajaViews="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views"
+    xmlns:abastecimientoVm="clr-namespace:BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels"
+    xmlns:abastecimientoV="clr-namespace:BodegaLuchito.Desktop.Modules.Abastecimiento.Views">
+    
 
     <DataTemplate DataType="{x:Type inicioVm:InicioViewModel}">
         <inicioViews:InicioView />
@@ -36,6 +39,10 @@
 
     <DataTemplate DataType="{x:Type cajaVm:CajaViewModel}">
         <cajaViews:CajaView />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type abastecimientoVm:AbastecimientoViewModel}">
+        <abastecimientoV:AbastecimientoView />
     </DataTemplate>
 
 </ResourceDictionary>

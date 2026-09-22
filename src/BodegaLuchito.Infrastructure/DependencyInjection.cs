@@ -1,14 +1,18 @@
+using BodegaLuchito.Application.Abastecimiento.Interfaces;
+using BodegaLuchito.Application.Abastecimiento.UseCases;
 using BodegaLuchito.Application.Autenticacion.Interfaces;
 using BodegaLuchito.Application.Caja.Interfaces;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Application.Proveedores.Interfaces;
 using BodegaLuchito.Application.Proveedores.UseCases;
+using BodegaLuchito.Infrastructure.Abastecimiento.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Security;
 using BodegaLuchito.Infrastructure.Caja.Repositories;
 using BodegaLuchito.Infrastructure.Persistence;
 using BodegaLuchito.Infrastructure.Productos.Repositories;
 using BodegaLuchito.Infrastructure.Proveedores.Repositories;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +39,8 @@ public static class DependencyInjection
         services.AddTransient<EliminarProveedorUseCase>();
         services.AddTransient<ICajaRepository, CajaRepository>();
         services.AddTransient<ICategoriaRepository, CategoriaRepository>();
+        services.AddTransient<IAbastecimientoRepository, AbastecimientoRepository>();
+        services.AddTransient<RegistrarAbastecimientoUseCase>();
 
 
         return services;

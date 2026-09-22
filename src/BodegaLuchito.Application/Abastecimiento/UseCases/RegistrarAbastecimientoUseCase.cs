@@ -34,14 +34,36 @@ public class RegistrarAbastecimientoUseCase
         // 1. Validaciones básicas
         if (request.Detalles == null || !request.Detalles.Any())
             throw new ArgumentException("El abastecimiento debe tener al menos un producto.");
-        if (request.Total <= 0)
-            throw new ArgumentException("El total del abastecimiento debe ser mayor a cero.");
+
+        if (request.Detalles.Any(d =>
+            d.Cantidad <= 0 ||
+            d.PrecioUnitario <= 0))
+        {
+            throw new ArgumentException(
+                "La cantidad y el precio de los productos deben ser mayores a cero.");
+        }
+
+        var totalCalculado =
+            request.Detalles.Sum(d => d.Subtotal);
+
+        if (totalCalculado <= 0)
+        {
+            throw new ArgumentException(
+                "El total del abastecimiento debe ser mayor a cero.");
+        }
+        var sesionAbierta = await _cajaRepository.ObtenerSesionAbiertaAsync(cancellationToken);
+
+        if (sesionAbierta is null)
+        {
+            throw new InvalidOperationException("Debe abrir una sesión de caja antes de registrar un abastecimiento");
+        }
+
 
         // 2. Preparar la entidad de Dominio
         var abastecimiento = new EntidadAbastecimiento
         {
             ProveedorId = request.ProveedorId,
-            Total = request.Total,
+            Total = totalCalculado,
             MetodoPago = request.MetodoPago,
             FechaHora = DateTime.Now
         };
@@ -71,23 +93,19 @@ public class RegistrarAbastecimientoUseCase
             }
         }
 
-        // 5. Afectar la Caja (Registrar el egreso si hay una sesión abierta)
-        var sesionAbierta = await _cajaRepository.ObtenerSesionAbiertaAsync(cancellationToken);
-        if (sesionAbierta != null)
+        // 5. Afectar la Caja
+        var movimiento = new MovimientoCaja
         {
-            var movimiento = new MovimientoCaja
-            {
-                SesionCajaId = sesionAbierta.Id,
-                UsuarioId = request.UsuarioId,
-                Tipo = TipoMovimientoCaja.EgresoAbastecimiento,
-                MetodoPago = request.MetodoPago,
-                Monto = request.Total,
-                FechaHora = DateTime.Now,
-                AbastecimientoId = abastecimiento.Id,
-                Descripcion = $"Pago por abastecimiento #{abastecimiento.Id}"
-            };
+            SesionCajaId = sesionAbierta.Id,
+            UsuarioId = request.UsuarioId,
+            Tipo = TipoMovimientoCaja.EgresoAbastecimiento,
+            MetodoPago = request.MetodoPago,
+            Monto = totalCalculado,
+            FechaHora = DateTime.Now,
+            AbastecimientoId = abastecimiento.Id,
+            Descripcion = $"Pago por abastecimiento #{abastecimiento.Id}"
+        };
 
-            await _cajaRepository.AgregarMovimientoAsync(movimiento, cancellationToken);
-        }
+        await _cajaRepository.AgregarMovimientoAsync(movimiento, cancellationToken);
     }
 }

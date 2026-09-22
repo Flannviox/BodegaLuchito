@@ -131,7 +131,7 @@ namespace BodegaLuchito.Tests.Application.Caja
             var useCase = new CerrarCajaUseCase(new CajaRepository(context));
 
             var request = new CerrarCajaRequest(
-                UsuarioCierreId: 1, EfectivoReal: 0m, YapeReal: 0m, PlinReal: 0m, ObservacionCierre: null);
+                UsuarioCierreId: 1, EfectivoReal: 0m, ObservacionCierre: null);
 
 
             var action = async () => await useCase.EjecutarAsync(request);
@@ -164,8 +164,6 @@ namespace BodegaLuchito.Tests.Application.Caja
             var request = new CerrarCajaRequest(
                 UsuarioCierreId: 2,
                 EfectivoReal: 100m,
-                YapeReal: 0m,
-                PlinReal: 0m,
                 ObservacionCierre: "Cierre normal");
 
 
@@ -192,7 +190,7 @@ namespace BodegaLuchito.Tests.Application.Caja
         }
 
         [Fact]
-        public async Task CerrarCaja_DebeCalcularDiferenciasCorrectamente()
+        public async Task CerrarCaja_DebeCalcularEfectivoYMovimientosDigitalesCorrectamente()
         {
 
             var (connection, options) = await CrearBaseEnMemoriaAsync();
@@ -278,7 +276,7 @@ namespace BodegaLuchito.Tests.Application.Caja
 
             var useCase = new CerrarCajaUseCase(repositorio);
             var request = new CerrarCajaRequest(
-                UsuarioCierreId: 2, EfectivoReal: 125m, YapeReal: 60m, PlinReal: 35m, ObservacionCierre: null);
+                UsuarioCierreId: 2, EfectivoReal: 125m, ObservacionCierre: null);
 
 
             var resultado = await useCase.EjecutarAsync(request);
@@ -288,17 +286,17 @@ namespace BodegaLuchito.Tests.Application.Caja
             Assert.Equal(125m, resultado.EfectivoReal);
             Assert.Equal(-5m, resultado.DiferenciaEfectivo);
 
-            Assert.Equal(65m, resultado.YapeEsperado);
-            Assert.Equal(60m, resultado.YapeReal);
-            Assert.Equal(-5m, resultado.DiferenciaYape);
+            Assert.Equal(80m, resultado.YapeIngresos);
+            Assert.Equal(15m, resultado.YapeSalidas);
+            Assert.Equal(65m, resultado.YapeNeto);
 
-            Assert.Equal(30m, resultado.PlinEsperado);
-            Assert.Equal(35m, resultado.PlinReal);
-            Assert.Equal(5m, resultado.DiferenciaPlin);
+            Assert.Equal(40m, resultado.PlinIngresos);
+            Assert.Equal(10m, resultado.PlinSalidas);
+            Assert.Equal(30m, resultado.PlinNeto);
         }
 
         [Fact]
-        public async Task CerrarCaja_ConMontoNegativo_DebeSerRechazado()
+        public async Task CerrarCaja_ConEfectivoNegativo_DebeSerRechazado()
         {
             var (connection, options) = await CrearBaseEnMemoriaAsync();
             await using var connectionDispose = connection;
@@ -322,8 +320,6 @@ namespace BodegaLuchito.Tests.Application.Caja
             var request = new CerrarCajaRequest(
                 UsuarioCierreId: 1,
                 EfectivoReal: -10m,
-                YapeReal: 0m,
-                PlinReal: 0m,
                 ObservacionCierre: null);
 
             var action = async () => await useCase.EjecutarAsync(request);
@@ -331,5 +327,61 @@ namespace BodegaLuchito.Tests.Application.Caja
             await Assert.ThrowsAsync<ArgumentException>(action);
         }
 
+        [Fact]
+        public async Task CerrarCaja_ConEgresoYape_DebeCalcularNetoNegativo()
+        {
+            var (connection, options) =
+                await CrearBaseEnMemoriaAsync();
+
+            await using var connectionDispose = connection;
+
+            await using var context =
+                new BodegaLuchitoDbContext(options);
+
+            var repositorio =
+                new CajaRepository(context);
+
+            var sesion = new SesionCaja
+            {
+                UsuarioAperturaId = 1,
+                FechaApertura = DateTime.Now,
+                FondoInicial = 100m,
+                Estado = EstadoSesionCaja.Abierta
+            };
+
+            context.Set<SesionCaja>().Add(sesion);
+            await context.SaveChangesAsync();
+
+            context.Set<MovimientoCaja>().Add(
+                new MovimientoCaja
+                {
+                    SesionCajaId = sesion.Id,
+                    UsuarioId = 1,
+                    Tipo = TipoMovimientoCaja.EgresoAbastecimiento,
+                    MetodoPago = MetodoPago.Yape,
+                    Monto = 30m,
+                    FechaHora = DateTime.Now
+                });
+
+            await context.SaveChangesAsync();
+
+            var useCase =
+                new CerrarCajaUseCase(repositorio);
+
+            var request = new CerrarCajaRequest(
+                UsuarioCierreId: 2,
+                EfectivoReal: 100m,
+                ObservacionCierre: null);
+
+            var resultado =
+                await useCase.EjecutarAsync(request);
+
+            Assert.Equal(0m, resultado.YapeIngresos);
+            Assert.Equal(30m, resultado.YapeSalidas);
+            Assert.Equal(-30m, resultado.YapeNeto);
+
+            Assert.Equal(100m, resultado.EfectivoEsperado);
+            Assert.Equal(0m, resultado.DiferenciaEfectivo);
+        }
     }
 }

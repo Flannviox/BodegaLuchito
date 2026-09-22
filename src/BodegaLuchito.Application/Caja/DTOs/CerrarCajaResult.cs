@@ -9,12 +9,12 @@ namespace BodegaLuchito.Application.Caja.DTOs
         decimal EfectivoEsperado,
         decimal EfectivoReal,
         decimal DiferenciaEfectivo,
-        decimal YapeEsperado,
-        decimal YapeReal,
-        decimal DiferenciaYape,
-        decimal PlinEsperado,
-        decimal PlinReal,
-        decimal DiferenciaPlin
+        decimal YapeIngresos,
+        decimal YapeSalidas,
+        decimal YapeNeto,
+        decimal PlinIngresos,
+        decimal PlinSalidas,
+        decimal PlinNeto
 
     );
 }

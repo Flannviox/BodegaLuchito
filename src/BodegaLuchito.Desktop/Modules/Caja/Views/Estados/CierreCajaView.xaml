@@ -44,7 +44,7 @@
                         Margin="0,0,0,22">
 
                     <TextBlock
-                        Text=" Importante: Debe registrar el total disponible al cierre, no únicamente las ventas realizadas durante la jornada. Elefectivo debe incluir tambien el fondo inicial"
+                        Text="Importante: Cuenta todo el efectivo disponible en caja, incluyendo el fondo inicial. Los movimientos realizados por Yape y Plin serán calculados automáticamente por el sistema."
                         FontSize="12"
                         Foreground="{StaticResource ColorAcento}"
                         TextWrapping="Wrap"
@@ -53,7 +53,7 @@
 
 
                 </Border>
-                <TextBlock Text="Verificacion final"
+                <TextBlock Text="Verificación final"
                            FontSize="14"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource ColorTextoPrincipal}"
@@ -61,14 +61,6 @@
                 <controles:CampoEntrada
                     Etiqueta="Efectivo total contado en caja"
                     Valor="{Binding EfectivoRealInput}" />
-
-                <controles:CampoEntrada
-                    Etiqueta="Total verificado en Yape"
-                    Valor="{Binding YapeRealInput}" />
-
-                <controles:CampoEntrada
-                    Etiqueta="Total verificado en Plin"
-                    Valor="{Binding PlinRealInput}" />
 
                 <TextBlock Text="Observación del cierre (opcional)"
                            FontSize="13"
@@ -171,7 +163,7 @@
                                    Foreground="{StaticResource ColorAdvertencia}"
                                    Margin="0,0,0,5" />
                         <TextBlock
-                            Text="El sistema comparará los montos calculados según el fondo inicial y los movimientos de la sesión con los montos verificados al cierre."
+                            Text="El sistema comparará el efectivo esperado y los movimientos netos de Yape y Plin con los valores verificados al cierre."
                             FontSize="12"
                             Foreground="{StaticResource ColorAdvertencia}"
                             TextWrapping="Wrap" />

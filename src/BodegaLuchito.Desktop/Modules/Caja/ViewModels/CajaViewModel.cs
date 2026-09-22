@@ -51,11 +51,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private string _efectivoRealInput = "0";
 
         [ObservableProperty]
-        private string _yapeRealInput = "0";
-
-        [ObservableProperty]
-        private string _plinRealInput = "0";
-        [ObservableProperty]
         private string? _observacionInput;
 
         [ObservableProperty]
@@ -76,15 +71,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         public bool CajaAbierta =>
             EstadoVista == EstadoVistaCaja.EnOperacion ||
             EstadoVista == EstadoVistaCaja.Cierre;
-
-        public decimal DiferenciaTotal =>
-            ResultadoUltimoCierre is null
-                ? 0m
-                : ResultadoUltimoCierre.DiferenciaEfectivo
-                  + ResultadoUltimoCierre.DiferenciaYape
-                  + ResultadoUltimoCierre.DiferenciaPlin;
-
-
         partial void OnEstadoVistaChanged(EstadoVistaCaja value)
         {
             OnPropertyChanged(nameof(MostrarApertura));
@@ -93,12 +79,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             OnPropertyChanged(nameof(MostrarResultadoCierre));
             OnPropertyChanged(nameof(CajaAbierta));
         }
-
-        partial void OnResultadoUltimoCierreChanged(CerrarCajaResult? value)
-        {
-            OnPropertyChanged(nameof(DiferenciaTotal));
-        }
-
 
         public async Task InicializarAsync()
         {
@@ -194,29 +174,11 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 return;
             }
 
-            if (!TryParseMonto(YapeRealInput, out var yapeReal))
-            {
-                MensajeError =
-                    "Ingresa un monto válido para Yape.";
-
-                return;
-            }
-
-            if (!TryParseMonto(PlinRealInput, out var plinReal))
-            {
-                MensajeError =
-                    "Ingresa un monto válido para Plin.";
-
-                return;
-            }
-
             try
             {
                 var request = new CerrarCajaRequest(
                     usuarioActual.IdUsuario,
                     efectivoReal,
-                    yapeReal,
-                    plinReal,
                     ObservacionInput);
 
                 ResultadoUltimoCierre =
@@ -250,8 +212,6 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private void LimpiarFormularioCierre()
         {
             EfectivoRealInput = "0";
-            YapeRealInput = "0";
-            PlinRealInput = "0";
             ObservacionInput = null;
         }
 

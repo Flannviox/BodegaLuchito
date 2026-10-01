@@ -35,6 +35,11 @@ public sealed class RegistrarProductoUseCaseTests
             return Task.FromResult(Enumerable.Empty<Producto>());
         }
 
+        public Task<IEnumerable<Producto>> ObtenerInactivosAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(Enumerable.Empty<Producto>());
+        }
+
         public Task<Producto?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<Producto?>(null);
@@ -43,6 +48,52 @@ public sealed class RegistrarProductoUseCaseTests
         public Task ActualizarAsync(Producto producto, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
+        }
+
+        public Task ActualizarConHistorialPrecioAsync(
+            Producto producto,
+            HistorialPrecioProducto? historialPrecio,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<IReadOnlyList<HistorialPrecioProducto>> ObtenerHistorialPreciosAsync(
+            int productoId,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<HistorialPrecioProducto>>(
+                Array.Empty<HistorialPrecioProducto>());
+        }
+
+        public Task<IReadOnlyList<HistorialPrecioProducto>> ObtenerHistorialPreciosGlobalAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<HistorialPrecioProducto>>(
+                Array.Empty<HistorialPrecioProducto>());
+        }
+
+        public Task ActualizarEstadoConHistorialAsync(
+            Producto producto,
+            HistorialActividadProducto historialActividad,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<IReadOnlyList<HistorialActividadProducto>> ObtenerHistorialActividadAsync(
+            int productoId,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<HistorialActividadProducto>>(
+                Array.Empty<HistorialActividadProducto>());
+        }
+
+        public Task<IReadOnlyList<HistorialActividadProducto>> ObtenerHistorialActividadGlobalAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<HistorialActividadProducto>>(
+                Array.Empty<HistorialActividadProducto>());
         }
     }
 
@@ -57,6 +108,7 @@ public sealed class RegistrarProductoUseCaseTests
 
         Assert.NotNull(repository.ProductoAgregado);
         Assert.Equal("Galleta", repository.ProductoAgregado.Nombre);
+        Assert.Equal(0m, repository.ProductoAgregado.StockActual);
     }
 
     [Fact]
@@ -90,13 +142,16 @@ public sealed class RegistrarProductoUseCaseTests
     }
 
     [Fact]
-    public async Task EjecutarAsync_StockActualNegativo_LanzaArgumentException()
+    public async Task EjecutarAsync_StockInicialIngresado_SeRegistraEnCero()
     {
         var repository = new FakeProductoRepository();
         var useCase = new RegistrarProductoUseCase(repository);
-        var request = new RegistrarProductoRequest("Galleta", 1, "123", 1.5m, UnidadVenta.Unidad, true, -1, 5);
+        var request = new RegistrarProductoRequest("Galleta", 1, "123", 1.5m, UnidadVenta.Unidad, true, 20, 5);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => useCase.EjecutarAsync(request));
+        await useCase.EjecutarAsync(request);
+
+        Assert.NotNull(repository.ProductoAgregado);
+        Assert.Equal(0m, repository.ProductoAgregado.StockActual);
     }
 
     [Fact]
@@ -121,7 +176,7 @@ public sealed class RegistrarProductoUseCaseTests
     }
 
     [Fact]
-    public async Task EjecutarAsync_SinControlInventario_AsignaStocksCero()
+    public async Task EjecutarAsync_AunSiLaSolicitudNoLoIndica_ControlaInventario()
     {
         var repository = new FakeProductoRepository();
         var useCase = new RegistrarProductoUseCase(repository);
@@ -130,8 +185,8 @@ public sealed class RegistrarProductoUseCaseTests
         await useCase.EjecutarAsync(request);
 
         Assert.NotNull(repository.ProductoAgregado);
-        Assert.False(repository.ProductoAgregado.ControlaInventario);
+        Assert.True(repository.ProductoAgregado.ControlaInventario);
         Assert.Equal(0m, repository.ProductoAgregado.StockActual);
-        Assert.Equal(0m, repository.ProductoAgregado.StockMinimo);
+        Assert.Equal(50m, repository.ProductoAgregado.StockMinimo);
     }
 }

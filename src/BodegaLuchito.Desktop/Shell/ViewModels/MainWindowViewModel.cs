@@ -36,7 +36,19 @@ public partial class MainWindowViewModel : ViewModelBase
         _navigationService.NavigateTo<InicioViewModel>();
     }
 
-    public string Titulo => "Bodega Luchito";
+    public string TituloVentana => "Bodega Luchito";
+
+    public string TituloPagina => CurrentViewModel switch
+    {
+        InicioViewModel => "Inicio",
+        ProductosViewModel => "Gestión de productos",
+        ProveedoresViewModel => "Proveedores",
+        AbastecimientoViewModel => "Abastecimiento",
+        UsuariosViewModel => "Usuarios",
+        VentasViewModel => "Ventas",
+        CajaViewModel => "Caja",
+        _ => "Bodega Luchito"
+    };
 
     public ViewModelBase? CurrentViewModel =>
         _navigationService.CurrentViewModel;
@@ -101,6 +113,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnCurrentViewModelChanged()
     {
         OnPropertyChanged(nameof(CurrentViewModel));
+        OnPropertyChanged(nameof(TituloPagina));
     }
 
     private void OnSesionCambiada()

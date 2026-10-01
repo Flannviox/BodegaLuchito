@@ -8,12 +8,12 @@ using BodegaLuchito.Domain.Productos.Enums;
 
 namespace BodegaLuchito.Application.Productos.UseCases;
 
-public sealed class EliminarProductoUseCase
+public sealed class ReactivarProductoUseCase
 {
     private readonly IProductoRepository _productoRepository;
     private readonly ISesionUsuario _sesionUsuario;
 
-    public EliminarProductoUseCase(
+    public ReactivarProductoUseCase(
         IProductoRepository productoRepository,
         ISesionUsuario sesionUsuario)
     {
@@ -25,23 +25,23 @@ public sealed class EliminarProductoUseCase
     {
         var producto = await _productoRepository.ObtenerPorIdAsync(id, cancellationToken);
 
-        if (producto == null)
-            throw new InvalidOperationException("El producto que intenta eliminar no existe en el sistema.");
+        if (producto is null)
+            throw new InvalidOperationException("El producto que intenta reactivar no existe en el sistema.");
 
-        if (!producto.Activo)
-            throw new InvalidOperationException("El producto ya se encuentra desactivado.");
+        if (producto.Activo)
+            throw new InvalidOperationException("El producto ya se encuentra activo.");
 
         var usuarioActual = _sesionUsuario.UsuarioActual;
         if (usuarioActual is null)
-            throw new InvalidOperationException("Debe iniciar sesión para desactivar un producto.");
+            throw new InvalidOperationException("Debe iniciar sesión para reactivar un producto.");
 
-        producto.Activo = false;
+        producto.Activo = true;
 
         var historialActividad = new HistorialActividadProducto
         {
             ProductoId = producto.Id,
-            Tipo = TipoActividadProducto.Desactivacion,
-            Descripcion = "Producto desactivado del catálogo.",
+            Tipo = TipoActividadProducto.Reactivacion,
+            Descripcion = "Producto reactivado en el catálogo.",
             FechaHora = DateTime.Now,
             UsuarioNombre = usuarioActual.NombreCompleto
         };

@@ -83,9 +83,6 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
         {
             var producto = productos[detalle.ProductoId];
 
-            if (!producto.ControlaInventario)
-                continue;
-
             var stockAnterior = producto.StockActual;
             producto.StockActual += detalle.Cantidad;
 

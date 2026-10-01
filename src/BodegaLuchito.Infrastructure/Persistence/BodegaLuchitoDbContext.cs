@@ -17,6 +17,12 @@ public sealed class BodegaLuchitoDbContext
     public DbSet<Producto> Productos =>
         Set<Producto>();
 
+    public DbSet<HistorialPrecioProducto> HistorialPreciosProducto =>
+        Set<HistorialPrecioProducto>();
+
+    public DbSet<HistorialActividadProducto> HistorialActividadProducto =>
+        Set<HistorialActividadProducto>();
+
     public DbSet<Categoria> Categorias =>
         Set<Categoria>();
 

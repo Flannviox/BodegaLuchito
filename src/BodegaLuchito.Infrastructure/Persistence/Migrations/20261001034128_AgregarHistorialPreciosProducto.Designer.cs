@@ -3,6 +3,7 @@ using System;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BodegaLuchito.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(BodegaLuchitoDbContext))]
-    partial class BodegaLuchitoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261001034128_AgregarHistorialPreciosProducto")]
+    partial class AgregarHistorialPreciosProducto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
@@ -282,40 +285,6 @@ namespace BodegaLuchito.Infrastructure.Persistence.Migrations
                     b.ToTable("Categoria", (string)null);
                 });
 
-            modelBuilder.Entity("BodegaLuchito.Domain.Productos.Entities.HistorialActividadProducto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("FechaHora")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UsuarioNombre")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductoId", "FechaHora");
-
-                    b.ToTable("HistorialActividadProducto", (string)null);
-                });
-
             modelBuilder.Entity("BodegaLuchito.Domain.Productos.Entities.HistorialPrecioProducto", b =>
                 {
                     b.Property<int>("Id")
@@ -480,17 +449,6 @@ namespace BodegaLuchito.Infrastructure.Persistence.Migrations
                 });
 
             modelBuilder.Entity("BodegaLuchito.Domain.Inventario.Entities.MovimientoInventario", b =>
-                {
-                    b.HasOne("BodegaLuchito.Domain.Productos.Entities.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Producto");
-                });
-
-            modelBuilder.Entity("BodegaLuchito.Domain.Productos.Entities.HistorialActividadProducto", b =>
                 {
                     b.HasOne("BodegaLuchito.Domain.Productos.Entities.Producto", "Producto")
                         .WithMany()

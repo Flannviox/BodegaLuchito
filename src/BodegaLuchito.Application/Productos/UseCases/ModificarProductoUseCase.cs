@@ -1,19 +1,25 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Application.Productos.DTOs;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Domain.Productos.Enums;
+using BodegaLuchito.Domain.Productos.Entities;
 
 namespace BodegaLuchito.Application.Productos.UseCases;
 
 public sealed class ModificarProductoUseCase
 {
     private readonly IProductoRepository _productoRepository;
+    private readonly ISesionUsuario _sesionUsuario;
 
-    public ModificarProductoUseCase(IProductoRepository productoRepository)
+    public ModificarProductoUseCase(
+        IProductoRepository productoRepository,
+        ISesionUsuario sesionUsuario)
     {
         _productoRepository = productoRepository;
+        _sesionUsuario = sesionUsuario;
     }
 
     public async Task EjecutarAsync(ModificarProductoRequest request, CancellationToken cancellationToken = default)
@@ -28,17 +34,11 @@ public sealed class ModificarProductoUseCase
         if (request.PrecioVenta <= 0)
             throw new ArgumentException("El precio de venta debe ser mayor a cero.", nameof(request.PrecioVenta));
 
-        if (request.StockActual < 0)
-            throw new ArgumentException("El stock actual no puede ser negativo.", nameof(request.StockActual));
-
         if (request.StockMinimo < 0)
             throw new ArgumentException("El stock mínimo no puede ser negativo.", nameof(request.StockMinimo));
 
         if (request.UnidadVenta == UnidadVenta.Unidad)
         {
-            if (request.StockActual % 1 != 0)
-                throw new ArgumentException("El stock actual debe ser un número entero para productos por unidad.", nameof(request.StockActual));
-
             if (request.StockMinimo % 1 != 0)
                 throw new ArgumentException("El stock mínimo debe ser un número entero para productos por unidad.", nameof(request.StockMinimo));
         }
@@ -65,22 +65,28 @@ public sealed class ModificarProductoUseCase
         producto.CategoriaId = request.CategoriaId;
         producto.Categoria = null!; // Desvinculamos el objeto viejo para que EF Core obedezca al nuevo CategoriaId
         producto.CodigoBarras = codigoBarrasLimpio;
+        var precioAnterior = producto.PrecioVenta;
         producto.PrecioVenta = request.PrecioVenta;
         producto.UnidadVenta = request.UnidadVenta;
-        producto.ControlaInventario = request.ControlaInventario;
+        producto.ControlaInventario = true;
+        producto.StockMinimo = request.StockMinimo;
 
-        if (producto.ControlaInventario)
+        HistorialPrecioProducto? historialPrecio = null;
+        if (precioAnterior != producto.PrecioVenta)
         {
-            producto.StockActual = request.StockActual;
-            producto.StockMinimo = request.StockMinimo;
-        }
-        else
-        {
-            producto.StockActual = 0;
-            producto.StockMinimo = 0;
+            historialPrecio = new HistorialPrecioProducto
+            {
+                ProductoId = producto.Id,
+                PrecioAnterior = precioAnterior,
+                PrecioNuevo = producto.PrecioVenta,
+                FechaHora = DateTime.Now,
+                UsuarioNombre = _sesionUsuario.UsuarioActual?.NombreCompleto ?? "Sistema"
+            };
         }
 
-        //Guardar cambios
-        await _productoRepository.ActualizarAsync(producto, cancellationToken);
+        await _productoRepository.ActualizarConHistorialPrecioAsync(
+            producto,
+            historialPrecio,
+            cancellationToken);
     }
 }

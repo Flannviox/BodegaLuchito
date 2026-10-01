@@ -100,6 +100,10 @@ public partial class App : System.Windows.Application
         services.AddTransient<RegistrarProductoUseCase>();
         services.AddTransient<ModificarProductoUseCase>();
         services.AddTransient<EliminarProductoUseCase>();
+        services.AddTransient<ReactivarProductoUseCase>();
+        services.AddTransient<ConsultarHistorialPreciosProductoUseCase>();
+        services.AddTransient<ConsultarHistorialProductoUseCase>();
+        services.AddTransient<ConsultarHistorialGeneralProductosUseCase>();
         services.AddTransient<RegistrarProductoViewModel>();
 
         // Categorías - Casos de uso

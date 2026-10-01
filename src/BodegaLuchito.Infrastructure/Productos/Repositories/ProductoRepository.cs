@@ -43,6 +43,16 @@ public class ProductoRepository : IProductoRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Producto>> ObtenerInactivosAsync(CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        return await context.Set<Producto>()
+            .Include(p => p.Categoria)
+            .AsNoTracking()
+            .Where(p => !p.Activo)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Producto?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
@@ -57,5 +67,89 @@ public class ProductoRepository : IProductoRepository
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
         context.Set<Producto>().Update(producto);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ActualizarConHistorialPrecioAsync(
+        Producto producto,
+        HistorialPrecioProducto? historialPrecio,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
+        context.Set<Producto>().Update(producto);
+
+        if (historialPrecio is not null)
+            await context.Set<HistorialPrecioProducto>().AddAsync(historialPrecio, cancellationToken);
+
+        await context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<HistorialPrecioProducto>> ObtenerHistorialPreciosAsync(
+        int productoId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<HistorialPrecioProducto>()
+            .AsNoTracking()
+            .Where(x => x.ProductoId == productoId)
+            .OrderByDescending(x => x.FechaHora)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<HistorialPrecioProducto>> ObtenerHistorialPreciosGlobalAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<HistorialPrecioProducto>()
+            .AsNoTracking()
+            .Include(x => x.Producto)
+            .OrderByDescending(x => x.FechaHora)
+            .Take(200)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task ActualizarEstadoConHistorialAsync(
+        Producto producto,
+        HistorialActividadProducto historialActividad,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
+        context.Set<Producto>().Update(producto);
+        await context.Set<HistorialActividadProducto>().AddAsync(historialActividad, cancellationToken);
+
+        await context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<HistorialActividadProducto>> ObtenerHistorialActividadAsync(
+        int productoId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<HistorialActividadProducto>()
+            .AsNoTracking()
+            .Where(x => x.ProductoId == productoId)
+            .OrderByDescending(x => x.FechaHora)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<HistorialActividadProducto>> ObtenerHistorialActividadGlobalAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await context.Set<HistorialActividadProducto>()
+            .AsNoTracking()
+            .Include(x => x.Producto)
+            .OrderByDescending(x => x.FechaHora)
+            .Take(200)
+            .ToListAsync(cancellationToken);
     }
 }

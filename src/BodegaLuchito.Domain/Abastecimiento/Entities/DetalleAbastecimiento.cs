@@ -13,6 +13,6 @@ public class DetalleAbastecimiento
     public Producto Producto { get; set; } = null!;
 
     public decimal Cantidad { get; set; }
-    public decimal PrecioUnitario { get; set; }
-    public decimal Subtotal { get; set; }
+    public decimal CostoUnitario { get; set; }
+    public decimal TotalLinea { get; set; }
 }

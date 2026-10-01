@@ -1,7 +1,12 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Productos.Views.RegistrarProductoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:BodegaLuchito.Desktop.Common.Converters"
              Background="#F8FAFC">
+    <UserControl.Resources>
+        <converters:DecimalFlexibleConverter x:Key="DecimalFlexibleConverter"/>
+    </UserControl.Resources>
+
     <Grid>
         <!-- ================= CAPA 1: VISTA PRINCIPAL ================= -->
         <Grid Margin="32">
@@ -184,7 +189,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Precio (S/)" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
-                            <TextBox x:Name="TxtPrecioVenta" Text="{Binding PrecioVenta, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarSoloNumerosDecimales" Height="44" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                            <TextBox x:Name="TxtPrecioVenta" Text="{Binding PrecioVenta, Converter={StaticResource DecimalFlexibleConverter}, ConverterParameter=2, UpdateSourceTrigger=PropertyChanged}" Height="44" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Unidad" Foreground="#475569" Margin="0,0,0,6" FontWeight="SemiBold" FontSize="13"/>
@@ -206,7 +211,7 @@
                                 <TextBlock Text="Stock Actual " Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
                                 <TextBlock Text="{Binding SufijoUnidad}" Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
                             </StackPanel>
-                            <TextBox Text="{Binding StockActual, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarEntradaStock" Height="44" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                            <TextBox Text="{Binding StockActual, Converter={StaticResource DecimalFlexibleConverter}, ConverterParameter=2, UpdateSourceTrigger=PropertyChanged}" Height="44" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
@@ -214,7 +219,7 @@
                                 <TextBlock Text="Stock Mínimo " Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
                                 <TextBlock Text="{Binding SufijoUnidad}" Foreground="#475569" FontWeight="SemiBold" FontSize="13"/>
                             </StackPanel>
-                            <TextBox Text="{Binding StockMinimo, UpdateSourceTrigger=LostFocus}" PreviewTextInput="ValidarEntradaStock" Height="44" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                            <TextBox Text="{Binding StockMinimo, Converter={StaticResource DecimalFlexibleConverter}, ConverterParameter=2, UpdateSourceTrigger=PropertyChanged}" Height="44" Padding="12,0" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
                         </StackPanel>
                     </Grid>
 

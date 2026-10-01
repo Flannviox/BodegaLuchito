@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 // Usamos un alias para evitar el choque de nombres con la carpeta
@@ -7,5 +8,11 @@ namespace BodegaLuchito.Application.Abastecimiento.Interfaces;
 
 public interface IAbastecimientoRepository
 {
-    Task RegistrarAsync(EntidadAbastecimiento abastecimiento, CancellationToken cancellationToken = default);
+    Task RegistrarOperacionAsync(
+        EntidadAbastecimiento abastecimiento,
+        int usuarioId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerHistorialAsync(
+        CancellationToken cancellationToken = default);
 }

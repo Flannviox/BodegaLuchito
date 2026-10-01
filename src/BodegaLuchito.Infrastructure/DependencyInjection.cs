@@ -2,6 +2,8 @@ using BodegaLuchito.Application.Abastecimiento.Interfaces;
 using BodegaLuchito.Application.Abastecimiento.UseCases;
 using BodegaLuchito.Application.Autenticacion.Interfaces;
 using BodegaLuchito.Application.Caja.Interfaces;
+using BodegaLuchito.Application.Inventario.Interfaces;
+using BodegaLuchito.Application.Inventario.UseCases;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Application.Proveedores.Interfaces;
 using BodegaLuchito.Application.Proveedores.UseCases;
@@ -9,6 +11,7 @@ using BodegaLuchito.Infrastructure.Abastecimiento.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Security;
 using BodegaLuchito.Infrastructure.Caja.Repositories;
+using BodegaLuchito.Infrastructure.Inventario.Repositories;
 using BodegaLuchito.Infrastructure.Persistence;
 using BodegaLuchito.Infrastructure.Productos.Repositories;
 using BodegaLuchito.Infrastructure.Proveedores.Repositories;
@@ -41,6 +44,9 @@ public static class DependencyInjection
         services.AddTransient<ICategoriaRepository, CategoriaRepository>();
         services.AddTransient<IAbastecimientoRepository, AbastecimientoRepository>();
         services.AddTransient<RegistrarAbastecimientoUseCase>();
+        services.AddTransient<ConsultarHistorialAbastecimientosUseCase>();
+        services.AddTransient<IInventarioRepository, InventarioRepository>();
+        services.AddTransient<ConsultarMovimientosInventarioUseCase>();
 
 
         return services;

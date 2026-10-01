@@ -12,8 +12,15 @@ public sealed class DetalleAbastecimientoConfiguration : IEntityTypeConfiguratio
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Cantidad).HasColumnType("decimal(18,2)").IsRequired();
-        builder.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)").IsRequired();
-        builder.Property(x => x.Subtotal).HasColumnType("decimal(18,2)").IsRequired();
+        builder.Property(x => x.CostoUnitario)
+            .HasColumnName("PrecioUnitario")
+            .HasColumnType("decimal(18,4)")
+            .IsRequired();
+
+        builder.Property(x => x.TotalLinea)
+            .HasColumnName("Subtotal")
+            .HasColumnType("decimal(18,2)")
+            .IsRequired();
 
         // Relación: Un detalle pertenece a un producto (No se puede borrar un producto si tiene historial de abastecimiento)
         builder.HasOne(x => x.Producto)

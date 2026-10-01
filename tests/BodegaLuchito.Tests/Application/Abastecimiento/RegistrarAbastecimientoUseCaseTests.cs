@@ -122,6 +122,37 @@ public sealed class RegistrarAbastecimientoUseCaseTests
     }
 
     [Fact]
+    public async Task RegistrarConProductoAntiguoSinMarcaInventariable_ActualizaSuStock()
+    {
+        var (connection, options) = await CrearBaseEnMemoriaAsync();
+        await using var connectionDispose = connection;
+        var factory = new TestDbContextFactory(options);
+        var datos = await SembrarDatosValidosAsync(options, controlaInventario: false);
+        var useCase = new RegistrarAbastecimientoUseCase(new AbastecimientoRepository(factory));
+
+        await useCase.ExecuteAsync(new RegistrarAbastecimientoRequest
+        {
+            ProveedorId = datos.proveedorId,
+            UsuarioId = datos.usuarioId,
+            MetodoPago = MetodoPago.Efectivo,
+            Detalles =
+            [
+                new DetalleAbastecimientoRequest
+                {
+                    ProductoId = datos.productoId,
+                    Cantidad = 5m,
+                    CostoUnitario = 2m,
+                    TotalLinea = 10m
+                }
+            ]
+        });
+
+        await using var context = new BodegaLuchitoDbContext(options);
+        Assert.Equal(15m, (await context.Set<Producto>().SingleAsync()).StockActual);
+        Assert.Single(await context.Set<MovimientoInventario>().ToListAsync());
+    }
+
+    [Fact]
     public async Task RegistrarConProductoPorPeso_AceptaCantidadDecimal()
     {
         var (connection, options) = await CrearBaseEnMemoriaAsync();
@@ -209,7 +240,8 @@ public sealed class RegistrarAbastecimientoUseCaseTests
     private static async Task<(int usuarioId, int proveedorId, int productoId)> SembrarDatosValidosAsync(
         DbContextOptions<BodegaLuchitoDbContext> options,
         bool productoActivo = true,
-        UnidadVenta unidadVenta = UnidadVenta.Unidad)
+        UnidadVenta unidadVenta = UnidadVenta.Unidad,
+        bool controlaInventario = true)
     {
         await using var context = new BodegaLuchitoDbContext(options);
         var usuario = new Usuario
@@ -237,7 +269,7 @@ public sealed class RegistrarAbastecimientoUseCaseTests
             CategoriaId = categoria.Id,
             PrecioVenta = 3m,
             UnidadVenta = unidadVenta,
-            ControlaInventario = true,
+            ControlaInventario = controlaInventario,
             StockActual = 10m,
             StockMinimo = 2m,
             Activo = productoActivo

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BodegaLuchito.Application.Inventario.Interfaces;
 using BodegaLuchito.Domain.Inventario.Entities;
+using BodegaLuchito.Domain.Inventario.Enums;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,4 +32,5 @@ public sealed class InventarioRepository : IInventarioRepository
             .Take(200)
             .ToListAsync(cancellationToken);
     }
+
 }

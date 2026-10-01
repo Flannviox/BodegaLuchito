@@ -32,26 +32,17 @@ public class RegistrarProductoUseCase
         if (request.PrecioVenta <= 0)
             throw new ArgumentException("El precio de venta debe ser mayor a cero.");
 
-        decimal stockActual = request.StockActual;
-        decimal stockMinimo = request.StockMinimo;
+        const decimal stockActual = 0;
+        const bool controlaInventario = true;
+        var stockMinimo = request.StockMinimo;
 
-        if (!request.ControlaInventario)
-        {
-            stockActual = 0;
-            stockMinimo = 0;
-        }
-        else
-        {
-            if (stockActual < 0) throw new ArgumentException("El stock actual no puede ser negativo.");
-            if (stockMinimo < 0) throw new ArgumentException("El stock mínimo no puede ser negativo.");
-            if (request.UnidadVenta == UnidadVenta.Unidad)
-            {
-                if (request.StockActual % 1 != 0)
-                    throw new ArgumentException("El stock actual debe ser un número entero para productos por unidad.", nameof(request.StockActual));
+        if (stockMinimo < 0)
+            throw new ArgumentException("El stock mínimo no puede ser negativo.");
 
-                if (request.StockMinimo % 1 != 0)
-                    throw new ArgumentException("El stock mínimo debe ser un número entero para productos por unidad.", nameof(request.StockMinimo));
-            }
+        if (request.UnidadVenta == UnidadVenta.Unidad)
+        {
+            if (stockMinimo % 1 != 0)
+                throw new ArgumentException("El stock mínimo debe ser un número entero para productos por unidad.", nameof(request.StockMinimo));
         }
 
         if (codigoBarras != null)
@@ -68,7 +59,7 @@ public class RegistrarProductoUseCase
             CodigoBarras = codigoBarras,
             PrecioVenta = request.PrecioVenta,
             UnidadVenta = request.UnidadVenta,
-            ControlaInventario = request.ControlaInventario,
+            ControlaInventario = controlaInventario,
             StockActual = stockActual,
             StockMinimo = stockMinimo,
             Activo = true,

@@ -52,5 +52,18 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<IReadOnlyList<SesionCaja>> ObtenerHistorialCierresAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await _context.Set<SesionCaja>()
+                .AsNoTracking()
+                .Where(s => s.Estado == EstadoSesionCaja.Cerrada)
+                .OrderByDescending(s => s.FechaCierre)
+                .ThenByDescending(s => s.Id)
+                .Take(200)
+                .ToListAsync(cancellationToken);
+
+        }
+
     }
 }

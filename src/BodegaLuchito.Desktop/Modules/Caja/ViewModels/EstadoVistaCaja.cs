@@ -9,6 +9,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         Apertura,
         EnOperacion,
         Cierre,
-        ResultadoCierre
+        ResultadoCierre,
+        Historial
     }
 }

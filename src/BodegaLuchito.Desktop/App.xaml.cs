@@ -92,6 +92,7 @@ public partial class App : System.Windows.Application
         services.AddTransient<RegistrarProveedorUseCase>();
         services.AddTransient<AbrirCajaUseCase>();
         services.AddTransient<CerrarCajaUseCase>();
+        services.AddTransient<ConsultarHistorialCierresUseCase>();
         services.AddTransient<RegistrarVentaUseCase>();
 
         // Abastecimiento

@@ -17,6 +17,10 @@ namespace BodegaLuchito.Application.Caja.Interfaces
         Task GuardarCambiosAsync(CancellationToken cancellationToken = default);
 
         Task AgregarMovimientoAsync(MovimientoCaja movimiento, CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<SesionCaja>> ObtenerHistorialCierresAsync(
+            CancellationToken cancellationToken = default);
+
     }
 
 }

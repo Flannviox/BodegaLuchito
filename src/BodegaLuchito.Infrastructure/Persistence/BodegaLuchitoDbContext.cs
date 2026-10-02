@@ -1,6 +1,7 @@
 using BodegaLuchito.Domain.Abastecimiento.Entities;
 using BodegaLuchito.Domain.Inventario.Entities;
 using BodegaLuchito.Domain.Productos.Entities;
+using BodegaLuchito.Domain.Ventas.Entities;
 using Microsoft.EntityFrameworkCore;
 using EntidadAbastecimiento = BodegaLuchito.Domain.Abastecimiento.Entities.Abastecimiento;
 namespace BodegaLuchito.Infrastructure.Persistence;
@@ -33,6 +34,9 @@ public sealed class BodegaLuchitoDbContext
 
     public DbSet<MovimientoInventario> MovimientosInventario =>
         Set<MovimientoInventario>();
+
+    public DbSet<Venta> Ventas => Set<Venta>();
+    public DbSet<DetalleVenta> DetallesVenta => Set<DetalleVenta>();
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)

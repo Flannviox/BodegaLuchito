@@ -1,0 +1,173 @@
+<Window x:Class="BodegaLuchito.Desktop.Modules.Ventas.Views.TicketVentaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Vista Previa de Ticket" 
+        Width="270" 
+        MaxHeight="700"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="None" 
+        AllowsTransparency="True"
+        Background="Transparent"
+        FontFamily="Consolas" 
+        FontSize="10">
+
+    <Border Background="White" BorderBrush="#94A3B8" BorderThickness="1" CornerRadius="6">
+        <!-- Sombra para que flote y se vea elegante -->
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="15" Opacity="0.2" ShadowDepth="2"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Cabecera para arrastrar la ventana -->
+                <RowDefinition Height="*"/>
+                <!-- El Ticket en sí -->
+                <RowDefinition Height="Auto"/>
+                <!-- Los botones de acción -->
+            </Grid.RowDefinitions>
+
+            <!-- BARRA SUPERIOR PERSONALIZADA -->
+            <Border Grid.Row="0" Background="#F1F5F9" Padding="10,8" MouseLeftButtonDown="BarraSuperior_MouseLeftButtonDown" CornerRadius="5,5,0,0" Cursor="SizeAll">
+                <Grid>
+                    <TextBlock Text="Vista previa del ticket" FontWeight="Bold" Foreground="#475569" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <!-- Botón X discreto -->
+                    <Button Content="✕" Click="BtnCerrar_Click" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="#64748B" Cursor="Hand" FontSize="12"/>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <!-- CONTENEDOR DEL TICKET: ESTO ES LO ÚNICO QUE SE IMPRIMIRÁ -->
+                <Grid x:Name="TicketContenedor" Margin="10,15,10,15" Width="250" HorizontalAlignment="Center">
+                    <StackPanel>
+                        <!-- CABECERA -->
+                        <TextBlock Text="BODEGA LUCHITO" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Av. Los Próceres 123 - Trujillo" HorizontalAlignment="Center" FontSize="9"/>
+                        <TextBlock Text="RUC: 10456789123" HorizontalAlignment="Center" FontSize="9" Margin="0,0,0,5"/>
+
+                        <TextBlock Text="CONSTANCIA INTERNA DE VENTA" HorizontalAlignment="Center" FontWeight="Bold" FontSize="9"/>
+                        <TextBlock Text="(SIN VALIDEZ TRIBUTARIA)" HorizontalAlignment="Center" FontSize="8" Margin="0,0,0,5"/>
+
+                        <Rectangle Height="1" Fill="Black" StrokeDashArray="2 2" Margin="0,3"/>
+
+                        <!-- DATOS DE VENTA -->
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Ticket N°:" FontWeight="Bold"/>
+                            <TextBlock x:Name="TxtTicketId" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Fecha:" FontWeight="Bold"/>
+                            <TextBlock x:Name="TxtFecha" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Cajero:" FontWeight="Bold"/>
+                            <TextBlock x:Name="TxtCajero" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" TextWrapping="Wrap"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Pago:" FontWeight="Bold"/>
+                            <TextBlock x:Name="TxtMetodoPago" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="Black" StrokeDashArray="2 2" Margin="0,3"/>
+
+                        <!-- ENCABEZADOS -->
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="CANT." FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Text="DESCRIPCIÓN" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="2" Text="TOTAL" HorizontalAlignment="Right" FontWeight="Bold"/>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="Black" StrokeDashArray="2 2" Margin="0,3"/>
+
+                        <!-- PRODUCTOS -->
+                        <ItemsControl x:Name="ListaProductos">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Cantidad, StringFormat={}{0:0.##}}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding NombreProducto}" TextWrapping="Wrap" Margin="0,0,3,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat=S/ {0:N2}}" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Rectangle Height="1" Fill="Black" StrokeDashArray="2 2" Margin="0,3"/>
+
+                        <!-- TOTALES -->
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Subtotal:"/>
+                            <TextBlock x:Name="TxtSubtotal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="IGV (18%):"/>
+                            <TextBlock x:Name="TxtIgv" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="TOTAL:" FontWeight="Bold" FontSize="13" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="TxtTotal" Grid.Row="2" Grid.Column="1" FontWeight="Bold" FontSize="13" HorizontalAlignment="Right" Margin="0,4,0,0"/>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="Black" StrokeDashArray="2 2" Margin="0,3"/>
+
+                        <!-- PIE DEL TICKET -->
+                        <TextBlock Text="¡Gracias por su preferencia!" HorizontalAlignment="Center" Margin="0,5,0,2" FontWeight="Bold"/>
+                        <TextBlock Text="Vuelva pronto" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- BOTONES DE ACCIÓN (Fuera del contenedor de impresión) -->
+            <Grid Grid.Row="2" Margin="15,0,15,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Cerrar" Height="35" Background="White" Foreground="#64748B" FontWeight="Bold" BorderBrush="#E2E8F0" BorderThickness="1" Click="BtnCerrar_Click" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Grid.Column="2" Content="🖨️ Imprimir" Height="35" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Click="BtnImprimir_Click" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

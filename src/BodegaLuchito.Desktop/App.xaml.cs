@@ -1,19 +1,20 @@
 using System.Windows;
 using System.Windows.Threading;
 using BodegaLuchito.Application.Autenticacion.UseCases;
+using BodegaLuchito.Application.Caja.UseCases;
 using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Application.Productos.UseCases;
 using BodegaLuchito.Application.Proveedores.UseCases;
-using BodegaLuchito.Application.Caja.UseCases;
+using BodegaLuchito.Application.Ventas.UseCases;
+using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels; // Agregado
+using BodegaLuchito.Desktop.Modules.Abastecimiento.Views; // Agregado
 using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
 using BodegaLuchito.Desktop.Modules.Autenticacion.Views;
+using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
-using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
-using BodegaLuchito.Desktop.Modules.Abastecimiento.Views; // Agregado
-using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels; // Agregado
 using BodegaLuchito.Desktop.Navigation;
 using BodegaLuchito.Desktop.Shell.ViewModels;
 using BodegaLuchito.Infrastructure;
@@ -91,6 +92,7 @@ public partial class App : System.Windows.Application
         services.AddTransient<RegistrarProveedorUseCase>();
         services.AddTransient<AbrirCajaUseCase>();
         services.AddTransient<CerrarCajaUseCase>();
+        services.AddTransient<RegistrarVentaUseCase>();
 
         // Abastecimiento
         services.AddTransient<AbastecimientoView>();

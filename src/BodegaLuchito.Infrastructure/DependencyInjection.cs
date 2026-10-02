@@ -46,9 +46,9 @@ public static class DependencyInjection
         services.AddTransient<IAbastecimientoRepository, AbastecimientoRepository>();
         services.AddTransient<RegistrarAbastecimientoUseCase>();
         services.AddTransient<ConsultarHistorialAbastecimientosUseCase>();
-        services.AddTransient<IInventarioRepository, InventarioRepository>();
-        services.AddTransient<ConsultarMovimientosInventarioUseCase>();
         services.AddScoped<IInventarioRepository, InventarioRepository>();
+        services.AddTransient<ConsultarMovimientosInventarioUseCase>();
+        services.AddTransient<GestionarInventarioUseCase>();
         services.AddScoped<IVentaRepository, VentaRepository>();
 
         return services;

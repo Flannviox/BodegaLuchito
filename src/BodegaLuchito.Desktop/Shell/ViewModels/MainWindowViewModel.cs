@@ -3,6 +3,7 @@ using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Desktop.Common.ViewModels;
 using BodegaLuchito.Desktop.Modules.Autenticacion.ViewModels;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
+using BodegaLuchito.Desktop.Modules.Inventario.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
 using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
@@ -42,6 +43,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         InicioViewModel => "Inicio",
         ProductosViewModel => "Gestión de productos",
+        InventarioViewModel => "Inventario",
         ProveedoresViewModel => "Proveedores",
         AbastecimientoViewModel => "Abastecimiento",
         UsuariosViewModel => "Usuarios",
@@ -82,6 +84,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 new NavigationItemViewModel(
                     "Productos",
                     IrAProductosCommand));
+            MenuItems.Add(new NavigationItemViewModel("Inventario", IrAInventarioCommand));
 
             MenuItems.Add(
                 new NavigationItemViewModel(
@@ -138,6 +141,13 @@ public partial class MainWindowViewModel : ViewModelBase
     private void IrAProductos()
     {
         _navigationService.NavigateTo<ProductosViewModel>();
+    }
+
+    [RelayCommand]
+    private void IrAInventario()
+    {
+        if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
+            _navigationService.NavigateTo<InventarioViewModel>();
     }
 
     [RelayCommand]

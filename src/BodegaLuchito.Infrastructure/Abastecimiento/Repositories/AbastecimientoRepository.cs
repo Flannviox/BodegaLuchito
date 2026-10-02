@@ -14,6 +14,7 @@ using BodegaLuchito.Domain.Productos.Enums;
 using BodegaLuchito.Domain.Proveedores.Entities;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using BodegaLuchito.Infrastructure.Productos.Repositories;
 using EntidadAbastecimiento = BodegaLuchito.Domain.Abastecimiento.Entities.Abastecimiento;
 
 namespace BodegaLuchito.Infrastructure.Abastecimiento.Repositories;
@@ -54,6 +55,7 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
             throw new InvalidOperationException("Debe abrir una sesión de caja antes de registrar un abastecimiento.");
 
         var productoIds = abastecimiento.Detalles
+            .Where(x => x.ProductoId > 0)
             .Select(x => x.ProductoId)
             .Distinct()
             .ToList();
@@ -68,8 +70,20 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
         if (productos.Values.Any(x => !x.Activo))
             throw new InvalidOperationException("No se puede registrar un abastecimiento con productos inactivos.");
 
+        foreach (var detalle in abastecimiento.Detalles)
+        {
+            if (detalle.ProductoId > 0)
+                detalle.Producto = productos[detalle.ProductoId];
+            else
+            {
+                if (detalle.Producto is null || detalle.Producto.Id != 0)
+                    throw new ArgumentException("Faltan los datos del producto nuevo.");
+                await AltaProductoEnOperacion.AgregarAsync(context, detalle.Producto, cancellationToken);
+            }
+        }
+
         if (abastecimiento.Detalles.Any(detalle =>
-                productos[detalle.ProductoId].UnidadVenta == UnidadVenta.Unidad &&
+                detalle.Producto.UnidadVenta == UnidadVenta.Unidad &&
                 detalle.Cantidad % 1 != 0))
         {
             throw new InvalidOperationException(
@@ -81,7 +95,7 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
 
         foreach (var detalle in abastecimiento.Detalles)
         {
-            var producto = productos[detalle.ProductoId];
+            var producto = detalle.Producto;
 
             var stockAnterior = producto.StockActual;
             producto.StockActual += detalle.Cantidad;

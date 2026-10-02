@@ -15,11 +15,14 @@ using BodegaLuchito.Domain.Proveedores.Entities;
 using BodegaLuchito.Domain.Shared.Enums;
 using BodegaLuchito.Desktop.Common.ViewModels;
 using CommunityToolkit.Mvvm.Input;
+using BodegaLuchito.Application.Productos.DTOs;
+using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 
 namespace BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels;
 
 public sealed class DetalleAbastecimientoItem : ViewModelBase
 {
+    public RegistrarProductoRequest? ProductoNuevo { get; set; }
     private decimal _cantidad;
     private decimal _costoUnitario;
     private decimal _totalLinea;
@@ -100,6 +103,8 @@ public partial class AbastecimientoViewModel : ViewModelBase
     private readonly IProveedorRepository _proveedorRepository;
     private readonly IProductoRepository _productoRepository;
     private readonly ISesionUsuario _sesionUsuario;
+    public NuevoProductoIngresoViewModel AltaProducto { get; }
+    private int _siguienteIdTemporal = -1;
 
     private List<Proveedor> _todosLosProveedores = new();
     private List<Producto> _todosLosProductos = new();
@@ -251,7 +256,8 @@ public partial class AbastecimientoViewModel : ViewModelBase
         ConsultarMovimientosInventarioUseCase consultarMovimientosUseCase,
         IProveedorRepository proveedorRepository,
         IProductoRepository productoRepository,
-        ISesionUsuario sesionUsuario)
+        ISesionUsuario sesionUsuario,
+        ICategoriaRepository categorias)
     {
         _registrarUseCase = registrarUseCase;
         _consultarHistorialUseCase = consultarHistorialUseCase;
@@ -259,6 +265,7 @@ public partial class AbastecimientoViewModel : ViewModelBase
         _proveedorRepository = proveedorRepository;
         _productoRepository = productoRepository;
         _sesionUsuario = sesionUsuario;
+        AltaProducto = new NuevoProductoIngresoViewModel(categorias);
 
         _ = CargarDatosInicialesAsync();
     }
@@ -283,7 +290,8 @@ public partial class AbastecimientoViewModel : ViewModelBase
 
     private async Task CargarMovimientosAsync()
     {
-        var movimientos = await _consultarMovimientosUseCase.ExecuteAsync();
+        var movimientos = await _consultarMovimientosUseCase.ExecuteAsync(
+            tipo: BodegaLuchito.Domain.Inventario.Enums.TipoMovimientoInventario.EntradaAbastecimiento);
         MovimientosInventario.Clear();
 
         foreach (var movimiento in movimientos)
@@ -437,10 +445,40 @@ public partial class AbastecimientoViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void EditarProductoAbastecimiento(DetalleAbastecimientoItem? detalle)
+    private async Task NuevoProductoAsync() => await AbrirAltaProductoAsync();
+
+    private Task AbrirAltaProductoAsync(DetalleAbastecimientoItem? editar = null) =>
+        AltaProducto.AbrirAsync(true, async (datos, cantidad, unitario, total) =>
+        {
+            var codigo = string.IsNullOrWhiteSpace(datos.CodigoBarras) ? null : datos.CodigoBarras.Trim();
+            if (codigo is not null &&
+                (await _productoRepository.ExisteCodigoBarrasAsync(codigo) ||
+                 ProductosAbastecimiento.Any(x => x != editar && x.ProductoNuevo?.CodigoBarras?.Trim() == codigo)))
+                throw new InvalidOperationException("Este código ya pertenece a un producto o está pendiente en esta compra.");
+            var item = new DetalleAbastecimientoItem {
+                ProductoId = editar?.ProductoId ?? _siguienteIdTemporal--, ProductoNuevo = datos,
+                NombreProducto = datos.Nombre.Trim() + " (nuevo)", CodigoBarras = codigo ?? "S/C",
+                Categoria = AltaProducto.Categoria?.Nombre ?? "",
+                Cantidad = cantidad, CostoUnitario = unitario, TotalLinea = total
+            };
+            if (editar is null) ProductosAbastecimiento.Add(item);
+            else ProductosAbastecimiento[ProductosAbastecimiento.IndexOf(editar)] = item;
+            OnPropertyChanged(nameof(TotalAbastecimiento));
+            OnPropertyChanged(nameof(AlturaTablaProductos));
+            MostrarMensaje("Producto pendiente. Se guardará al confirmar el abastecimiento.");
+        }, editar?.ProductoNuevo, editar?.Cantidad, editar?.TotalLinea);
+
+    [RelayCommand]
+    private async Task EditarProductoAbastecimientoAsync(DetalleAbastecimientoItem? detalle)
     {
         if (detalle is null || !ProductosAbastecimiento.Contains(detalle))
             return;
+
+        if (detalle.ProductoNuevo is not null)
+        {
+            await AbrirAltaProductoAsync(detalle);
+            return;
+        }
 
         var producto = _todosLosProductos.FirstOrDefault(x => x.Id == detalle.ProductoId);
 
@@ -511,7 +549,8 @@ public partial class AbastecimientoViewModel : ViewModelBase
             UsuarioId = usuarioActual.IdUsuario,
             Detalles = ProductosAbastecimiento.Select(x => new DetalleAbastecimientoRequest
             {
-                ProductoId = x.ProductoId,
+                ProductoId = x.ProductoNuevo is null ? x.ProductoId : 0,
+                ProductoNuevo = x.ProductoNuevo,
                 Cantidad = x.Cantidad,
                 CostoUnitario = x.CostoUnitario,
                 TotalLinea = x.TotalLinea

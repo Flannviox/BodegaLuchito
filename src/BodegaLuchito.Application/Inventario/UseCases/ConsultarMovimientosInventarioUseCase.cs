@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BodegaLuchito.Application.Inventario.Interfaces;
 using BodegaLuchito.Domain.Inventario.Entities;
+using BodegaLuchito.Domain.Inventario.Enums;
 
 namespace BodegaLuchito.Application.Inventario.UseCases;
 
@@ -16,8 +17,8 @@ public sealed class ConsultarMovimientosInventarioUseCase
     }
 
     public Task<IReadOnlyList<MovimientoInventario>> ExecuteAsync(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, TipoMovimientoInventario? tipo = null)
     {
-        return _inventarioRepository.ObtenerMovimientosAsync(cancellationToken);
+        return _inventarioRepository.ObtenerMovimientosAsync(cancellationToken, tipo);
     }
 }

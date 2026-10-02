@@ -83,6 +83,7 @@ public partial class App : System.Windows.Application
 
         // Modulos
         services.AddTransient<InicioViewModel>();
+        services.AddTransient<BodegaLuchito.Desktop.Modules.Inventario.ViewModels.InventarioViewModel>();
         services.AddTransient<ProductosViewModel>();
         services.AddTransient<VentasViewModel>();
         services.AddTransient<ProveedoresViewModel>();

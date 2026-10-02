@@ -14,7 +14,13 @@
     xmlns:cajaVm="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.ViewModels"
     xmlns:cajaViews="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views"
     xmlns:abastecimientoVm="clr-namespace:BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels"
-    xmlns:abastecimientoV="clr-namespace:BodegaLuchito.Desktop.Modules.Abastecimiento.Views">
+    xmlns:abastecimientoV="clr-namespace:BodegaLuchito.Desktop.Modules.Abastecimiento.Views"
+    xmlns:inventarioVm="clr-namespace:BodegaLuchito.Desktop.Modules.Inventario.ViewModels"
+    xmlns:inventarioV="clr-namespace:BodegaLuchito.Desktop.Modules.Inventario.Views">
+
+    <DataTemplate DataType="{x:Type inventarioVm:InventarioViewModel}">
+        <inventarioV:InventarioView />
+    </DataTemplate>
     
 
     <DataTemplate DataType="{x:Type inicioVm:InicioViewModel}">

@@ -221,6 +221,67 @@ public sealed class RegistrarAbastecimientoUseCaseTests
         Assert.Empty(await context.Set<MovimientoCaja>().ToListAsync());
     }
 
+    [Fact]
+    public async Task CompraConDosNuevosSinCodigoYUnoExistente_GuardaTodoUnaVez()
+    {
+        var (connection, options) = await CrearBaseEnMemoriaAsync();
+        await using var conexion = connection;
+        var datos = await SembrarDatosValidosAsync(options);
+        await using var contexto = new BodegaLuchitoDbContext(options);
+        var categoria = await contexto.Categorias.SingleAsync();
+        var nuevo = new BodegaLuchito.Application.Productos.DTOs.RegistrarProductoRequest(
+            "Producto nuevo", categoria.Id, null, 6m, UnidadVenta.Peso, true, 0, 2);
+        var solicitud = new RegistrarAbastecimientoRequest {
+            UsuarioId = datos.usuarioId, ProveedorId = datos.proveedorId, MetodoPago = MetodoPago.Efectivo,
+            Detalles = [
+                new() { ProductoNuevo = nuevo, Cantidad = 1.125m, CostoUnitario = 4, TotalLinea = 4.50m },
+                new() { ProductoNuevo = nuevo with { Nombre = "Segundo nuevo" }, Cantidad = 2, CostoUnitario = 4, TotalLinea = 8 },
+                new() { ProductoId = datos.productoId, Cantidad = 3, CostoUnitario = 2, TotalLinea = 6 }
+            ]
+        };
+        var caso = new RegistrarAbastecimientoUseCase(new AbastecimientoRepository(new TestDbContextFactory(options)));
+        await caso.ExecuteAsync(solicitud);
+        var productos = await contexto.Productos.AsNoTracking().ToListAsync();
+        Assert.Equal(3, productos.Count);
+        Assert.Equal(1.125m, productos.Single(x => x.Nombre == "Producto nuevo").StockActual);
+        Assert.Equal(2m, productos.Single(x => x.Nombre == "Segundo nuevo").StockActual);
+        Assert.Equal(13m, productos.Single(x => x.Id == datos.productoId).StockActual);
+        Assert.Equal(3, await contexto.MovimientosInventario.CountAsync());
+        Assert.Equal(18.5m, (await contexto.Set<MovimientoCaja>().SingleAsync()).Monto);
+        Assert.Single(await contexto.Abastecimientos.ToListAsync());
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task CompraNuevaFallida_NoDejaProductosHuerfanos(bool cajaCerrada)
+    {
+        var (connection, options) = await CrearBaseEnMemoriaAsync();
+        await using var conexion = connection;
+        var datos = await SembrarDatosValidosAsync(options);
+        await using var contexto = new BodegaLuchitoDbContext(options);
+        var categoria = await contexto.Categorias.SingleAsync();
+        if (cajaCerrada) {
+            (await contexto.Set<SesionCaja>().SingleAsync()).Estado = EstadoSesionCaja.Cerrada;
+            await contexto.SaveChangesAsync();
+        }
+        var nuevo = new BodegaLuchito.Application.Productos.DTOs.RegistrarProductoRequest(
+            "Producto nuevo", categoria.Id, "CODIGO-REPETIDO", 6m, UnidadVenta.Unidad, true, 0, 2);
+        var solicitud = new RegistrarAbastecimientoRequest {
+            UsuarioId = datos.usuarioId, ProveedorId = datos.proveedorId, MetodoPago = MetodoPago.Efectivo,
+            Detalles = [
+                new() { ProductoNuevo = nuevo, Cantidad = 2, CostoUnitario = 4, TotalLinea = 8 },
+                new() { ProductoNuevo = nuevo with { Nombre = "Otro nombre" }, Cantidad = 2, CostoUnitario = 4, TotalLinea = 8 }
+            ]
+        };
+        var caso = new RegistrarAbastecimientoUseCase(new AbastecimientoRepository(new TestDbContextFactory(options)));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => caso.ExecuteAsync(solicitud));
+        Assert.Single(await contexto.Productos.AsNoTracking().ToListAsync());
+        Assert.Empty(await contexto.Abastecimientos.ToListAsync());
+        Assert.Empty(await contexto.MovimientosInventario.ToListAsync());
+        Assert.Empty(await contexto.Set<MovimientoCaja>().ToListAsync());
+    }
+
     private static async Task<(SqliteConnection connection, DbContextOptions<BodegaLuchitoDbContext> options)>
         CrearBaseEnMemoriaAsync()
     {

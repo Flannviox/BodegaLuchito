@@ -50,7 +50,9 @@
 
                 <!-- MENU -->
 
-                <ItemsControl Grid.Row="1"
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl
                               ItemsSource="{Binding MenuItems}">
 
                     <ItemsControl.ItemTemplate>
@@ -67,6 +69,7 @@
                     </ItemsControl.ItemTemplate>
 
                 </ItemsControl>
+                </ScrollViewer>
 
 
                 <!-- CERRAR SESION -->

@@ -6,6 +6,7 @@ namespace BodegaLuchito.Application.Abastecimiento.DTOs;
 public class DetalleAbastecimientoRequest
 {
     public int ProductoId { get; set; }
+    public BodegaLuchito.Application.Productos.DTOs.RegistrarProductoRequest? ProductoNuevo { get; set; }
     public decimal Cantidad { get; set; }
     public decimal CostoUnitario { get; set; }
     public decimal TotalLinea { get; set; }

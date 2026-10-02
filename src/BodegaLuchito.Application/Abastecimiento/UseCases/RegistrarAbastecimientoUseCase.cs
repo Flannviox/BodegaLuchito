@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BodegaLuchito.Application.Abastecimiento.DTOs;
 using BodegaLuchito.Application.Abastecimiento.Interfaces;
 using BodegaLuchito.Domain.Abastecimiento.Entities;
+using BodegaLuchito.Application.Productos.UseCases;
 using EntidadAbastecimiento = BodegaLuchito.Domain.Abastecimiento.Entities.Abastecimiento;
 
 namespace BodegaLuchito.Application.Abastecimiento.UseCases;
@@ -31,8 +32,9 @@ public class RegistrarAbastecimientoUseCase
             throw new ArgumentException("Debe existir un usuario autenticado para registrar el abastecimiento.");
 
         if (request.Detalles.Any(d =>
-            d.ProductoId <= 0 ||
+            (d.ProductoNuevo is null ? d.ProductoId <= 0 : d.ProductoId != 0) ||
             d.Cantidad <= 0 ||
+            decimal.Round(d.Cantidad, 3) != d.Cantidad ||
             d.CostoUnitario <= 0 ||
             d.TotalLinea <= 0))
         {
@@ -40,7 +42,7 @@ public class RegistrarAbastecimientoUseCase
                 "Cada producto debe tener cantidad, costo unitario y total de línea mayores a cero.");
         }
 
-        if (request.Detalles.GroupBy(d => d.ProductoId).Any(group => group.Count() > 1))
+        if (request.Detalles.Where(d => d.ProductoNuevo is null).GroupBy(d => d.ProductoId).Any(group => group.Count() > 1))
             throw new ArgumentException("Un producto solo puede aparecer una vez en el abastecimiento.");
 
         var totalCalculado = Math.Round(
@@ -66,6 +68,7 @@ public class RegistrarAbastecimientoUseCase
             abastecimiento.Detalles.Add(new DetalleAbastecimiento
             {
                 ProductoId = det.ProductoId,
+                Producto = det.ProductoNuevo is null ? null! : PrepararProductoNuevo.Crear(det.ProductoNuevo),
                 Cantidad = det.Cantidad,
                 CostoUnitario = det.CostoUnitario,
                 TotalLinea = det.TotalLinea

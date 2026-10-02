@@ -47,6 +47,7 @@ public static class DependencyInjection
         services.AddTransient<ConsultarHistorialAbastecimientosUseCase>();
         services.AddTransient<IInventarioRepository, InventarioRepository>();
         services.AddTransient<ConsultarMovimientosInventarioUseCase>();
+        services.AddTransient<GestionarInventarioUseCase>();
 
 
         return services;

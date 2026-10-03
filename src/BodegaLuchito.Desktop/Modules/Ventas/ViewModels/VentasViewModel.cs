@@ -63,6 +63,10 @@ public class DetalleCarritoVenta : ViewModelBase
 
 public partial class VentasViewModel : ViewModelBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PuedeInteractuar))]
+    private bool _procesandoCobro;
+    public bool PuedeInteractuar => !ProcesandoCobro;
     private readonly IProductoRepository _productoRepository;
     private readonly RegistrarVentaUseCase _registrarVentaUseCase;
     private readonly ISesionUsuario _sesionUsuario;
@@ -114,10 +118,16 @@ public partial class VentasViewModel : ViewModelBase
         _productoRepository = productoRepository;
         _registrarVentaUseCase = registrarVentaUseCase;
         _sesionUsuario = sesionUsuario;
-        CargarCatalogosAsync();
+        _ = InicializarCatalogosAsync();
     }
 
-    private async void CargarCatalogosAsync()
+    private async Task InicializarCatalogosAsync()
+    {
+        try { await CargarCatalogosAsync(); }
+        catch (Exception ex) { MessageBox.Show(ex.Message, "No se pudieron cargar los productos"); }
+    }
+
+    private async Task CargarCatalogosAsync()
     {
         var productos = await _productoRepository.ObtenerActivosAsync();
         _todosLosProductos = productos.ToList();
@@ -184,7 +194,7 @@ public partial class VentasViewModel : ViewModelBase
         }
         else
         {
-            Carrito.Add(new DetalleCarritoVenta
+            var detalle = new DetalleCarritoVenta
             {
                 ProductoId = producto.Id,
                 CodigoBarras = producto.CodigoBarras ?? "S/C",
@@ -192,9 +202,17 @@ public partial class VentasViewModel : ViewModelBase
                 UnidadVenta = producto.UnidadVenta,
                 PrecioUnitario = producto.PrecioVenta,
                 Cantidad = 1
-            });
+            };
+            detalle.PropertyChanged += DetalleCambiado;
+            Carrito.Add(detalle);
         }
         OnPropertyChanged(nameof(TotalVenta));
+    }
+
+    private void DetalleCambiado(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DetalleCarritoVenta.Subtotal))
+            OnPropertyChanged(nameof(TotalVenta));
     }
 
     [RelayCommand]
@@ -203,6 +221,7 @@ public partial class VentasViewModel : ViewModelBase
         if (detalle != null && Carrito.Contains(detalle))
         {
             Carrito.Remove(detalle);
+            detalle.PropertyChanged -= DetalleCambiado;
             OnPropertyChanged(nameof(TotalVenta));
         }
     }
@@ -233,20 +252,29 @@ public partial class VentasViewModel : ViewModelBase
 
     private async Task ProcesarCobroAsync(MetodoPago metodoPago)
     {
+        if (ProcesandoCobro || !Carrito.Any()) return;
+        ProcesandoCobro = true;
         try
         {
-            decimal subtotalCalc = Math.Round(TotalVenta / 1.18m, 2);
-            decimal igvCalc = TotalVenta - subtotalCalc;
+            var usuario = _sesionUsuario.UsuarioActual
+                ?? throw new InvalidOperationException("Inicia sesión antes de registrar una venta.");
+            var productosTicket = Carrito.Select(x => new DetalleCarritoVenta {
+                ProductoId = x.ProductoId, Nombre = x.Nombre, CodigoBarras = x.CodigoBarras,
+                UnidadVenta = x.UnidadVenta, Cantidad = x.Cantidad, PrecioUnitario = x.PrecioUnitario
+            }).ToList();
+            var total = productosTicket.Sum(x => x.Subtotal);
+            decimal subtotalCalc = Math.Round(total / 1.18m, 2);
+            decimal igvCalc = total - subtotalCalc;
 
             var request = new RegistrarVentaRequest
             {
-                UsuarioId = _sesionUsuario.UsuarioActual!.IdUsuario,
-                Total = TotalVenta,
+                UsuarioId = usuario.IdUsuario,
+                Total = total,
                 Subtotal = subtotalCalc,
                 IGV = igvCalc,
                 MetodoPago = metodoPago,
 
-                Detalles = Carrito.Select(item => new DetalleVentaRequest
+                Detalles = productosTicket.Select(item => new DetalleVentaRequest
                 {
                     ProductoId = item.ProductoId,
                     Cantidad = item.Cantidad,
@@ -257,26 +285,35 @@ public partial class VentasViewModel : ViewModelBase
 
             int nuevaVentaId = await _registrarVentaUseCase.ExecuteAsync(request);
 
-            var ventanaTicket = new BodegaLuchito.Desktop.Modules.Ventas.Views.TicketVentaWindow(
-                nuevaVentaId,
-                _sesionUsuario.UsuarioActual!.NombreCompleto,
-                metodoPago,
-                subtotalCalc,
-                igvCalc,
-                TotalVenta,
-                Carrito.ToList() 
-            );
-            ventanaTicket.ShowDialog();
-
-            MessageBox.Show($"¡Venta registrada!\nSe guardó la operación con ID: {nuevaVentaId}", "Bodega Luchito", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            // Reiniciamos la pantalla para el siguiente cliente
+            // La venta ya está confirmada. Un fallo del ticket no debe permitir cobrarla otra vez.
             ModalCobroVisible = Visibility.Collapsed;
+            foreach (var detalle in Carrito) detalle.PropertyChanged -= DetalleCambiado;
             Carrito.Clear();
+            OnPropertyChanged(nameof(TotalVenta));
+            TextoBusquedaProducto = "";
+            ProductoSeleccionado = null;
+            try { await CargarCatalogosAsync(); }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"La venta #{nuevaVentaId} se guardó y descontó el stock. No se pudo recargar el catálogo: {ex.Message}",
+                    "Venta registrada");
+            }
+            try
+            {
+                var ventanaTicket = new BodegaLuchito.Desktop.Modules.Ventas.Views.TicketVentaWindow(
+                    nuevaVentaId, usuario.NombreCompleto, metodoPago, subtotalCalc, igvCalc, total, productosTicket);
+                ventanaTicket.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"La venta #{nuevaVentaId} se guardó y descontó el stock, pero no se pudo mostrar el ticket: {ex.Message}",
+                    "Venta registrada");
+            }
         }
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "Error al procesar", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+        finally { ProcesandoCobro = false; }
     }
 }

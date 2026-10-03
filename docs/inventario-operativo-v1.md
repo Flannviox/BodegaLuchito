@@ -18,7 +18,7 @@ Stock y movimiento se guardan juntos en una transacción. Si el stock cambió de
 
 No se modifica el esquema ni se necesita una migración nueva: se reutiliza MovimientosInventario. Las migraciones previas deben estar aplicadas mediante el inicio normal de la aplicación.
 
-Abastecimiento conserva su consulta de ingresos por compra. Inventario ofrece la consulta conjunta sin el límite de 200 filas del historial anterior. Ventas todavía debe integrar sus salidas cuando se desarrolle ese flujo; esta entrega no implementa ventas, devoluciones ni valoración monetaria de existencias.
+Abastecimiento conserva su consulta de ingresos por compra. Inventario ofrece la consulta conjunta sin el límite de 200 filas del historial anterior. Las ventas nuevas descuentan stock al confirmarse y generan movimientos de salida; ver [integración de Ventas](ventas-inventario.md). Las devoluciones y la valoración monetaria de existencias siguen pendientes.
 
 Los registros históricos anteriores se muestran tal como existen. No se inventan movimientos para productos con stock antiguo sin trazabilidad.
 

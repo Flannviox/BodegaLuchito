@@ -33,7 +33,7 @@ public partial class InventarioViewModel : ViewModelBase
     public ObservableCollection<ExistenciaInventario> ProductosOperacion { get; } = [];
     public ObservableCollection<string> Categorias { get; } = ["Todas"];
     public string[] Estados { get; } = ["Activos", "Todos", "Stock bajo", "Agotados", "Desactivados"];
-    public string[] TiposMovimiento { get; } = ["Todos", "Abastecimiento", "Saldo inicial", "Ajuste por conteo", "Pérdida o daño"];
+    public string[] TiposMovimiento { get; } = ["Todos", "Abastecimiento", "Saldo inicial", "Ajuste por conteo", "Pérdida o daño", "Venta"];
 
     [ObservableProperty] private string _busqueda = "";
     [ObservableProperty] private string _categoria = "Todas";

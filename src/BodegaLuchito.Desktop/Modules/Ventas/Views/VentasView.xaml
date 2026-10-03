@@ -1,7 +1,7 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Ventas.Views.VentasView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="White">
+             Background="White" IsEnabled="{Binding PuedeInteractuar}">
     <UserControl.Resources>
         <!-- ESTILOS MODERNOS PARA EL DATA GRID DEL CARRITO -->
         <Style TargetType="DataGrid">

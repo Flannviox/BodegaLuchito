@@ -13,6 +13,7 @@ using BodegaLuchito.Domain.Productos.Entities;
 using BodegaLuchito.Domain.Productos.Enums;
 using BodegaLuchito.Domain.Autenticacion.Entities;
 using BodegaLuchito.Domain.Autenticacion.Enums;
+using BodegaLuchito.Domain.Ventas.Entities;
 using BodegaLuchito.Application.Productos.UseCases;
 using BodegaLuchito.Infrastructure.Productos.Repositories;
 
@@ -35,7 +36,8 @@ public sealed class InventarioRepository : IInventarioRepository
                 x.UnidadVenta, x.StockActual, x.StockMinimo, x.Activo,
                 x.Activo && x.StockActual == 0 &&
                 !context.MovimientosInventario.Any(m => m.ProductoId == x.Id) &&
-                !context.DetallesAbastecimiento.Any(d => d.ProductoId == x.Id)))
+                !context.DetallesAbastecimiento.Any(d => d.ProductoId == x.Id) &&
+                !context.Set<DetalleVenta>().Any(d => d.ProductoId == x.Id)))
             .ToListAsync(cancellationToken);
     }
 
@@ -73,7 +75,8 @@ public sealed class InventarioRepository : IInventarioRepository
             producto = await context.Productos.SingleOrDefaultAsync(x => x.Id == solicitud.ProductoId, cancellationToken)
                 ?? throw new InvalidOperationException("El producto ya no está disponible.");
         var tieneOperaciones = await context.MovimientosInventario.AnyAsync(x => x.ProductoId == producto.Id, cancellationToken)
-            || await context.DetallesAbastecimiento.AnyAsync(x => x.ProductoId == producto.Id, cancellationToken);
+            || await context.DetallesAbastecimiento.AnyAsync(x => x.ProductoId == producto.Id, cancellationToken)
+            || await context.Set<DetalleVenta>().AnyAsync(x => x.ProductoId == producto.Id, cancellationToken);
         var posterior = ReglasMovimientoManual.CalcularStockPosterior(producto, solicitud.Tipo,
             solicitud.Cantidad, solicitud.StockEsperado, tieneOperaciones, solicitud.Motivo);
         context.MovimientosInventario.Add(new MovimientoInventario

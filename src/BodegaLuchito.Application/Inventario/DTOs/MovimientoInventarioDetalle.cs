@@ -11,6 +11,7 @@ public sealed record MovimientoInventarioDetalle(int Id, int ProductoId, string 
         TipoMovimientoInventario.SaldoInicial => "Saldo inicial",
         TipoMovimientoInventario.AjusteConteo => "Ajuste por conteo",
         TipoMovimientoInventario.Merma => "Pérdida o daño",
+        TipoMovimientoInventario.Venta => "Venta",
         _ => Tipo.ToString()
     };
     public decimal Variacion => StockPosterior - StockAnterior;

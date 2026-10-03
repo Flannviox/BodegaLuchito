@@ -4,6 +4,8 @@ using BodegaLuchito.Application.Ventas.Interfaces;
 using BodegaLuchito.Domain.Ventas.Entities;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using BodegaLuchito.Application.Inventario.UseCases;
+using BodegaLuchito.Domain.Autenticacion.Entities;
 
 namespace BodegaLuchito.Infrastructure.Ventas.Repositories;
 
@@ -19,8 +21,22 @@ public sealed class VentaRepository : IVentaRepository
     public async Task RegistrarVentaAsync(Venta venta, CancellationToken cancellationToken = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        await using var transaccion = await context.Database.BeginTransactionAsync(cancellationToken);
+        if (venta.Id != 0 || venta.Anulado)
+            throw new InvalidOperationException("La venta ya fue registrada o está anulada.");
+        if (!await context.Set<Usuario>().AnyAsync(x => x.Id == venta.UsuarioId && x.Activo, cancellationToken))
+            throw new InvalidOperationException("El usuario de la venta no existe o está desactivado.");
+        var ids = venta.Detalles.Select(x => x.ProductoId).Distinct().ToList();
+        var productos = await context.Productos.Where(x => ids.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, cancellationToken);
+        var movimientos = PrepararSalidaVentaUseCase.Ejecutar(venta, productos);
         await context.Set<Venta>().AddAsync(venta, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+        foreach (var movimiento in movimientos)
+            movimiento.Descripcion = $"Salida por venta #{venta.Id}";
+        context.MovimientosInventario.AddRange(movimientos);
+        await context.SaveChangesAsync(cancellationToken);
+        await transaccion.CommitAsync(cancellationToken);
     }
 
     public async Task<Venta?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default)

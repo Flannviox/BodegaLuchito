@@ -42,7 +42,7 @@ public class RegistrarVentaUseCase
 
         foreach (var det in request.Detalles)
         {
-            if (det.Cantidad <= 0 || det.PrecioUnitario <= 0)
+            if (det.ProductoId <= 0 || det.Cantidad <= 0 || det.PrecioUnitario <= 0)
                 throw new ArgumentException("Las cantidades y precios deben ser mayores a cero.");
 
             venta.Detalles.Add(new DetalleVenta

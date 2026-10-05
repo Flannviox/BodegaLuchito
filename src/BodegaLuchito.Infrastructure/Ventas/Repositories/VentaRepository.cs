@@ -56,4 +56,15 @@ public sealed class VentaRepository : IVentaRepository
         context.Set<Venta>().Update(venta);
         await context.SaveChangesAsync(cancellationToken);
     }
+    public async Task<IReadOnlyList<Venta>> ObtenerHistorialVentasAsync(CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        return await context.Set<Venta>()
+            .Include(v => v.Usuario) // Para ver quién la hizo
+            .Include(v => v.Detalles) // Para saber cuántos productos tiene
+            .OrderByDescending(v => v.FechaHora)
+            .Take(100) // Traemos las últimas 100 por rendimiento
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
 }

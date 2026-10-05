@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="White" IsEnabled="{Binding PuedeInteractuar}">
     <UserControl.Resources>
-        <!-- ESTILOS MODERNOS PARA EL DATA GRID DEL CARRITO -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <!-- ESTILOS DE TABLAS OMITIDOS POR BREVEDAD, SON LOS MISMOS QUE YA TENÍAS -->
         <Style TargetType="DataGrid">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -52,139 +54,237 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- HEADER: CAJA DE BÚSQUEDA / ESCÁNER -->
-        <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,15">
-            <StackPanel>
-                <TextBlock Text="Escanear Código de Barras o Buscar Producto" FontSize="16" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+        <!-- SUB-MENÚ (PESTAÑAS) -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+            <Button Content="Registrar Venta" Command="{Binding MostrarNuevaVentaCommand}" 
+                    Width="160" Height="40" FontSize="15" FontWeight="Bold" Cursor="Hand"
+                    Background="{Binding FondoBotonNuevaVenta}" Foreground="{Binding TextoBotonNuevaVenta}" BorderThickness="0" Margin="0,0,10,0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="6"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button Content="Historial de Ventas" Command="{Binding MostrarHistorialCommand}" 
+                    Width="180" Height="40" FontSize="15" FontWeight="Bold" Cursor="Hand"
+                    Background="{Binding FondoBotonHistorial}" Foreground="{Binding TextoBotonHistorial}" BorderThickness="0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="6"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+
+        <!-- PESTAÑA 1: NUEVA VENTA (CARRITO DE COMPRAS COMPLETO) -->
+        <Grid Grid.Row="1" Visibility="{Binding IsNuevaVentaVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- BÚSQUEDA Y ESCÁNER -->
+            <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="Escanear Código de Barras o Buscar Producto" FontSize="16" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <Grid>
+                        <TextBox x:Name="BuscadorTextBox" 
+                                 Text="{Binding TextoBusquedaProducto, UpdateSourceTrigger=PropertyChanged}" 
+                                 Height="50" FontSize="18" Padding="15,0" VerticalContentAlignment="Center" 
+                                 ToolTip="Pistolee el código de barras aquí o escriba para buscar">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding AgregarAlCarritoManualCommand}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <Popup IsOpen="{Binding IsDropdownOpen}" PlacementTarget="{Binding ElementName=BuscadorTextBox}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" Width="{Binding ElementName=BuscadorTextBox, Path=ActualWidth}">
+                            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4" Margin="0,5,0,0">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="10" ShadowDepth="3"/>
+                                </Border.Effect>
+                                <DataGrid ItemsSource="{Binding ProductosFiltrados}" SelectedItem="{Binding ProductoSeleccionado}" MaxHeight="250" IsReadOnly="True" HeadersVisibility="None" RowHeight="40" Background="White" BorderThickness="0" GridLinesVisibility="None" SelectionMode="Single">
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow">
+                                            <Setter Property="Background" Value="White"/>
+                                            <Setter Property="Cursor" Value="Hand"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <EventSetter Event="MouseLeftButtonUp" Handler="FilaProducto_MouseLeftButtonUp"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#F1F5F9"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="#E0F2FE"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Nombre}" Width="*">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                    <Setter Property="Foreground" Value="#1E293B"/>
+                                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                                    <Setter Property="Margin" Value="10,0,0,0"/>
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding="{Binding CodigoBarras}" Width="120" Foreground="#64748B">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding="{Binding PrecioVenta, StringFormat=S/ {0:N2}}" Width="100" FontWeight="Bold" Foreground="#10B981">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- CARRITO A PANTALLA COMPLETA -->
+            <Border Grid.Row="1" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                <DataGrid ItemsSource="{Binding Carrito}" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" RowHeight="55" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9" VerticalGridLinesBrush="Transparent" BorderThickness="0" Background="White" RowBackground="White" AlternatingRowBackground="#F8FAFC">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Código" Binding="{Binding CodigoBarras}" Width="120" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Und/Peso" Binding="{Binding UnidadVenta}" Width="100" IsReadOnly="True"/>
+
+                        <DataGridTextColumn Header="Precio Unit." Binding="{Binding PrecioUnitario, StringFormat=S/ {0:N2}}" Width="120" IsReadOnly="True"/>
+
+                        <!-- BOTONES +/- PERFECTOS -->
+                        <DataGridTemplateColumn Width="155">
+                            <DataGridTemplateColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="Content" Value="Cantidad"/>
+                                </Style>
+                            </DataGridTemplateColumn.HeaderStyle>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
+                                        <Button Command="{Binding DataContext.RestarCantidadCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}" Content="−" Width="32" Height="32" Padding="0" FontSize="18" FontWeight="Bold" 
+                                                Background="#E2E8F0" Foreground="#334155" BorderThickness="0" Cursor="Hand">
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="16"/>
+                                                </Style>
+                                            </Button.Resources>
+                                        </Button>
+                                        <TextBox Text="{Binding CantidadTexto, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Width="40" Height="32" TextAlignment="Center" VerticalContentAlignment="Center" 
+                                                 FontWeight="Bold" Foreground="#2563EB" BorderBrush="#CBD5E1" BorderThickness="0,0,0,1" 
+                                                 Background="Transparent" Margin="5,0,5,0"/>
+                                        <Button Command="{Binding DataContext.SumarCantidadCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}" Content="+" Width="32" Height="32" Padding="0" FontSize="18" FontWeight="Bold" 
+                                                Background="#E2E8F0" Foreground="#334155" BorderThickness="0" Cursor="Hand">
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="16"/>
+                                                </Style>
+                                            </Button.Resources>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=S/ {0:N2}}" Width="120" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="#0F172A"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn Header="Acción" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Quitar" Command="{Binding DataContext.QuitarDelCarritoCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="Transparent" Foreground="#EF4444" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- TOTALES Y COBRO -->
+            <Border Grid.Row="2" Background="#0F172A" BorderThickness="0" CornerRadius="8" Padding="25" Margin="0,15,0,0">
                 <Grid>
-                    <!-- El Name 'BuscadorTextBox' es crucial para que el Popup sepa dónde anclarse -->
-                    <TextBox x:Name="BuscadorTextBox" 
-                             Text="{Binding TextoBusquedaProducto, UpdateSourceTrigger=PropertyChanged}" 
-                             Height="50" FontSize="18" Padding="15,0" VerticalContentAlignment="Center" 
-                             ToolTip="Pistolee el código de barras aquí o escriba para buscar">
-                        <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding AgregarAlCarritoManualCommand}" />
-                        </TextBox.InputBindings>
-                    </TextBox>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <!-- POPUP DROPDOWN (Buscador Predictivo tipo Google) -->
-                    <Popup IsOpen="{Binding IsDropdownOpen}" 
-                           PlacementTarget="{Binding ElementName=BuscadorTextBox}" 
-                           Placement="Bottom" StaysOpen="False" AllowsTransparency="True" Width="{Binding ElementName=BuscadorTextBox, Path=ActualWidth}">
-                        <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4" Margin="0,5,0,0">
-                            <!-- Sombra suave para el Popup -->
-                            <Border.Effect>
-                                <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="10" ShadowDepth="3"/>
-                            </Border.Effect>
+                    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock Text="TOTAL A COBRAR" FontSize="16" FontWeight="SemiBold" Foreground="#94A3B8"/>
+                        <TextBlock Text="{Binding TotalVenta, StringFormat=S/ {0:N2}}" FontSize="48" FontWeight="Bold" Foreground="#10B981" Margin="0,-5,0,0"/>
+                    </StackPanel>
 
-                            <DataGrid ItemsSource="{Binding ProductosFiltrados}" 
-                                      SelectedItem="{Binding ProductoSeleccionado}" 
-                                      MaxHeight="250" 
-                                      IsReadOnly="True" 
-                                      HeadersVisibility="None" 
-                                      RowHeight="40"
-                                      Background="White"
-                                      BorderThickness="0"
-                                      GridLinesVisibility="None"
-                                      SelectionMode="Single">
-
-                                <DataGrid.RowStyle>
-                                    <Style TargetType="DataGridRow">
-                                        <Setter Property="Background" Value="White"/>
-                                        <Setter Property="Cursor" Value="Hand"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
-
-                                        <!-- AQUÍ LLAMAMOS AL EVENTO DEL CÓDIGO C# CON UN SOLO CLIC -->
-                                        <EventSetter Event="MouseLeftButtonUp" Handler="FilaProducto_MouseLeftButtonUp"/>
-
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#F1F5F9"/>
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter Property="Background" Value="#E0F2FE"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </DataGrid.RowStyle>
-
-                                <!-- (Se eliminó el InputBindings conflictivo) -->
-
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Nombre}" Width="*">
-                                        <DataGridTextColumn.ElementStyle>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                                <Setter Property="Foreground" Value="#1E293B"/>
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                                <Setter Property="Margin" Value="10,0,0,0"/>
-                                            </Style>
-                                        </DataGridTextColumn.ElementStyle>
-                                    </DataGridTextColumn>
-                                    <DataGridTextColumn Binding="{Binding CodigoBarras}" Width="120" Foreground="#64748B">
-                                        <DataGridTextColumn.ElementStyle>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                            </Style>
-                                        </DataGridTextColumn.ElementStyle>
-                                    </DataGridTextColumn>
-                                    <DataGridTextColumn Binding="{Binding PrecioVenta, StringFormat=C}" Width="100" FontWeight="Bold" Foreground="#10B981">
-                                        <DataGridTextColumn.ElementStyle>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                            </Style>
-                                        </DataGridTextColumn.ElementStyle>
-                                    </DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Border>
-                    </Popup>
+                    <Button Grid.Column="1" Command="{Binding IrACobrarCommand}" Content="Ir a Cobrar (F12)" Height="70" Width="220" Background="#10B981" Foreground="White" FontSize="20" FontWeight="Bold" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
                 </Grid>
-            </StackPanel>
-        </Border>
+            </Border>
+        </Grid>
 
-        <!-- BODY: CARRITO DE COMPRAS -->
-        <Border Grid.Row="1" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
-            <DataGrid ItemsSource="{Binding Carrito}">
+        <!-- PESTAÑA 2: HISTORIAL DE VENTAS A PANTALLA COMPLETA -->
+        <Border Grid.Row="1" Visibility="{Binding IsHistorialVisible, Converter={StaticResource BooleanToVisibilityConverter}}" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+            <DataGrid ItemsSource="{Binding HistorialVentas}" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" RowHeight="55" HeadersVisibility="Column">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Código" Binding="{Binding CodigoBarras}" Width="120" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Und/Peso" Binding="{Binding UnidadVenta}" Width="100" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Precio Unit." Binding="{Binding PrecioUnitario, StringFormat=C}" Width="120" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Nº Ticket" Binding="{Binding Id, StringFormat=Venta #{0}}" Width="120" IsReadOnly="True" FontWeight="Bold"/>
+                    <DataGridTextColumn Header="Fecha" Binding="{Binding FechaHora, StringFormat=dd/MM/yyyy HH:mm}" Width="150" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Usuario" Binding="{Binding Usuario.NombreCompleto}" Width="*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Método de Pago" Binding="{Binding MetodoPago}" Width="150" IsReadOnly="True"/>
 
-                    <!-- COLUMNA EDITABLE: CANTIDAD -->
-                    <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" Width="120">
+                    <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=S/ {0:N2}}" Width="120" IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="FontWeight" Value="Bold"/>
-                                <Setter Property="Foreground" Value="#2563EB"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.EditingElementStyle>
-                            <Style TargetType="TextBox">
-                                <Setter Property="FontWeight" Value="Bold"/>
-                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.EditingElementStyle>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C}" Width="120" IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="FontWeight" Value="Bold"/>
-                                <Setter Property="Foreground" Value="#0F172A"/>
+                                <Setter Property="Foreground" Value="#10B981"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn Header="Acción" Width="100">
+                    <!-- COLUMNA DE ACCIONES: VER TICKET Y ANULAR -->
+                    <DataGridTemplateColumn Header="Acciones" Width="160">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Quitar" Command="{Binding DataContext.QuitarDelCarritoCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="Transparent" Foreground="#EF4444" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                                    <!-- Botón Ver Detalles (Ticket) -->
+                                    <Button Content="Ver Ticket" Command="{Binding DataContext.VerDetallesVentaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                            CommandParameter="{Binding}" Background="#3B82F6" Foreground="White" BorderThickness="0" 
+                                            FontWeight="SemiBold" Cursor="Hand" Height="32" Width="70" Margin="0,0,8,0">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="4"/>
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -192,43 +292,16 @@
             </DataGrid>
         </Border>
 
-        <!-- FOOTER: TOTALES Y COBRO -->
-        <Border Grid.Row="2" Background="#0F172A" BorderThickness="0" CornerRadius="8" Padding="25" Margin="0,15,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBlock Text="TOTAL A COBRAR" FontSize="16" FontWeight="SemiBold" Foreground="#94A3B8"/>
-                    <TextBlock Text="{Binding TotalVenta, StringFormat=S/ {0:N2}}" FontSize="48" FontWeight="Bold" Foreground="#10B981" Margin="0,-5,0,0"/>
-                </StackPanel>
-
-                <!-- Botón de Jesús que abre el modal -->
-                <Button Grid.Column="1" Command="{Binding IrACobrarCommand}" Content="Ir a Cobrar (F12)" Height="70" Width="220" Background="#10B981" Foreground="White" FontSize="20" FontWeight="Bold" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="8"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-            </Grid>
-        </Border>
-
-        <!-- MODAL DE COBRO (Capa superpuesta) -->
-        <Border Background="#990F172A" Visibility="{Binding ModalCobroVisible}" Panel.ZIndex="10">
-            <Border Background="White" BorderThickness="0" CornerRadius="12" Padding="40" 
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Width="450">
+        <!-- MODAL DE COBRO (Capa superpuesta a todo) -->
+        <Border Grid.Row="0" Grid.RowSpan="2" Background="#990F172A" Visibility="{Binding ModalCobroVisible}" Panel.ZIndex="10">
+            <Border Background="White" BorderThickness="0" CornerRadius="12" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" Width="450">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" BlurRadius="20" Opacity="0.15" ShadowDepth="4"/>
                 </Border.Effect>
                 <StackPanel>
                     <TextBlock Text="Confirmar Venta" FontSize="24" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
                     <TextBlock Text="Monto total a cobrar:" FontSize="15" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,15,0,0"/>
-
                     <TextBlock Text="{Binding TotalVenta, StringFormat=S/ {0:N2}}" FontSize="45" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center" Margin="0,-5,0,25"/>
-
                     <TextBlock Text="Seleccione el método de pago:" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,10"/>
 
                     <Button Content="Efectivo" Command="{Binding CobrarEfectivoCommand}" Height="50" Background="#3B82F6" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,10" BorderThickness="0" Cursor="Hand">
@@ -238,7 +311,6 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-
                     <Button Content="Yape" Command="{Binding CobrarYapeCommand}" Height="50" Background="#7C3AED" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,10" BorderThickness="0" Cursor="Hand">
                         <Button.Resources>
                             <Style TargetType="Border">
@@ -246,7 +318,6 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-
                     <Button Content="Plin" Command="{Binding CobrarPlinCommand}" Height="50" Background="#0EA5E9" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,25" BorderThickness="0" Cursor="Hand">
                         <Button.Resources>
                             <Style TargetType="Border">
@@ -254,7 +325,6 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-
                     <Button Content="Cancelar" Command="{Binding CancelarCobroCommand}" Height="40" Background="Transparent" Foreground="#64748B" FontSize="15" FontWeight="SemiBold" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand">
                         <Button.Resources>
                             <Style TargetType="Border">
@@ -265,6 +335,5 @@
                 </StackPanel>
             </Border>
         </Border>
-
     </Grid>
 </UserControl>

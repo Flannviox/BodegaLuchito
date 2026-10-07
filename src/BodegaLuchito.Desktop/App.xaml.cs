@@ -112,7 +112,12 @@ public partial class App : System.Windows.Application
 
         // Categorías - Casos de uso
         services.AddTransient<ObtenerCategoriasActivasUseCase>(); 
-        services.AddTransient<CrearCategoriaUseCase>();          
+        services.AddTransient<CrearCategoriaUseCase>();
+        //Caja - Casos de uso
+        services.AddTransient<AbrirCajaUseCase>();
+        services.AddTransient<CerrarCajaUseCase>();
+        services.AddTransient<ConsultarHistorialCierresUseCase>();
+        services.AddTransient<ConsultarDetalleMovimientosCajaUseCase>();
     }
 
     protected override async void OnStartup(

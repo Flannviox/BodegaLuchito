@@ -12,6 +12,8 @@ using BodegaLuchito.Infrastructure.Persistence;
 using BodegaLuchito.Infrastructure.Ventas.Repositories;
 using BodegaLuchito.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
+using BodegaLuchito.Domain.Caja.Entities;
+using BodegaLuchito.Domain.Caja.Enums;
 
 namespace BodegaLuchito.Tests.Application.Ventas;
 
@@ -34,6 +36,13 @@ public sealed class VentaInventarioTests : IAsyncLifetime
                 PrecioVenta=3, StockActual=10, ControlaInventario=true },
             new Producto { Id=2, Nombre="Papa", CategoriaId=1, UnidadVenta=UnidadVenta.Peso,
                 PrecioVenta=3, StockActual=5.625m, ControlaInventario=true });
+        db.Set<SesionCaja>().Add(new SesionCaja
+        {
+            UsuarioAperturaId = 1,
+            FechaApertura = DateTime.Now,
+            FondoInicial = 100m,
+            Estado = EstadoSesionCaja.Abierta
+        });
         await db.SaveChangesAsync();
         _registrar = new RegistrarVentaUseCase(new VentaRepository(new TestDbContextFactory(_opciones)));
     }

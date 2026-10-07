@@ -6,6 +6,9 @@ using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using BodegaLuchito.Application.Inventario.UseCases;
 using BodegaLuchito.Domain.Autenticacion.Entities;
+using BodegaLuchito.Domain.Caja.Entities;
+using BodegaLuchito.Domain.Caja.Enums;
+
 
 namespace BodegaLuchito.Infrastructure.Ventas.Repositories;
 
@@ -26,6 +29,11 @@ public sealed class VentaRepository : IVentaRepository
             throw new InvalidOperationException("La venta ya fue registrada o está anulada.");
         if (!await context.Set<Usuario>().AnyAsync(x => x.Id == venta.UsuarioId && x.Activo, cancellationToken))
             throw new InvalidOperationException("El usuario de la venta no existe o está desactivado.");
+        var sesionAbierta = await context.Set<SesionCaja>().SingleOrDefaultAsync(x => x.Estado ==
+        EstadoSesionCaja.Abierta, cancellationToken);
+        if (sesionAbierta is null){
+            throw new InvalidOperationException("Debe abrir una sesión de caja antes de registrar una venta.");
+        }
         var ids = venta.Detalles.Select(x => x.ProductoId).Distinct().ToList();
         var productos = await context.Productos.Where(x => ids.Contains(x.Id))
             .ToDictionaryAsync(x => x.Id, cancellationToken);
@@ -36,7 +44,22 @@ public sealed class VentaRepository : IVentaRepository
             movimiento.Descripcion = $"Salida por venta #{venta.Id}";
         context.MovimientosInventario.AddRange(movimientos);
         await context.SaveChangesAsync(cancellationToken);
-        await transaccion.CommitAsync(cancellationToken);
+
+        await context.Set<MovimientoCaja>().AddAsync(
+         new MovimientoCaja
+            {
+                SesionCajaId = sesionAbierta.Id,
+                UsuarioId = venta.UsuarioId,
+                Tipo = TipoMovimientoCaja.IngresoVenta,
+                MetodoPago = venta.MetodoPago,
+                Monto = venta.Total,
+                FechaHora = venta.FechaHora,
+                VentaId = venta.Id,
+                Descripcion = $"Ingreso por venta #{venta.Id}"
+            },
+          cancellationToken);
+         await context.SaveChangesAsync(cancellationToken);
+         await transaccion.CommitAsync(cancellationToken);
     }
 
     public async Task<Venta?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default)

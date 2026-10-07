@@ -455,6 +455,11 @@ public partial class VentasViewModel : ViewModelBase
                 MessageBox.Show($"La venta se registró, pero falló la impresión: {ex.Message}", "Aviso");
             }
         }
+        catch (InvalidOperationException ex)
+            when (ex.Message.Contains("sesión de caja", StringComparison.OrdinalIgnoreCase))
+        {
+            MessageBox.Show(ex.Message,"Caja no abierta", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "Error al procesar", MessageBoxButton.OK, MessageBoxImage.Error);

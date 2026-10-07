@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using BodegaLuchito.Domain.Caja.Entities;
+using BodegaLuchito.Application.Caja.DTOs;
 
 namespace BodegaLuchito.Application.Caja.Interfaces
 {
@@ -12,6 +13,9 @@ namespace BodegaLuchito.Application.Caja.Interfaces
         Task AgregarSesionAsync(SesionCaja sesion, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<MovimientoCaja>> ObtenerMovimientosPorSesionAsync(
+            int sesionCajaId, CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<MovimientoCajaDetalleResult>> ObtenerDetalleMovimientosPorSesionAsync(
             int sesionCajaId, CancellationToken cancellationToken = default);
 
         Task GuardarCambiosAsync(CancellationToken cancellationToken = default);

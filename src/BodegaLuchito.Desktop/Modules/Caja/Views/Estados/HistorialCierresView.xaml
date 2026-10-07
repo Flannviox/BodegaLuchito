@@ -3,37 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views.Estados"
              mc:Ignorable="d"
              d:DesignWidth="1000"
              d:DesignHeight="620">
 
     <UserControl.Resources>
         <ResourceDictionary>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/CajaStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="HistorialHeaderStyle"
                    TargetType="DataGridColumnHeader">
-
                 <Setter Property="Background"
                         Value="#F3F6FA" />
-
                 <Setter Property="Foreground"
                         Value="{StaticResource ColorTextoPrincipal}" />
-
                 <Setter Property="FontWeight"
                         Value="SemiBold" />
-
                 <Setter Property="FontSize"
                         Value="12" />
-
                 <Setter Property="Padding"
                         Value="10,8" />
-
                 <Setter Property="BorderBrush"
                         Value="{StaticResource ColorBorde}" />
-
                 <Setter Property="BorderThickness"
                         Value="0,0,0,1" />
             </Style>
@@ -49,9 +44,12 @@
 
                 <Setter Property="Foreground"
                         Value="{StaticResource ColorTextoPrincipal}" />
+
             </Style>
+
             <Style x:Key="HistorialRowStyle"
                    TargetType="DataGridRow">
+
                 <Setter Property="MinHeight"
                         Value="34" />
                 <Setter Property="Background"
@@ -60,11 +58,14 @@
                         Value="{StaticResource ColorBorde}" />
                 <Setter Property="BorderThickness"
                         Value="0,0,0,1" />
+
             </Style>
+
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -78,20 +79,62 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1"
-                    Content="Volver"
-                    Command="{Binding VolverDesdeHistorialCommand}"
-                    Style="{StaticResource BotonSecundario}"
-                    Width="120"
-                    Height="42"
-                    VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <Button Content="Ver detalle"
+                        Command="{Binding VerDetalleCierreCommand}"
+                        CommandParameter="{Binding CierreSeleccionado}"
+                        Width="120"
+                        Height="42"
+                        Margin="0,0,10,0">
+
+                    <Button.Style>
+
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource BotonPrimario}">
+
+                            <Setter Property="IsEnabled"
+                                    Value="True" />
+
+                            <Style.Triggers>
+
+                                <DataTrigger Binding="{Binding CierreSeleccionado}"
+                                             Value="{x:Null}">
+
+                                    <Setter Property="IsEnabled"
+                                            Value="False" />
+
+                                    <Setter Property="Opacity"
+                                            Value="0.55" />
+
+                                </DataTrigger>
+
+                            </Style.Triggers>
+
+                        </Style>
+
+                    </Button.Style>
+
+                </Button>
+
+                <Button Content="Volver"
+                        Command="{Binding VolverDesdeHistorialCommand}"
+                        Style="{StaticResource BotonSecundario}"
+                        Width="120"
+                        Height="42" />
+
+            </StackPanel>
 
         </Grid>
 
         <Border Grid.Row="1"
                 Style="{StaticResource Tarjeta}"
                 Padding="22">
+
             <Grid>
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="16" />
@@ -101,22 +144,26 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
+
                         <TextBlock Text="Historial de cierres"
                                    FontSize="22"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource ColorTextoPrincipal}" />
+
                         <TextBlock
                             Text="Consulta las sesiones cerradas y revisa los montos registrados en cada cierre de caja."
                             FontSize="13"
                             Foreground="{StaticResource ColorTextoSecundario}"
                             Margin="0,6,0,0"
                             TextWrapping="Wrap" />
+
                         <TextBlock
                             Text="Puedes filtrar los registros o hacer clic en los encabezados para ordenarlos."
                             FontSize="13"
@@ -124,6 +171,7 @@
                             Foreground="{StaticResource ColorAdvertencia}"
                             Margin="0,6,0,0"
                             TextWrapping="Wrap" />
+
                     </StackPanel>
 
                     <Border Grid.Column="1"
@@ -142,6 +190,7 @@
                     </Border>
 
                 </Grid>
+
                 <Border Grid.Row="2"
                         Background="#F8FAFC"
                         BorderBrush="{StaticResource ColorBorde}"
@@ -150,6 +199,7 @@
                         Padding="14">
 
                     <Grid>
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="150" />
                             <ColumnDefinition Width="16" />
@@ -163,6 +213,7 @@
                             <ColumnDefinition Width="10" />
                             <ColumnDefinition Width="100" />
                         </Grid.ColumnDefinitions>
+
                         <StackPanel Grid.Column="0">
 
                             <TextBlock Text="Fecha desde"
@@ -170,8 +221,10 @@
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource ColorTextoPrincipal}"
                                        Margin="0,0,0,5" />
+
                             <DatePicker
                                 SelectedDate="{Binding FechaDesdeFiltro}" />
+
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
@@ -181,6 +234,7 @@
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource ColorTextoPrincipal}"
                                        Margin="0,0,0,5" />
+
                             <DatePicker
                                 SelectedDate="{Binding FechaHastaFiltro}" />
 
@@ -198,8 +252,7 @@
                                 Width="140"
                                 Height="25"
                                 Text="{Binding MontoMinimoFiltroInput,
-                                               UpdateSourceTrigger=PropertyChanged}"
-                                 />
+                                               UpdateSourceTrigger=PropertyChanged}" />
 
                         </StackPanel>
 
@@ -215,8 +268,7 @@
                                 Width="140"
                                 Height="25"
                                 Text="{Binding MontoMaximoFiltroInput,
-                                               UpdateSourceTrigger=PropertyChanged}"
-                              />
+                                               UpdateSourceTrigger=PropertyChanged}" />
 
                         </StackPanel>
 
@@ -226,16 +278,21 @@
                                 Style="{StaticResource BotonPrimario}"
                                 VerticalAlignment="Bottom" />
 
+                        <!-- LIMPIAR -->
                         <Button Grid.Column="10"
                                 Content="Limpiar"
                                 Command="{Binding LimpiarFiltrosHistorialCommand}"
                                 Style="{StaticResource BotonSecundario}"
                                 VerticalAlignment="Bottom" />
+
                     </Grid>
+
                 </Border>
 
                 <DataGrid Grid.Row="4"
                           ItemsSource="{Binding HistorialCierresVista}"
+                          SelectedItem="{Binding CierreSeleccionado,
+                                                 Mode=TwoWay}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserAddRows="False"
@@ -257,23 +314,27 @@
                           SelectionUnit="FullRow">
 
                     <DataGrid.Columns>
+
                         <DataGridTextColumn
                             Header="N.°"
                             Binding="{Binding Id}"
                             SortMemberPath="Id"
                             Width="70" />
+
                         <DataGridTextColumn
                             Header="Apertura"
                             Binding="{Binding FechaApertura,
                                               StringFormat={}{0:dd/MM/yyyy HH:mm}}"
                             SortMemberPath="FechaApertura"
                             Width="150" />
+
                         <DataGridTextColumn
                             Header="Cierre"
                             Binding="{Binding FechaCierre,
                                               StringFormat={}{0:dd/MM/yyyy HH:mm}}"
                             SortMemberPath="FechaCierre"
                             Width="150" />
+
                         <DataGridTextColumn
                             Header="Fondo inicial"
                             Binding="{Binding FondoInicial,
@@ -308,20 +369,54 @@
                                               StringFormat=S/ {0:N2}}"
                             SortMemberPath="YapeNeto"
                             Width="110" />
+
                         <DataGridTextColumn
                             Header="Plin neto"
                             Binding="{Binding PlinNeto,
                                               StringFormat=S/ {0:N2}}"
                             SortMemberPath="PlinNeto"
                             Width="110" />
+
                         <DataGridTextColumn
                             Header="Observación"
                             Binding="{Binding ObservacionCierre}"
                             SortMemberPath="ObservacionCierre"
                             Width="*" />
+
                     </DataGrid.Columns>
+
                 </DataGrid>
+
             </Grid>
+
         </Border>
+
+        <Grid Grid.RowSpan="2"
+              Panel.ZIndex="10"
+              Background="#66000000">
+            <Grid.Style>
+
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility"
+                            Value="Collapsed" />
+                    <Style.Triggers>
+
+                        <DataTrigger Binding="{Binding MostrarDetalleCierre}"
+                                     Value="True">
+
+                            <Setter Property="Visibility"
+                                    Value="Visible" />
+
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <local:DetalleCierreView
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="900"
+                MaxHeight="720"
+                Margin="40" />
+        </Grid>
     </Grid>
 </UserControl>

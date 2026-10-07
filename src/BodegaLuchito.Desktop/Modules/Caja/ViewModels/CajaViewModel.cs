@@ -38,9 +38,12 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private readonly ISesionUsuario _sesionUsuario;
         private decimal? _montoMinimoAplicado;
         private decimal? _montoMaximoAplicado;
+        private readonly ConsultarDetalleMovimientosCajaUseCase _consultarDetalleMovimientosCajaUseCase;
+
         public CajaViewModel(
             AbrirCajaUseCase abrirCajaUseCase,
             CerrarCajaUseCase cerrarCajaUseCase,
+            ConsultarDetalleMovimientosCajaUseCase consultarDetalleMovimientosCajaUseCase,
             ConsultarHistorialCierresUseCase consultarHistorialCierresUseCase,
             ICajaRepository cajaRepository,
             ISesionUsuario sesionUsuario)
@@ -50,6 +53,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             _consultarHistorialCierresUseCase = consultarHistorialCierresUseCase;
             _cajaRepository = cajaRepository;
             _sesionUsuario = sesionUsuario;
+            _consultarDetalleMovimientosCajaUseCase = consultarDetalleMovimientosCajaUseCase;
             HistorialCierresVista = CollectionViewSource.GetDefaultView(HistorialCierres);
 
             HistorialCierresVista.Filter = FiltrarCierre;
@@ -94,6 +98,12 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
 
         [ObservableProperty]
         private int _cantidadCierresMostrados;
+
+        [ObservableProperty]
+        private HistorialCierreItem? _cierreSeleccionado;
+
+        [ObservableProperty]
+        private bool _mostrarDetalleCierre;
         public bool MostrarApertura =>
             EstadoVista == EstadoVistaCaja.Apertura;
 
@@ -114,6 +124,9 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             EstadoVista == EstadoVistaCaja.Historial;
 
         public ObservableCollection<HistorialCierreItem> HistorialCierres { get; } = new();
+        public ObservableCollection<MovimientoCajaDetalleResult>
+    MovimientosCierreSeleccionado
+        { get; } = new();
         public ICollectionView HistorialCierresVista { get; }
 
         partial void OnEstadoVistaChanged(EstadoVistaCaja value)
@@ -182,6 +195,8 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
                 MensajeError = ex.Message;
             }
         }
+
+
 
         [RelayCommand]
         private void AbrirFormularioCierre()
@@ -366,6 +381,45 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             _montoMaximoAplicado = null;
             HistorialCierresVista.Refresh();
             ActualizarCantidadCierresMostrados();
+        }
+
+        [RelayCommand]
+        private async Task VerDetalleCierreAsync(HistorialCierreItem? cierre)
+        {
+            if (cierre is null)
+            {
+                return;
+            }
+
+            MensajeError = null;
+
+            try
+            {
+                var movimientos =
+                    await _consultarDetalleMovimientosCajaUseCase
+                        .EjecutarAsync(cierre.Id);
+
+                MovimientosCierreSeleccionado.Clear();
+
+                foreach (var movimiento in movimientos)
+                {
+                    MovimientosCierreSeleccionado.Add(movimiento);
+                }
+
+                CierreSeleccionado = cierre;
+                MostrarDetalleCierre = true;
+            }
+            catch (ArgumentException ex)
+            {
+                MensajeError = ex.Message;
+            }
+        }
+        [RelayCommand]
+        private void CerrarDetalleCierre()
+        {
+            MostrarDetalleCierre = false;
+            CierreSeleccionado = null;
+            MovimientosCierreSeleccionado.Clear();
         }
 
         private static bool TryParseMonto(string texto, out decimal monto)

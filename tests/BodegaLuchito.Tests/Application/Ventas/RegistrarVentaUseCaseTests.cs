@@ -16,6 +16,8 @@ using BodegaLuchito.Tests.Helpers;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using BodegaLuchito.Domain.Caja.Entities;
+using BodegaLuchito.Domain.Caja.Enums;
 
 namespace BodegaLuchito.Tests.Application.Ventas;
 
@@ -49,7 +51,6 @@ public sealed class RegistrarVentaUseCaseTests
             Rol = RolUsuario.Vendedora,
             Activo = true
         };
-
         var categoria = new Categoria { Nombre = "Abarrotes" };
 
         var producto = new Producto
@@ -67,6 +68,17 @@ public sealed class RegistrarVentaUseCaseTests
         context.Set<Usuario>().Add(usuario);
         context.Set<Categoria>().Add(categoria);
         context.Set<Producto>().Add(producto);
+
+        var sesionCaja = new SesionCaja
+        {
+            UsuarioAperturaId = usuario.Id,
+            FechaApertura = DateTime.Now,
+            FondoInicial = 100m,
+            Estado = EstadoSesionCaja.Abierta
+        };
+
+        context.Set<SesionCaja>().Add(sesionCaja);
+
 
         await context.SaveChangesAsync();
 

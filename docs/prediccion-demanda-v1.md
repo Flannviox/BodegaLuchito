@@ -13,7 +13,7 @@ Los reportes descriptivos y el dashboard quedan fuera de este cambio.
 
 ## Dos orígenes separados
 
-**Datos del negocio:** consulta SQLite mediante EF Core y el contrato de Application.
+**Mi negocio:** consulta SQLite mediante EF Core y el contrato de Application.
 Seleccionar la fecha desde la cual se registraron todas las ventas; máximo 180 días atrás.
 La fecha efectiva por producto también respeta su alta y la primera venta válida del negocio.
 Se excluyen el día de alta del producto y el día actual para evitar períodos parciales.
@@ -27,12 +27,12 @@ para obtener cifras si falta información. Los días sin stock pueden ocultar de
 Si una unidad de venta cambió durante el período, elegir un período posterior al cambio:
 esta versión no reconstruye cambios históricos de unidad.
 
-**Demostración:** genera en memoria 15 días sintéticos reproducibles para leche, agua y papa,
+**Ver un ejemplo:** genera en memoria 15 días sintéticos reproducibles para leche, agua y papa,
 y ocho días para un producto nuevo que demuestra el estado de datos insuficientes. No consulta
 ni escribe la base real, ni usa su stock. Los nombres contienen “ejemplo” y la pantalla señala
 el modo. Evaluar estos datos demuestra el funcionamiento técnico, no la precisión comercial.
-No hay selector de cantidad de días ni de etapas. Basta elegir Demostración y analizar.
-Piloto y uso real emplean el mismo origen Datos del negocio: si contiene pruebas, sus resultados
+No hay selector de cantidad de días ni de etapas. Basta elegir Ver un ejemplo y pulsar Revisar productos.
+Piloto y uso real emplean el mismo origen Mi negocio: si contiene pruebas, sus resultados
 son de prueba. Cuando se instale, usar una base de producción separada de las pruebas.
 
 ## Modelo y evaluación
@@ -63,7 +63,8 @@ la aplicación; otras arquitecturas requieren validación aparte.
 - Se muestra el error absoluto medio de los **totales de tres días**, en unid o kg. Menor es mejor.
   No se presenta como porcentaje de precisión ni se mezclan errores entre productos o unidades.
 - Después se entrena con todo el período disponible y se estiman hoy y los próximos dos días.
-  El resultado se muestra hasta tres decimales; una estimación en unidades puede ser fraccionaria.
+  Se conserva la estimación original para evaluar y clasificar el riesgo. En la interfaz las unidades
+  se redondean hacia arriba y se indican como aproximadas; los kg conservan hasta tres decimales.
 - Las salidas negativas de SSA se limitan a cero; los resultados no finitos se rechazan.
 - Si el modelo no supera al promedio, se informa expresamente; no se cambia silenciosamente
   de algoritmo ni se asegura que el pronóstico sea confiable.
@@ -90,6 +91,13 @@ volver a analizar después de ventas, abastecimientos o ajustes.
 
 ## Interfaz y comprobación manual
 
+La tabla muestra Producto, Tienes ahora, Podrías vender en 3 días y ¿Alcanzaría?. La dueña ve
+Podría faltar, Quedaría poco o Alcanzaría, con una explicación al seleccionar el producto.
+Los avisos de historial corto y de no superar al promedio permanecen visibles. Los detalles
+estadísticos se consultan en Ver detalles del cálculo, cerrado inicialmente. Cuando no hay
+estimación se explica qué falta, sin presentar cero como una predicción.
+
+
 La pantalla usa la paleta azul, texto oscuro al pasar el mouse o seleccionar filas y una tabla
 con desplazamiento propio. En ventanas muy pequeñas hay desplazamiento exterior de respaldo
 para conservar accesibles los controles y la evaluación. No se ocultan columnas: cuando no caben,
@@ -97,17 +105,17 @@ la tabla permite desplazamiento horizontal. Los resultados se limpian al cambiar
 o confirmación para no confundir resultados anteriores con la selección actual.
 
 1. Iniciar sesión como administradora y abrir Predicción de demanda.
-2. Analizar Datos del negocio con los registros recientes: debe indicar Datos insuficientes.
-3. Cambiar a Demostración y pulsar Analizar demanda, sin seleccionar cantidades de días: deben
+2. Revisar Mi negocio con los registros recientes: debe indicar Datos insuficientes.
+3. Cambiar a Ver un ejemplo y pulsar Revisar productos, sin seleccionar cantidades de días: deben
    aparecer tres estimaciones experimentales y un producto sin historial suficiente. Seleccionar
-   cada fila para ver sus errores, el número de períodos evaluados y la limitación del historial corto.
+   cada fila para leer su explicación. Abrir Ver detalles del cálculo para consultar errores y períodos evaluados.
 4. Comprobar que stock, ventas, caja y movimientos reales no cambiaron.
-5. Volver a Datos del negocio: desaparecen inmediatamente las cifras simuladas.
+5. Volver a Mi negocio: desaparecen inmediatamente las cifras simuladas.
 6. Probar fecha vacía/futura, cancelar un cálculo y navegar a otro módulo durante el análisis.
 7. Probar selección, rueda del mouse, tamaño de laptop y ventana pequeña.
 8. Con un conjunto completo de al menos 15 días, comprobar exclusión de ventas anuladas,
    conservación de kg y tratamiento de días sin ventas. No insertar ventas ficticias en producción
-   para desbloquear el modelo: usar Demostración.
+   para desbloquear el modelo: usar Ver un ejemplo.
 9. Para el piloto, el primer día de alta del producto no se cuenta porque puede ser parcial.
    Quince días completos no equivalen a quince comprobantes ni a registrar todas las pruebas hoy.
 

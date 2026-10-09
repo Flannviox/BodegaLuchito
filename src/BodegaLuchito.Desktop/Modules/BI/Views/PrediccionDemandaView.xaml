@@ -78,10 +78,21 @@
         <Style x:Key="TextoCelda" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="10,6"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <Grid Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}" MinHeight="560">
+    <Grid Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="MinHeight" Value="600"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding DetallesVisibles}" Value="True">
+                        <Setter Property="MinHeight" Value="760"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -90,23 +101,25 @@
         </Grid.RowDefinitions>
         <Border Style="{StaticResource Tarjeta}" Margin="0,0,0,10">
             <StackPanel>
-                <TextBlock Text="Anticípate a lo que podrías necesitar" FontSize="19" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding AvisoOrigen}" TextWrapping="Wrap" Margin="0,6,0,12" Foreground="#456385"/>
+                <TextBlock Text="¿Qué productos podrían faltarte?" FontSize="21" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                <TextBlock Text="Revisa si lo que tienes alcanzaría para los próximos tres días, según las ventas anteriores."
+                    TextWrapping="Wrap" Margin="0,6,0,8"/>
+                <TextBlock Text="{Binding AvisoOrigen}" TextWrapping="Wrap" Margin="0,0,0,12" Foreground="#456385"/>
                 <WrapPanel IsEnabled="{Binding Disponible}">
                     <StackPanel Width="195" Margin="0,0,16,8">
-                        <TextBlock Text="Origen de los datos" Margin="0,0,0,5"/>
+                        <TextBlock Text="¿Qué quieres consultar?" Margin="0,0,0,5"/>
                         <ComboBox ItemsSource="{Binding Fuentes}" SelectedItem="{Binding Fuente}"/>
                     </StackPanel>
                     <StackPanel Width="190" Margin="0,0,16,8" Visibility="{Binding EsNegocio, Converter={StaticResource Visible}}">
-                        <TextBlock Text="Ventas completas desde" Margin="0,0,0,5"/>
+                        <TextBlock Text="Registré mis ventas desde" Margin="0,0,0,5"/>
                         <DatePicker SelectedDate="{Binding Desde}" DisplayDateStart="{Binding FechaMinima, Mode=OneWay}"
                             DisplayDateEnd="{Binding FechaMaxima, Mode=OneWay}"/>
                     </StackPanel>
-                    <Button Content="Analizar demanda" Command="{Binding AnalizarCommand}" VerticalAlignment="Bottom" Margin="0,0,0,8"/>
+                    <Button Content="Revisar productos" Command="{Binding AnalizarCommand}" VerticalAlignment="Bottom" Margin="0,0,0,8"/>
                 </WrapPanel>
                 <CheckBox IsChecked="{Binding HistorialCompleto}" IsEnabled="{Binding Disponible}"
                     Visibility="{Binding EsNegocio, Converter={StaticResource Visible}}">
-                    <TextBlock Text="Confirmo que registré todas las ventas del período. Los días sin registros fueron días sin ventas." TextWrapping="Wrap"/>
+                    <TextBlock Text="He registrado todas las ventas desde esa fecha. Si un día no tiene registros, no hubo ventas." TextWrapping="Wrap"/>
                 </CheckBox>
             </StackPanel>
         </Border>
@@ -116,7 +129,7 @@
                 <TextBlock Text="{Binding Resumen}" FontWeight="SemiBold"/>
                 <TextBlock Text="{Binding Mensaje}" TextWrapping="Wrap" Margin="0,5,8,0"/>
             </StackPanel>
-            <Button Grid.Column="1" Content="Cancelar análisis" Command="{Binding CancelarCommand}"
+            <Button Grid.Column="1" Content="Cancelar revisión" Command="{Binding CancelarCommand}"
                 Visibility="{Binding Ocupado, Converter={StaticResource Visible}}"/>
         </Grid>
         <Border Grid.Row="2" Style="{StaticResource Tarjeta}" Padding="0">
@@ -128,10 +141,9 @@
                 ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*" MinWidth="180" ElementStyle="{StaticResource TextoCelda}"/>
-                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock, StringFormat={}{0:0.###}}" Width="85" MinWidth="85" ElementStyle="{StaticResource TextoCelda}"/>
-                    <DataGridTextColumn Header="Unidad" Binding="{Binding Unidad}" Width="70" MinWidth="70" ElementStyle="{StaticResource TextoCelda}"/>
-                    <DataGridTextColumn Header="Estimado · 3 días" Binding="{Binding Demanda, StringFormat={}{0:0.###}, TargetNullValue=—}" Width="140" MinWidth="140" ElementStyle="{StaticResource TextoCelda}"/>
-                    <DataGridTemplateColumn Header="Riesgo" Width="85" MinWidth="85">
+                    <DataGridTextColumn Header="Tienes ahora" Binding="{Binding Existencias, Mode=OneWay}" Width="140" MinWidth="140" ElementStyle="{StaticResource TextoCelda}"/>
+                    <DataGridTextColumn Header="Podrías vender en 3 días" Binding="{Binding VentaPosible, Mode=OneWay}" Width="200" MinWidth="200" ElementStyle="{StaticResource TextoCelda}"/>
+                    <DataGridTemplateColumn Header="¿Alcanzaría?" Width="160" MinWidth="160">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Padding="8,4" Margin="5" CornerRadius="5" VerticalAlignment="Center">
@@ -145,22 +157,34 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="{Binding Riesgo}" Foreground="#17365D" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Situacion}" Foreground="#17365D" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Días de historial" Binding="{Binding Dias}" Width="130" MinWidth="130" ElementStyle="{StaticResource TextoCelda}"/>
-                    <DataGridTextColumn Header="Resultado" Binding="{Binding Estado}" Width="180" MinWidth="180" ElementStyle="{StaticResource TextoCelda}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
         <Border Grid.Row="3" Style="{StaticResource Tarjeta}" Margin="0,10,0,0">
             <StackPanel>
-                <TextBlock Text="{Binding DetalleSeleccion}" TextWrapping="Wrap" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding Evaluacion}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                <TextBlock Text="Se estiman ventas observadas: faltantes de stock y registros incompletos pueden subestimar la demanda." TextWrapping="Wrap" Foreground="#456385" Margin="0,6,0,0"/>
+                <TextBlock Text="{Binding TituloDetalle}" TextWrapping="Wrap" FontWeight="SemiBold" FontSize="16"/>
+                <TextBlock Text="{Binding DetalleSeleccion}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                <Border Background="#FFF7E6" CornerRadius="5" Padding="8" Margin="0,8,0,0"
+                        Visibility="{Binding TieneAdvertencia, Converter={StaticResource Visible}}">
+                    <TextBlock Text="{Binding AdvertenciaSeleccion}" TextWrapping="Wrap" Foreground="#7C4A03"/>
+                </Border>
+                <TextBlock Text="Esta consulta te ayuda a planificar; no realiza compras ni cambia tus existencias." TextWrapping="Wrap" Foreground="#456385" Margin="0,6,0,0"/>
                 <TextBlock Text="{Binding FechaCalculo}" TextWrapping="Wrap" Foreground="#456385" FontSize="12" Margin="0,4,0,0"/>
+                <Expander Header="Ver detalles del cálculo" IsExpanded="{Binding DetallesVisibles}" Margin="0,8,0,0">
+                    <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="6,8">
+                            <TextBlock Text="{Binding DetalleTecnico}" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Evaluacion}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                            <TextBlock Text="Las ventas no registradas y los días sin existencias pueden hacer que el cálculo sea menor que la demanda real. Las unidades se muestran redondeadas hacia arriba solo para facilitar su lectura."
+                                TextWrapping="Wrap" Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Expander>
             </StackPanel>
         </Border>
     </Grid>

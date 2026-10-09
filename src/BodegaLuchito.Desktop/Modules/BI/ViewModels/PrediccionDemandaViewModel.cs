@@ -9,30 +9,37 @@ namespace BodegaLuchito.Desktop.Modules.BI.ViewModels;
 public partial class PrediccionDemandaViewModel(GenerarPrediccionDemandaUseCase generar) : ViewModelBase
 {
     private CancellationTokenSource? _cancelacion;
-    public string[] Fuentes { get; } = ["Datos del negocio", "Demostración"];
-    public ObservableCollection<ResultadoPrediccion> Resultados { get; } = [];
+    public string[] Fuentes { get; } = ["Mi negocio", "Ver un ejemplo"];
+    public ObservableCollection<ProductoPrediccionViewModel> Resultados { get; } = [];
     public DateTime FechaMinima => DateTime.Today.AddDays(-GenerarPrediccionDemandaUseCase.MaximoDias);
     public DateTime FechaMaxima => DateTime.Today.AddDays(-1);
 
-    [ObservableProperty] private string _fuente = "Datos del negocio";
+    [ObservableProperty] private string _fuente = "Mi negocio";
     [ObservableProperty] private DateTime? _desde = DateTime.Today.AddDays(-90);
     [ObservableProperty] private bool _historialCompleto;
     [ObservableProperty] private bool _ocupado;
-    [ObservableProperty] private string _mensaje = "Selecciona el origen de los datos y pulsa Analizar demanda.";
-    [ObservableProperty] private string _fechaCalculo = "Sin análisis";
-    [ObservableProperty] private ResultadoPrediccion? _seleccionado;
+    [ObservableProperty] private string _mensaje = "Puedes usar tus ventas o ver un ejemplo sin cambiar tu negocio.";
+    [ObservableProperty] private string _fechaCalculo = "Todavía no se ha realizado una consulta.";
+    [ObservableProperty] private bool _analisisRealizado;
+    [ObservableProperty] private bool _detallesVisibles;
+    [ObservableProperty] private ProductoPrediccionViewModel? _seleccionado;
 
     public bool Disponible => !Ocupado;
     public bool EsNegocio => Fuente == Fuentes[0];
     public string AvisoOrigen => EsNegocio
-        ? "Desde 15 días completos puedes probar una estimación experimental. Si registras ventas de prueba, los resultados también serán de prueba."
-        : "DEMOSTRACIÓN · Productos, ventas y stock ficticios, separados de la base del negocio. No es necesario registrar ventas para probarla.";
-    public string Resumen => $"{Resultados.Count} productos · {Resultados.Count(x => x.Demanda.HasValue)} estimaciones · "
-        + $"{Resultados.Count(x => x.Riesgo == "Alto")} con riesgo alto";
-    public string DetalleSeleccion => Seleccionado?.Detalle ?? "Selecciona un producto para ver su evaluación.";
-    public string Evaluacion => Seleccionado?.ErrorModelo is decimal error
-        ? $"Evaluación: {Seleccionado.PeriodosEvaluados} período(s) de 3 días. Error medio: modelo {error:0.###} {Seleccionado.Unidad} · promedio {Seleccionado.ErrorPromedio:0.###} {Seleccionado.Unidad}. Menor es mejor."
-        : "La evaluación aparecerá cuando exista una estimación.";
+        ? "Se usan las ventas que guardaste en el sistema. Si son ventas de prueba, esta consulta también será de prueba."
+        : "ESTÁS VIENDO UN EJEMPLO · Estos productos y cantidades son inventados. Tu inventario y tu caja no cambian.";
+    public string Resumen => !AnalisisRealizado ? "Productos que conviene revisar"
+        : $"Productos revisados: {Resultados.Count} · Podrían faltar: {Resultados.Count(x => x.Riesgo == "Alto")} · "
+        + $"Aún sin cálculo: {Resultados.Count(x => x.Resultado.Demanda is null)}";
+    public string TituloDetalle => Seleccionado is null ? "¿Cómo leer esta pantalla?" : $"Sobre {Seleccionado.Producto}";
+    public string DetalleSeleccion => Seleccionado?.Explicacion ?? "Compara lo que tienes con lo que podrías vender. Selecciona un producto para entender su resultado.";
+    public string AdvertenciaSeleccion => Seleccionado?.Advertencia ?? "";
+    public bool TieneAdvertencia => !string.IsNullOrEmpty(AdvertenciaSeleccion);
+    public string DetalleTecnico => Seleccionado?.Resultado.Detalle ?? "Selecciona un producto para consultar los detalles del cálculo.";
+    public string Evaluacion => Seleccionado?.Resultado is { ErrorModelo: decimal error } fila
+        ? $"Historial: {fila.Dias} días. Evaluación: {fila.PeriodosEvaluados} período(s) de 3 días. Error medio: modelo {error:0.###} {fila.Unidad} · promedio {fila.ErrorPromedio:0.###} {fila.Unidad}. Menor es mejor. Estimación sin redondeo visual: {fila.Demanda:0.###} {fila.Unidad}."
+        : "Todavía no hay una estimación para evaluar.";
 
     partial void OnFuenteChanged(string value)
     {
@@ -44,18 +51,25 @@ public partial class PrediccionDemandaViewModel(GenerarPrediccionDemandaUseCase 
     partial void OnDesdeChanged(DateTime? value) => LimpiarResultado();
     partial void OnHistorialCompletoChanged(bool value) => LimpiarResultado();
     partial void OnOcupadoChanged(bool value) => OnPropertyChanged(nameof(Disponible));
-    partial void OnSeleccionadoChanged(ResultadoPrediccion? value)
+    partial void OnAnalisisRealizadoChanged(bool value) => OnPropertyChanged(nameof(Resumen));
+    partial void OnSeleccionadoChanged(ProductoPrediccionViewModel? value)
     {
+        OnPropertyChanged(nameof(TituloDetalle));
         OnPropertyChanged(nameof(DetalleSeleccion));
+        OnPropertyChanged(nameof(AdvertenciaSeleccion));
+        OnPropertyChanged(nameof(TieneAdvertencia));
+        OnPropertyChanged(nameof(DetalleTecnico));
         OnPropertyChanged(nameof(Evaluacion));
     }
 
     private void LimpiarResultado()
     {
         Resultados.Clear();
+        AnalisisRealizado = false;
+        DetallesVisibles = false;
         Seleccionado = null;
-        FechaCalculo = "Sin análisis";
-        Mensaje = "Pulsa Analizar demanda para calcular con estos datos.";
+        FechaCalculo = "Todavía no se ha realizado una consulta.";
+        Mensaje = "Pulsa Revisar productos para consultar con estos datos.";
         OnPropertyChanged(nameof(Resumen));
     }
 
@@ -67,17 +81,19 @@ public partial class PrediccionDemandaViewModel(GenerarPrediccionDemandaUseCase 
         LimpiarResultado();
         Ocupado = true;
         _cancelacion = new CancellationTokenSource();
-        Mensaje = "Analizando el historial y evaluando las predicciones…";
+        Mensaje = "Revisando tus productos y las ventas anteriores…";
         try
         {
             var informe = await generar.EjecutarAsync(!EsNegocio, Desde ?? DateTime.Today.AddDays(-90),
                 HistorialCompleto, _cancelacion.Token);
-            foreach (var fila in informe.Productos) Resultados.Add(fila);
+            foreach (var fila in informe.Productos) Resultados.Add(new ProductoPrediccionViewModel(fila));
+            AnalisisRealizado = true;
             Seleccionado = Resultados.FirstOrDefault();
-            FechaCalculo = $"Calculado: {informe.CalculadoEn:dd/MM/yyyy HH:mm} · Ventas hasta {informe.Hasta:dd/MM/yyyy}";
-            Mensaje = Resultados.Count == 0 ? "No hay productos activos con inventario para analizar."
-                : informe.Demostracion ? "Demostración calculada. Su desempeño no demuestra precisión en el negocio real."
-                : "Análisis terminado. Las existencias corresponden al momento de la consulta; vuelve a analizar después de nuevas operaciones.";
+            FechaCalculo = $"Consulta: {informe.CalculadoEn:dd/MM/yyyy HH:mm} · Para las ventas del {informe.CalculadoEn:dd/MM} al {informe.CalculadoEn.AddDays(2):dd/MM}.";
+            Mensaje = Resultados.Count == 0 ? "No hay productos activos con inventario para revisar."
+                : informe.Demostracion ? "Ejemplo listo. Selecciona un producto para ver qué significa su resultado."
+                : Resultados.All(x => x.Resultado.Demanda is null) ? "Todavía no podemos calcular las ventas próximas. Selecciona un producto para saber qué falta."
+                : "Consulta lista. Vuelve a revisar después de registrar nuevas ventas o recibir mercadería.";
         }
         catch (OperationCanceledException) { Mensaje = "Análisis cancelado. Puedes volver a intentarlo."; }
         catch (Exception ex)

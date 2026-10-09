@@ -19,6 +19,8 @@ using BodegaLuchito.Infrastructure.Proveedores.Repositories;
 using BodegaLuchito.Infrastructure.Ventas.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using BodegaLuchito.Application.BI;
+using BodegaLuchito.Infrastructure.BI;
 
 namespace BodegaLuchito.Infrastructure;
 
@@ -50,6 +52,9 @@ public static class DependencyInjection
         services.AddTransient<ConsultarMovimientosInventarioUseCase>();
         services.AddTransient<GestionarInventarioUseCase>();
         services.AddScoped<IVentaRepository, VentaRepository>();
+        services.AddTransient<IHistorialDemandaRepository, HistorialDemandaRepository>();
+        services.AddTransient<IModeloDemanda, ModeloDemandaSsa>();
+        services.AddTransient<GenerarPrediccionDemandaUseCase>();
 
         return services;
     }

@@ -11,6 +11,7 @@ using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using CommunityToolkit.Mvvm.Input;
+using BodegaLuchito.Desktop.Modules.BI.ViewModels;
 
 namespace BodegaLuchito.Desktop.Shell.ViewModels;
 
@@ -44,6 +45,7 @@ public partial class MainWindowViewModel : ViewModelBase
         InicioViewModel => "Inicio",
         ProductosViewModel => "Gestión de productos",
         InventarioViewModel => "Inventario",
+        PrediccionDemandaViewModel => "Predicción de demanda",
         ProveedoresViewModel => "Proveedores",
         AbastecimientoViewModel => "Abastecimiento",
         UsuariosViewModel => "Usuarios",
@@ -85,6 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     "Productos",
                     IrAProductosCommand));
             MenuItems.Add(new NavigationItemViewModel("Inventario", IrAInventarioCommand));
+            MenuItems.Add(new NavigationItemViewModel("Predicción de demanda", IrAPrediccionCommand));
 
             MenuItems.Add(
                 new NavigationItemViewModel(
@@ -148,6 +151,13 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
             _navigationService.NavigateTo<InventarioViewModel>();
+    }
+
+    [RelayCommand]
+    private void IrAPrediccion()
+    {
+        if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
+            _navigationService.NavigateTo<PrediccionDemandaViewModel>();
     }
 
     [RelayCommand]

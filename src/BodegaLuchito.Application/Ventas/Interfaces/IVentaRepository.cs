@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BodegaLuchito.Domain.Ventas.Entities;
@@ -9,6 +10,5 @@ public interface IVentaRepository
     Task<IReadOnlyList<Venta>> ObtenerHistorialVentasAsync(CancellationToken cancellationToken = default);
     Task RegistrarVentaAsync(Venta venta, CancellationToken cancellationToken = default);
     Task<Venta?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default);
-    Task AnularVentaAsync(Venta venta, CancellationToken cancellationToken = default);
+    Task AnularVentaAsync(Venta venta, int sesionCajaAbiertaId, CancellationToken cancellationToken = default);
 }
-

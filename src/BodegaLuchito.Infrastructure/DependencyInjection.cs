@@ -1,6 +1,7 @@
 using BodegaLuchito.Application.Abastecimiento.Interfaces;
 using BodegaLuchito.Application.Abastecimiento.UseCases;
 using BodegaLuchito.Application.Autenticacion.Interfaces;
+using BodegaLuchito.Application.BI;
 using BodegaLuchito.Application.Caja.Interfaces;
 using BodegaLuchito.Application.Inventario.Interfaces;
 using BodegaLuchito.Application.Inventario.UseCases;
@@ -8,9 +9,11 @@ using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Application.Proveedores.Interfaces;
 using BodegaLuchito.Application.Proveedores.UseCases;
 using BodegaLuchito.Application.Ventas.Interfaces;
+using BodegaLuchito.Application.Ventas.UseCases;
 using BodegaLuchito.Infrastructure.Abastecimiento.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Repositories;
 using BodegaLuchito.Infrastructure.Autenticacion.Security;
+using BodegaLuchito.Infrastructure.BI;
 using BodegaLuchito.Infrastructure.Caja.Repositories;
 using BodegaLuchito.Infrastructure.Inventario.Repositories;
 using BodegaLuchito.Infrastructure.Persistence;
@@ -19,8 +22,6 @@ using BodegaLuchito.Infrastructure.Proveedores.Repositories;
 using BodegaLuchito.Infrastructure.Ventas.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using BodegaLuchito.Application.BI;
-using BodegaLuchito.Infrastructure.BI;
 
 namespace BodegaLuchito.Infrastructure;
 
@@ -55,7 +56,7 @@ public static class DependencyInjection
         services.AddTransient<IHistorialDemandaRepository, HistorialDemandaRepository>();
         services.AddTransient<IModeloDemanda, ModeloDemandaSsa>();
         services.AddTransient<GenerarPrediccionDemandaUseCase>();
-
+        services.AddTransient<AnularVentaUseCase>();
         return services;
     }
 }

@@ -269,21 +269,65 @@
                     </DataGridTextColumn>
 
                     <!-- COLUMNA DE ACCIONES: VER TICKET Y ANULAR -->
-                    <DataGridTemplateColumn Header="Acciones" Width="160">
+                    <DataGridTemplateColumn Header="Acciones" Width="170">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                    <!-- Botón Ver Detalles (Ticket) -->
-                                    <Button Content="Ver Ticket" Command="{Binding DataContext.VerDetallesVentaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                            CommandParameter="{Binding}" Background="#3B82F6" Foreground="White" BorderThickness="0" 
-                                            FontWeight="SemiBold" Cursor="Hand" Height="32" Width="70" Margin="0,0,8,0">
+                                    <!-- 1. BOTÓN VER TICKET (Restaurado) -->
+                                    <Button Content="Ver Ticket" 
+                        Command="{Binding DataContext.VerDetallesVentaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                        CommandParameter="{Binding}" 
+                        Background="#3B82F6" Foreground="White" BorderThickness="0" 
+                        FontWeight="SemiBold" Cursor="Hand" Height="32" Width="70" Margin="0,0,8,0">
                                         <Button.Resources>
                                             <Style TargetType="Border">
                                                 <Setter Property="CornerRadius" Value="4"/>
                                             </Style>
                                         </Button.Resources>
                                     </Button>
+
+                                    <!-- 2. BOTÓN ANULAR (Con lógica de estados) -->
+                                    <Button Command="{Binding DataContext.AnularVentaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                        CommandParameter="{Binding}"
+                        Foreground="White" BorderThickness="0"
+                        Cursor="Hand" FontWeight="SemiBold" Height="32" Width="70">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="4"/>
+                                            </Style>
+                                        </Button.Resources>
+
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <!-- Por defecto, lo ocultamos para ventas antiguas o de cajas cerradas -->
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+
+                                                <Style.Triggers>
+                                                    <!-- Caso A: Venta de HOY (turno actual) y NO anulada -> Botón rojo y activo -->
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding EsTurnoActual}" Value="True"/>
+                                                            <Condition Binding="{Binding Anulado}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Setter Property="Content" Value="Anular"/>
+                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                        <Setter Property="Background" Value="#EF4444"/>
+                                                    </MultiDataTrigger>
+
+                                                    <!-- Caso B: Venta Anulada -> Botón plomo deshabilitado diciendo "Anulado" -->
+                                                    <DataTrigger Binding="{Binding Anulado}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Setter Property="Content" Value="Anulado"/>
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Background" Value="#CBD5E1"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

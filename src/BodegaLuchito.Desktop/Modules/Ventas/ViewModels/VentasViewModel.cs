@@ -16,6 +16,7 @@ using BodegaLuchito.Domain.Ventas.Entities;
 using BodegaLuchito.Desktop.Common.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using BodegaLuchito.Application.Caja.Interfaces;
 
 namespace BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 
@@ -167,6 +168,8 @@ public partial class VentasViewModel : ViewModelBase
     private readonly RegistrarVentaUseCase _registrarVentaUseCase;
     private readonly IVentaRepository _ventaRepository;
     private readonly ISesionUsuario _sesionUsuario;
+    private readonly AnularVentaUseCase _anularVentaUseCase;
+    private readonly ICajaRepository _cajaRepository;
 
     private List<Producto> _todosLosProductos = new();
 
@@ -212,11 +215,15 @@ public partial class VentasViewModel : ViewModelBase
         IProductoRepository productoRepository,
         RegistrarVentaUseCase registrarVentaUseCase,
         IVentaRepository ventaRepository,
+        AnularVentaUseCase anularVentaUseCase,
+        ICajaRepository cajaRepository,
         ISesionUsuario sesionUsuario)
     {
         _productoRepository = productoRepository;
         _registrarVentaUseCase = registrarVentaUseCase;
         _ventaRepository = ventaRepository;
+        _anularVentaUseCase = anularVentaUseCase;
+        _cajaRepository = cajaRepository;
         _sesionUsuario = sesionUsuario;
         _ = InicializarCatalogosAsync();
     }
@@ -241,8 +248,14 @@ public partial class VentasViewModel : ViewModelBase
     {
         HistorialVentas.Clear();
         var historial = await _ventaRepository.ObtenerHistorialVentasAsync();
+
+        var sesionAbierta = await _cajaRepository.ObtenerSesionAbiertaAsync();
+
         foreach (var venta in historial)
         {
+            
+            venta.EsTurnoActual = sesionAbierta != null && venta.FechaHora >= sesionAbierta.FechaApertura;
+
             HistorialVentas.Add(venta);
         }
     }
@@ -502,6 +515,47 @@ public partial class VentasViewModel : ViewModelBase
         catch (Exception ex)
         {
             MessageBox.Show($"Error al cargar los detalles del ticket: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    [RelayCommand]
+    private async Task AnularVentaAsync(Venta ventaAnular)
+    {
+        if (ventaAnular == null) return;
+
+        if (ventaAnular.Anulado)
+        {
+            MessageBox.Show("Esta venta ya se encuentra anulada.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        // Mostramos el modal que acabamos de crear (Asegúrate de importar el namespace Views si no está)
+        var dialog = new BodegaLuchito.Desktop.Modules.Ventas.Views.AnularVentaWindow();
+
+        // Asignamos el Owner para que el modal se centre y bloquee la ventana principal
+        dialog.Owner = System.Windows.Application.Current.MainWindow;
+
+        if (dialog.ShowDialog() == true)
+        {
+            try
+            {
+                var request = new AnularVentaRequest(
+                    ventaAnular.Id,
+                    dialog.MotivoAnulacion,
+                    _sesionUsuario.UsuarioActual!.IdUsuario);
+
+                await _anularVentaUseCase.ExecuteAsync(request);
+
+                MessageBox.Show("Venta anulada correctamente.\nEl stock y la caja han sido actualizados.",
+                    "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // Refrescamos el historial para que se note el cambio de estado (Rojo/Anulado)
+                await CargarHistorialAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error al anular", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

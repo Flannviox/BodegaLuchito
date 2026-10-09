@@ -1,7 +1,8 @@
-using BodegaLuchito.Domain.Autenticacion.Entities;
-using BodegaLuchito.Domain.Shared.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using BodegaLuchito.Domain.Autenticacion.Entities;
+using BodegaLuchito.Domain.Shared.Enums;
 
 namespace BodegaLuchito.Domain.Ventas.Entities;
 
@@ -27,4 +28,8 @@ public sealed class Venta
     public int? UsuarioAnulacionId { get; set; }
 
     public List<DetalleVenta> Detalles { get; set; } = new();
+
+    [NotMapped]
+    public bool EsTurnoActual { get; set; }
+
 }

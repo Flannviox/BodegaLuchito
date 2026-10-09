@@ -3,16 +3,128 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cajaEnums="clr-namespace:BodegaLuchito.Domain.Caja.Enums;assembly=BodegaLuchito.Domain"
+             xmlns:sharedEnums="clr-namespace:BodegaLuchito.Domain.Shared.Enums;assembly=BodegaLuchito.Domain"
              mc:Ignorable="d"
-             d:DesignWidth="1000"
-             d:DesignHeight="430">
+             d:DesignWidth="1100"
+             d:DesignHeight="900">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="../../Resources/CajaStyles.xaml" />
+                <ResourceDictionary Source="../../Resources/CajaStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="ChipTipoMovimiento" TargetType="Border">
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="10,4" />
+                <Setter Property="Background" Value="{StaticResource ColorAcentoClaro}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.IngresoVenta}">
+                        <Setter Property="Background" Value="{StaticResource ColorExitoClaro}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.EgresoAbastecimiento}">
+                        <Setter Property="Background" Value="{StaticResource ColorErrorFondo}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.ReversionVenta}">
+                        <Setter Property="Background" Value="{StaticResource ColorAdvertenciaClaro}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="TextoTipoMovimiento" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Text" Value="{Binding Tipo}" />
+                <Setter Property="Foreground" Value="{StaticResource ColorAcento}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.IngresoVenta}">
+                        <Setter Property="Text" Value="Ingreso" />
+                        <Setter Property="Foreground" Value="{StaticResource ColorExito}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.EgresoAbastecimiento}">
+                        <Setter Property="Text" Value="Egreso" />
+                        <Setter Property="Foreground" Value="{StaticResource ColorError}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.ReversionVenta}">
+                        <Setter Property="Text" Value="Reversión" />
+                        <Setter Property="Foreground" Value="{StaticResource ColorAdvertencia}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="ChipMetodoPago" TargetType="Border">
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="10,4" />
+                <Setter Property="Background" Value="{StaticResource ColorAcentoClaro}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Efectivo}">
+                        <Setter Property="Background" Value="#E8F2FC" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Yape}">
+                        <Setter Property="Background" Value="#F3E8FF" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Plin}">
+                        <Setter Property="Background" Value="#E7F3FF" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="IconoMetodoPago" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,0,5,0" />
+                <Setter Property="Foreground" Value="{StaticResource ColorAcento}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Efectivo}">
+                        <Setter Property="Text" Value="&#xEC59;" />
+                        <Setter Property="Foreground" Value="{StaticResource ColorExito}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Yape}">
+                        <Setter Property="Text" Value="&#xE717;" />
+                        <Setter Property="Foreground" Value="#7C3AED" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Plin}">
+                        <Setter Property="Text" Value="&#xE717;" />
+                        <Setter Property="Foreground" Value="#1683D8" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="TextoMetodoPago" TargetType="TextBlock">
+                <Setter Property="Text" Value="{Binding MetodoPago}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{StaticResource ColorAcento}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Efectivo}">
+                        <Setter Property="Foreground" Value="{StaticResource ColorExito}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Yape}">
+                        <Setter Property="Foreground" Value="#7C3AED" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding MetodoPago}" Value="{x:Static sharedEnums:MetodoPago.Plin}">
+                        <Setter Property="Foreground" Value="#1683D8" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="IndicadorTipoMovimiento" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource ColorAcento}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.IngresoVenta}">
+                        <Setter Property="Background" Value="{StaticResource ColorExito}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.EgresoAbastecimiento}">
+                        <Setter Property="Background" Value="{StaticResource ColorError}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.ReversionVenta}">
+                        <Setter Property="Background" Value="{StaticResource ColorAdvertencia}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -26,106 +138,324 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0"
-                    Style="{StaticResource Tarjeta}"
-                    Padding="20">
+            <Border Grid.Column="0" Style="{StaticResource Tarjeta}" Padding="20">
                 <StackPanel>
-                    <TextBlock Text="FONDO INICIAL"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorTextoSecundario}" />
-                    <TextBlock Text="{Binding FondoInicialActual,
-                                             StringFormat=S/ \{0:N2\}}"
-                               FontSize="23"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorTextoPrincipal}"
-                               Margin="0,8,0,0" />
+                    <TextBlock Text="FONDO INICIAL" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                    <TextBlock Text="{Binding FondoInicialActual, StringFormat=S/ \{0:N2\}}" FontSize="23" FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,8,0,0" />
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="2"
-                    Style="{StaticResource Tarjeta}"
-                    Padding="20">
+            <Border Grid.Column="2" Style="{StaticResource Tarjeta}" Padding="20">
                 <StackPanel>
-
-                    <TextBlock Text="APERTURA"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorTextoSecundario}" />
-
-                    <TextBlock Text="{Binding FechaApertura,
-                                             StringFormat={}{0:dd/MM/yyyy HH:mm}}"
-                               FontSize="19"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorTextoPrincipal}"
-                               Margin="0,8,0,0" />
+                    <TextBlock Text="APERTURA" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                    <TextBlock Text="{Binding FechaApertura, StringFormat={}{0:dd/MM/yyyy HH:mm}}" FontSize="19" FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,8,0,0" />
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="4"
-                    Style="{StaticResource Tarjeta}"
-                    Padding="20">
+            <Border Grid.Column="4" Style="{StaticResource Tarjeta}" Padding="20">
                 <StackPanel>
-                    <TextBlock Text="ESTADO"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorTextoSecundario}" />
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,10,0,0">
-                        <Ellipse Width="9"
-                                 Height="9"
-                                 Fill="{StaticResource ColorExito}"
-                                 VerticalAlignment="Center"
-                                 Margin="0,0,8,0" />
-                        <TextBlock Text="En operación"
-                                   FontSize="18"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource ColorExito}" />
+                    <TextBlock Text="ESTADO" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Ellipse Width="9" Height="9" Fill="{StaticResource ColorExito}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="En operación" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource ColorExito}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Border Style="{StaticResource Tarjeta}">
+        <Border Style="{StaticResource Tarjeta}" Padding="20" Margin="0,0,0,20">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <StackPanel>
-                    <TextBlock Text="Sesión de caja activa"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ColorTextoPrincipal}" />
-                    <TextBlock
-                        Text="La caja está abierta y lista para operar. Cuando finalice la jornada, realiza el cierre para registrar los montos encontrados."
-                        FontSize="13"
-                        Foreground="{StaticResource ColorTextoSecundario}"
-                        TextWrapping="Wrap"
-                        MaxWidth="650"
-                        HorizontalAlignment="Left"
-                        Margin="0,8,0,18" />
-                    <Border Background="{StaticResource ColorAcentoClaro}"
-                            CornerRadius="8"
-                            Padding="14"
-                            MaxWidth="650"
-                            HorizontalAlignment="Left">
-                        <TextBlock
-                            Text="El fondo inicial permanecerá asociado a esta sesión hasta realizar el cierre."
-                            FontSize="12"
-                            Foreground="{StaticResource ColorAcento}"
-                            TextWrapping="Wrap" />
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Resumen de la caja actual" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{StaticResource ColorTextoPrincipal}" />
+                        <TextBlock Text="Montos calculados con los movimientos registrados hasta este momento."
+                                   FontSize="12" Foreground="{StaticResource ColorTextoSecundario}" Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Content="Cerrar caja"
+                            Command="{Binding AbrirFormularioCierreCommand}"
+                            Style="{StaticResource BotonSecundario}"
+                            Width="140" Height="40" />
+                </Grid>
+
+                <UniformGrid Grid.Row="2" Columns="4">
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,10,10">
+                        <StackPanel>
+                            <TextBlock Text="INGRESOS EFECTIVO" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding IngresosEfectivoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorExito}" Margin="0,6,0,0" />
+                        </StackPanel>
                     </Border>
-                </StackPanel>
 
-                <Button Grid.Column="1"
-                        Content="Cerrar caja"
-                        Command="{Binding AbrirFormularioCierreCommand}"
-                        Style="{StaticResource BotonSecundario}"
-                        Width="150"
-                        Margin="30,0,0,0"
-                        VerticalAlignment="Center" />
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,10,10">
+                        <StackPanel>
+                            <TextBlock Text="EGRESOS EFECTIVO" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding EgresosEfectivoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorError}" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,10,10">
+                        <StackPanel>
+                            <TextBlock Text="REVERSIONES EFECTIVO" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding ReversionesEfectivoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorAdvertencia}" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{StaticResource ColorAcentoClaro}" BorderBrush="{StaticResource ColorAcento}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="EFECTIVO ESPERADO" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorAcento}" />
+                            <TextBlock Text="{Binding EfectivoEsperadoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorAcento}" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock Text="YAPE NETO" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding YapeNetoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="#7C3AED" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock Text="PLIN NETO" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding PlinNetoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="#1683D8" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock Text="FONDO + OPERACIONES" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding EfectivoEsperadoActual, StringFormat=S/ \{0:N2\}}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}" BorderThickness="1" CornerRadius="8" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="MOVIMIENTOS" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource ColorTextoSecundario}" />
+                            <TextBlock Text="{Binding MovimientosCajaActual.Count}" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+            </Grid>
+        </Border>
+
+        <Border Style="{StaticResource Tarjeta}" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Movimientos de la caja actual" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{StaticResource ColorTextoPrincipal}" />
+                        <TextBlock Text="Consulta las operaciones registradas durante la jornada sin necesidad de cerrar la caja."
+                                   FontSize="12" Foreground="{StaticResource ColorTextoSecundario}" Margin="0,4,0,0" />
+                    </StackPanel>
+
+                </Grid>
+
+                <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="{StaticResource ColorBorde}"
+                        BorderThickness="1" CornerRadius="8" Padding="14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="190" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="190" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Tipo de movimiento" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <ComboBox ItemsSource="{Binding TiposMovimientoActualFiltro}"
+                                      SelectedItem="{Binding TipoMovimientoActualFiltroSeleccionado}"
+                                      Height="28" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Método de pago" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <ComboBox ItemsSource="{Binding MetodosPagoActualFiltro}"
+                                      SelectedItem="{Binding MetodoPagoActualFiltroSeleccionado}"
+                                      Height="28" />
+                        </StackPanel>
+
+                        <Button Grid.Column="4"
+                                Content="Limpiar"
+                                Command="{Binding LimpiarFiltrosMovimientosActualesCommand}"
+                                Style="{StaticResource BotonSecundario}"
+                                VerticalAlignment="Bottom" />
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Row="4"
+                              MaxHeight="430"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding MovimientosCajaActualVista}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White"
+                                        BorderBrush="#CCD6E2"
+                                        BorderThickness="1.2"
+                                        CornerRadius="9"
+                                        Margin="0,0,4,14">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="5" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0"
+                                                Style="{StaticResource IndicadorTipoMovimiento}"
+                                                CornerRadius="8,0,0,8" />
+
+                                        <StackPanel Grid.Column="1" Margin="16,14,16,12">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Descripcion}"
+                                                               FontSize="14"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                                        <Border Style="{StaticResource ChipTipoMovimiento}" Margin="0,0,8,0">
+                                                            <TextBlock Style="{StaticResource TextoTipoMovimiento}" />
+                                                        </Border>
+
+                                                        <Border Style="{StaticResource ChipMetodoPago}" Margin="0,0,10,0">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Style="{StaticResource IconoMetodoPago}" />
+                                                                <TextBlock Style="{StaticResource TextoMetodoPago}" />
+                                                            </StackPanel>
+                                                        </Border>
+
+                                                        <TextBlock Text="{Binding FechaHora, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                                                   FontSize="12"
+                                                                   Foreground="{StaticResource ColorTextoSecundario}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding Monto, StringFormat=S/ {0:N2}}"
+                                                           FontSize="17"
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center"
+                                                           Margin="20,0,0,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{StaticResource ColorTextoPrincipal}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.IngresoVenta}">
+                                                                    <Setter Property="Foreground" Value="{StaticResource ColorExito}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.EgresoAbastecimiento}">
+                                                                    <Setter Property="Foreground" Value="{StaticResource ColorError}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Tipo}" Value="{x:Static cajaEnums:TipoMovimientoCaja.ReversionVenta}">
+                                                                    <Setter Property="Foreground" Value="{StaticResource ColorAdvertencia}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Grid>
+
+                                            <ItemsControl ItemsSource="{Binding Detalles}" Margin="0,12,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="#F8FAFC"
+                                                                BorderBrush="#E1E7EE"
+                                                                BorderThickness="1"
+                                                                CornerRadius="6"
+                                                                Padding="10,7"
+                                                                Margin="0,3,0,0">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="160" />
+                                                                    <ColumnDefinition Width="100" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                                                               Text="&#xE7B8;"
+                                                                               FontSize="13"
+                                                                               Foreground="#8190A3"
+                                                                               VerticalAlignment="Center"
+                                                                               Margin="0,0,8,0" />
+                                                                    <TextBlock Text="{Binding ProductoNombre}"
+                                                                               FontSize="13"
+                                                                               VerticalAlignment="Center"
+                                                                               Foreground="{StaticResource ColorTextoPrincipal}" />
+                                                                </StackPanel>
+
+                                                                <TextBlock Grid.Column="1"
+                                                                           HorizontalAlignment="Right"
+                                                                           VerticalAlignment="Center"
+                                                                           Foreground="{StaticResource ColorTextoSecundario}">
+                                                                    <Run Text="{Binding Cantidad}" />
+                                                                    <Run Text=" x S/ " />
+                                                                    <Run Text="{Binding PrecioUnitario, StringFormat={}{0:N2}}" />
+                                                                </TextBlock>
+
+                                                                <TextBlock Grid.Column="2"
+                                                                           Text="{Binding Subtotal, StringFormat=S/ {0:N2}}"
+                                                                           HorizontalAlignment="Right"
+                                                                           VerticalAlignment="Center"
+                                                                           FontSize="13"
+                                                                           FontWeight="SemiBold"
+                                                                           Foreground="{StaticResource ColorTextoPrincipal}" />
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Grid>
         </Border>
     </StackPanel>

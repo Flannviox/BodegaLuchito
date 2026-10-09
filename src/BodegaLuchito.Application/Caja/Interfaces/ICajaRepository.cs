@@ -25,6 +25,9 @@ namespace BodegaLuchito.Application.Caja.Interfaces
         Task<IReadOnlyList<SesionCaja>> ObtenerHistorialCierresAsync(
             CancellationToken cancellationToken = default);
 
+        Task<SesionCaja?> ObtenerSesionPorIdAsync(int sesionCajaId,
+            CancellationToken cancellationToken = default);
+
     }
 
 }

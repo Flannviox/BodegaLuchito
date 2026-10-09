@@ -161,6 +161,16 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
                 .ToListAsync(cancellationToken);
 
         }
+        public async Task<SesionCaja?> ObtenerSesionPorIdAsync(
+            int sesionCajaId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _context
+                .Set<SesionCaja>()
+                .SingleOrDefaultAsync(
+                    s => s.Id == sesionCajaId,
+                    cancellationToken);
+        }
 
     }
 }

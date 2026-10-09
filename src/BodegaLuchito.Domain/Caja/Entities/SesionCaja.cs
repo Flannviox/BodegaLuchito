@@ -31,6 +31,14 @@ namespace BodegaLuchito.Domain.Caja.Entities
 
         public string? ObservacionCierre { get; set; }
 
+        public bool DescuadreResuelto { get; set; }
+
+        public DateTime? FechaResolucionDescuadre { get; set; }
+
+        public int? UsuarioResolucionId { get; set; }
+
+        public string? ObservacionResolucionDescuadre { get; set; }
+
         public ICollection<MovimientoCaja> Movimientos { get; set; } = new List<MovimientoCaja>();
 
 

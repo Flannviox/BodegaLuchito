@@ -5,83 +5,74 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views.Estados"
              mc:Ignorable="d"
-             d:DesignWidth="1000"
-             d:DesignHeight="620">
+             d:DesignWidth="1200"
+             d:DesignHeight="720">
 
     <UserControl.Resources>
         <ResourceDictionary>
-
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/CajaStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="HistorialHeaderStyle"
-                   TargetType="DataGridColumnHeader">
-                <Setter Property="Background"
-                        Value="#F3F6FA" />
-                <Setter Property="Foreground"
-                        Value="{StaticResource ColorTextoPrincipal}" />
-                <Setter Property="FontWeight"
-                        Value="SemiBold" />
-                <Setter Property="FontSize"
-                        Value="12" />
-                <Setter Property="Padding"
-                        Value="10,8" />
-                <Setter Property="BorderBrush"
-                        Value="{StaticResource ColorBorde}" />
-                <Setter Property="BorderThickness"
-                        Value="0,0,0,1" />
+            <Style x:Key="HistorialHeaderStyle" TargetType="DataGridColumnHeader">
+                <Setter Property="Background" Value="#F3F6FA" />
+                <Setter Property="Foreground" Value="{StaticResource ColorTextoPrincipal}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="10,8" />
+                <Setter Property="BorderBrush" Value="{StaticResource ColorBorde}" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
             </Style>
 
-            <Style x:Key="HistorialCellStyle"
-                   TargetType="DataGridCell">
-
-                <Setter Property="Padding"
-                        Value="10,8" />
-
-                <Setter Property="BorderThickness"
-                        Value="0" />
-
-                <Setter Property="Foreground"
-                        Value="{StaticResource ColorTextoPrincipal}" />
-
+            <Style x:Key="HistorialCellStyle" TargetType="DataGridCell">
+                <Setter Property="Padding" Value="10,8" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{StaticResource ColorTextoPrincipal}" />
             </Style>
 
-            <Style x:Key="HistorialRowStyle"
-                   TargetType="DataGridRow">
-
-                <Setter Property="MinHeight"
-                        Value="34" />
-                <Setter Property="Background"
-                        Value="White" />
-                <Setter Property="BorderBrush"
-                        Value="{StaticResource ColorBorde}" />
-                <Setter Property="BorderThickness"
-                        Value="0,0,0,1" />
-
+            <Style x:Key="HistorialRowStyle" TargetType="DataGridRow">
+                <Setter Property="MinHeight" Value="34" />
+                <Setter Property="Background" Value="White" />
+                <Setter Property="BorderBrush" Value="{StaticResource ColorBorde}" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
             </Style>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"
-              Margin="0,0,0,20">
-
+        <Grid Grid.Row="0" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Resolver descuadre"
+                        Command="{Binding AbrirResolucionDescuadreCommand}"
+                        IsEnabled="{Binding PuedeResolverDescuadre}"
+                        Width="155"
+                        Height="42"
+                        Margin="0,0,10,0">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource BotonPrimario}">
+                            <Setter Property="Opacity" Value="1" />
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="#D8DEE6" />
+                                    <Setter Property="Foreground" Value="#7B8794" />
+                                    <Setter Property="BorderBrush" Value="#D8DEE6" />
+                                    <Setter Property="Opacity" Value="1" />
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
 
                 <Button Content="Ver detalle"
                         Command="{Binding VerDetalleCierreCommand}"
@@ -89,34 +80,17 @@
                         Width="120"
                         Height="42"
                         Margin="0,0,10,0">
-
                     <Button.Style>
-
-                        <Style TargetType="Button"
-                               BasedOn="{StaticResource BotonPrimario}">
-
-                            <Setter Property="IsEnabled"
-                                    Value="True" />
-
+                        <Style TargetType="Button" BasedOn="{StaticResource BotonPrimario}">
+                            <Setter Property="IsEnabled" Value="True" />
                             <Style.Triggers>
-
-                                <DataTrigger Binding="{Binding CierreSeleccionado}"
-                                             Value="{x:Null}">
-
-                                    <Setter Property="IsEnabled"
-                                            Value="False" />
-
-                                    <Setter Property="Opacity"
-                                            Value="0.55" />
-
+                                <DataTrigger Binding="{Binding CierreSeleccionado}" Value="{x:Null}">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Setter Property="Opacity" Value="0.55" />
                                 </DataTrigger>
-
                             </Style.Triggers>
-
                         </Style>
-
                     </Button.Style>
-
                 </Button>
 
                 <Button Content="Volver"
@@ -124,54 +98,44 @@
                         Style="{StaticResource BotonSecundario}"
                         Width="120"
                         Height="42" />
-
             </StackPanel>
-
         </Grid>
 
-        <Border Grid.Row="1"
-                Style="{StaticResource Tarjeta}"
-                Padding="22">
-
+        <Border Grid.Row="1" Style="{StaticResource Tarjeta}" Padding="22">
             <Grid>
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="12" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
-
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
-
                         <TextBlock Text="Historial de cierres"
                                    FontSize="22"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource ColorTextoPrincipal}" />
 
-                        <TextBlock
-                            Text="Consulta las sesiones cerradas y revisa los montos registrados en cada cierre de caja."
-                            FontSize="13"
-                            Foreground="{StaticResource ColorTextoSecundario}"
-                            Margin="0,6,0,0"
-                            TextWrapping="Wrap" />
+                        <TextBlock Text="Consulta los cierres, identifica descuadres pendientes y registra su resolución."
+                                   FontSize="13"
+                                   Foreground="{StaticResource ColorTextoSecundario}"
+                                   Margin="0,6,0,0"
+                                   TextWrapping="Wrap" />
 
-                        <TextBlock
-                            Text="Puedes filtrar los registros o hacer clic en los encabezados para ordenarlos."
-                            FontSize="13"
-                            FontStyle="Italic"
-                            Foreground="{StaticResource ColorAdvertencia}"
-                            Margin="0,6,0,0"
-                            TextWrapping="Wrap" />
-
+                        <TextBlock Text="Puede seleccionar un cierre con descuadre pendiente para marcarlo como resuelto."
+                                   FontSize="15"
+                                   FontStyle="Oblique"
+                                   Foreground="{StaticResource ColorError}"
+                                   Margin="0,6,0,0"
+                                   TextWrapping="Wrap" />
                     </StackPanel>
 
                     <Border Grid.Column="1"
@@ -179,16 +143,11 @@
                             CornerRadius="14"
                             Padding="12,6"
                             VerticalAlignment="Center">
-
-                        <TextBlock
-                            Text="{Binding CantidadCierresMostrados,
-                                           StringFormat='Mostrados: {0}'}"
-                            FontSize="12"
-                            FontWeight="SemiBold"
-                            Foreground="{StaticResource ColorAcento}" />
-
+                        <TextBlock Text="{Binding CantidadCierresMostrados, StringFormat='Mostrados: {0}'}"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource ColorAcento}" />
                     </Border>
-
                 </Grid>
 
                 <Border Grid.Row="2"
@@ -197,102 +156,92 @@
                         BorderThickness="1"
                         CornerRadius="8"
                         Padding="14">
-
                     <Grid>
-
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="150" />
-                            <ColumnDefinition Width="28" />
-                            <ColumnDefinition Width="140" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="140" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="155" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="155" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="180" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="145" />
+                            <ColumnDefinition Width="12" />
                             <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="110" />
                             <ColumnDefinition Width="10" />
                             <ColumnDefinition Width="100" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-
-                            <TextBlock Text="Fecha desde"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}"
-                                       Margin="0,0,0,5" />
-
-                            <DatePicker
-                                SelectedDate="{Binding FechaDesdeFiltro}" />
-
+                            <TextBlock Text="Fecha desde" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <DatePicker SelectedDate="{Binding FechaDesdeFiltro}" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-
-                            <TextBlock Text="Fecha hasta"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}"
-                                       Margin="0,0,0,5" />
-
-                            <DatePicker
-                                SelectedDate="{Binding FechaHastaFiltro}" />
-
+                            <TextBlock Text="Fecha hasta" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <DatePicker SelectedDate="{Binding FechaHastaFiltro}" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="4">
-
-                            <TextBlock Text="Efectivo mín."
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}"
-                                       Margin="0,0,0,5" />
-
-                            <TextBox
-                                Width="140"
-                                Height="25"
-                                Text="{Binding MontoMinimoFiltroInput,
-                                               UpdateSourceTrigger=PropertyChanged}" />
-
+                            <TextBlock Text="Usuario" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <ComboBox ItemsSource="{Binding UsuariosFiltro}"
+                                      SelectedItem="{Binding UsuarioFiltroSeleccionado}"
+                                      DisplayMemberPath="Nombre"
+                                      Height="25" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="6">
-
-                            <TextBlock Text="Efectivo máx."
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}"
-                                       Margin="0,0,0,5" />
-
-                            <TextBox
-                                Width="140"
-                                Height="25"
-                                Text="{Binding MontoMaximoFiltroInput,
-                                               UpdateSourceTrigger=PropertyChanged}" />
-
+                            <TextBlock Text="Estado descuadre" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <ComboBox ItemsSource="{Binding EstadosDescuadreFiltro}"
+                                      SelectedItem="{Binding EstadoDescuadreFiltroSeleccionado}"
+                                      Height="25" />
                         </StackPanel>
 
-                        <Button Grid.Column="8"
+                        <StackPanel Grid.Column="8">
+                            <TextBlock Text="Efectivo mín." FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <TextBox Height="25"
+                                     Text="{Binding MontoMinimoFiltroInput, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="10">
+                            <TextBlock Text="Efectivo máx." FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
+                            <TextBox Height="25"
+                                     Text="{Binding MontoMaximoFiltroInput, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
+                        <Button Grid.Column="12"
                                 Content="Filtrar"
                                 Command="{Binding AplicarFiltrosHistorialCommand}"
                                 Style="{StaticResource BotonPrimario}"
                                 VerticalAlignment="Bottom" />
 
-                        <!-- LIMPIAR -->
-                        <Button Grid.Column="10"
+                        <Button Grid.Column="14"
                                 Content="Limpiar"
                                 Command="{Binding LimpiarFiltrosHistorialCommand}"
                                 Style="{StaticResource BotonSecundario}"
                                 VerticalAlignment="Bottom" />
-
                     </Grid>
-
                 </Border>
 
-                <DataGrid Grid.Row="4"
+                <TextBlock Grid.Row="3"
+                           Text="{Binding MensajeError}"
+                           Foreground="#C62828"
+                           FontSize="12"
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap" />
+
+                <DataGrid Grid.Row="5"
                           ItemsSource="{Binding HistorialCierresVista}"
-                          SelectedItem="{Binding CierreSeleccionado,
-                                                 Mode=TwoWay}"
+                          SelectedItem="{Binding CierreSeleccionado, Mode=TwoWay}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserAddRows="False"
@@ -310,113 +259,224 @@
                           RowBackground="White"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto"
+                          MaxHeight="430"
                           SelectionMode="Single"
                           SelectionUnit="FullRow">
 
                     <DataGrid.Columns>
+                        <DataGridTextColumn Header="N.°"
+                                            Binding="{Binding Id}"
+                                            SortMemberPath="Id"
+                                            Width="65" />
 
-                        <DataGridTextColumn
-                            Header="N.°"
-                            Binding="{Binding Id}"
-                            SortMemberPath="Id"
-                            Width="70" />
+                        <DataGridTextColumn Header="Usuario"
+                                            Binding="{Binding UsuarioAperturaNombre}"
+                                            SortMemberPath="UsuarioAperturaNombre"
+                                            Width="150" />
 
-                        <DataGridTextColumn
-                            Header="Apertura"
-                            Binding="{Binding FechaApertura,
-                                              StringFormat={}{0:dd/MM/yyyy HH:mm}}"
-                            SortMemberPath="FechaApertura"
-                            Width="150" />
+                        <DataGridTextColumn Header="Apertura"
+                                            Binding="{Binding FechaApertura, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                            SortMemberPath="FechaApertura"
+                                            Width="145" />
 
-                        <DataGridTextColumn
-                            Header="Cierre"
-                            Binding="{Binding FechaCierre,
-                                              StringFormat={}{0:dd/MM/yyyy HH:mm}}"
-                            SortMemberPath="FechaCierre"
-                            Width="150" />
+                        <DataGridTextColumn Header="Cierre"
+                                            Binding="{Binding FechaCierre, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                            SortMemberPath="FechaCierre"
+                                            Width="145" />
 
-                        <DataGridTextColumn
-                            Header="Fondo inicial"
-                            Binding="{Binding FondoInicial,
-                                              StringFormat=S/ {0:N2}}"
-                            SortMemberPath="FondoInicial"
-                            Width="120" />
+                        <DataGridTextColumn Header="Esperado"
+                                            Binding="{Binding EfectivoEsperado, StringFormat=S/ {0:N2}}"
+                                            SortMemberPath="EfectivoEsperado"
+                                            Width="105" />
 
-                        <DataGridTextColumn
-                            Header="Efectivo esperado"
-                            Binding="{Binding EfectivoEsperado,
-                                              StringFormat=S/ {0:N2}}"
-                            SortMemberPath="EfectivoEsperado"
-                            Width="140" />
+                        <DataGridTextColumn Header="Contado"
+                                            Binding="{Binding EfectivoReal, StringFormat=S/ {0:N2}}"
+                                            SortMemberPath="EfectivoReal"
+                                            Width="105" />
 
-                        <DataGridTextColumn
-                            Header="Efectivo contado"
-                            Binding="{Binding EfectivoReal,
-                                              StringFormat=S/ {0:N2}}"
-                            SortMemberPath="EfectivoReal"
-                            Width="140" />
+                        <DataGridTextColumn Header="Diferencia"
+                                            Binding="{Binding DiferenciaEfectivo, StringFormat=S/ {0:N2}}"
+                                            SortMemberPath="DiferenciaEfectivo"
+                                            Width="105" />
 
-                        <DataGridTextColumn
-                            Header="Diferencia"
-                            Binding="{Binding DiferenciaEfectivo,
-                                              StringFormat=S/ {0:N2}}"
-                            SortMemberPath="DiferenciaEfectivo"
-                            Width="120" />
+                        <DataGridTemplateColumn Header="Estado"
+                                                SortMemberPath="EstadoDescuadre"
+                                                Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#EEF2F7" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding EstadoDescuadre}" Value="Pendiente">
+                                                        <Setter Property="Background" Value="#FFF3E0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding EstadoDescuadre}" Value="Resuelto">
+                                                        <Setter Property="Background" Value="#E8F5E9" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
 
-                        <DataGridTextColumn
-                            Header="Yape neto"
-                            Binding="{Binding YapeNeto,
-                                              StringFormat=S/ {0:N2}}"
-                            SortMemberPath="YapeNeto"
-                            Width="110" />
+                                        <TextBlock Text="{Binding EstadoDescuadre}" FontSize="11" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#607080" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EstadoDescuadre}" Value="Pendiente">
+                                                            <Setter Property="Foreground" Value="#D97706" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding EstadoDescuadre}" Value="Resuelto">
+                                                            <Setter Property="Foreground" Value="#2E7D32" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-                        <DataGridTextColumn
-                            Header="Plin neto"
-                            Binding="{Binding PlinNeto,
-                                              StringFormat=S/ {0:N2}}"
-                            SortMemberPath="PlinNeto"
-                            Width="110" />
+                        <DataGridTextColumn Header="Fecha resolución"
+                                            Binding="{Binding FechaResolucionDescuadre, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                            SortMemberPath="FechaResolucionDescuadre"
+                                            Width="145" />
 
-                        <DataGridTextColumn
-                            Header="Observación"
-                            Binding="{Binding ObservacionCierre}"
-                            SortMemberPath="ObservacionCierre"
-                            Width="*" />
+                        <DataGridTextColumn Header="Obs. resolución"
+                                            Binding="{Binding ObservacionResolucionDescuadre}"
+                                            SortMemberPath="ObservacionResolucionDescuadre"
+                                            Width="180" />
 
+                        <DataGridTextColumn Header="Yape"
+                                            Binding="{Binding YapeNeto, StringFormat=S/ {0:N2}}"
+                                            SortMemberPath="YapeNeto"
+                                            Width="95" />
+
+                        <DataGridTextColumn Header="Plin"
+                                            Binding="{Binding PlinNeto, StringFormat=S/ {0:N2}}"
+                                            SortMemberPath="PlinNeto"
+                                            Width="95" />
+
+                        <DataGridTextColumn Header="Observación cierre"
+                                            Binding="{Binding ObservacionCierre}"
+                                            SortMemberPath="ObservacionCierre"
+                                            Width="180" />
                     </DataGrid.Columns>
-
                 </DataGrid>
-
             </Grid>
-
         </Border>
 
-        <Grid Grid.RowSpan="2"
-              Panel.ZIndex="10"
-              Background="#66000000">
+        <Grid Grid.RowSpan="2" Panel.ZIndex="10" Background="#66000000">
             <Grid.Style>
-
                 <Style TargetType="Grid">
-                    <Setter Property="Visibility"
-                            Value="Collapsed" />
+                    <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-
-                        <DataTrigger Binding="{Binding MostrarDetalleCierre}"
-                                     Value="True">
-
-                            <Setter Property="Visibility"
-                                    Value="Visible" />
-
+                        <DataTrigger Binding="{Binding MostrarDetalleCierre}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <local:DetalleCierreView
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Width="900"
-                MaxHeight="720"
-                Margin="40" />
+
+            <local:DetalleCierreView HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Width="900"
+                                     MaxHeight="720"
+                                     Margin="40" />
+        </Grid>
+
+        <Grid Grid.RowSpan="2" Panel.ZIndex="20" Background="#77000000">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding MostrarResolucionDescuadre}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <Border Width="500"
+                    Padding="28"
+                    Background="White"
+                    CornerRadius="12"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Resolver descuadre"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                    <TextBlock Text="El cierre quedará registrado como resuelto y no deberá volver a considerarse como pendiente."
+                               Margin="0,8,0,20"
+                               FontSize="13"
+                               Foreground="{StaticResource ColorTextoSecundario}"
+                               TextWrapping="Wrap" />
+
+                    <Border Background="#FFF8E1"
+                            BorderBrush="#F5C451"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="14"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <TextBlock Text="{Binding CierreSeleccionado.UsuarioAperturaNombre}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource ColorTextoPrincipal}" />
+
+                            <TextBlock Text="{Binding CierreSeleccionado.DiferenciaEfectivo, StringFormat='Diferencia de efectivo: S/ {0:N2}'}"
+                                       Margin="0,5,0,0"
+                                       FontSize="13"
+                                       Foreground="#B45309" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Observación de resolución"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextoPrincipal}"
+                               Margin="0,0,0,6" />
+
+                    <TextBox Text="{Binding ObservacionResolucionDescuadreInput, UpdateSourceTrigger=PropertyChanged}"
+                             Height="90"
+                             MaxLength="300"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             Padding="8" />
+
+                    <TextBlock Text="Máximo 300 caracteres. La observación es opcional."
+                               FontSize="11"
+                               Foreground="{StaticResource ColorTextoSecundario}"
+                               Margin="0,5,0,18" />
+
+                    <TextBlock Text="{Binding MensajeError}"
+                               Foreground="#C62828"
+                               FontSize="12"
+                               Margin="0,0,0,12"
+                               TextWrapping="Wrap" />
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Cancelar"
+                                Command="{Binding CancelarResolucionDescuadreCommand}"
+                                Style="{StaticResource BotonSecundario}"
+                                Width="110"
+                                Height="40"
+                                Margin="0,0,10,0" />
+
+                        <Button Content="Marcar resuelto"
+                                Command="{Binding ConfirmarResolucionDescuadreCommand}"
+                                Style="{StaticResource BotonPrimario}"
+                                Width="140"
+                                Height="40" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </UserControl>

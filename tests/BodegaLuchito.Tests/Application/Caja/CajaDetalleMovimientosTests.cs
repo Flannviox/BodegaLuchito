@@ -185,8 +185,7 @@ namespace BodegaLuchito.Tests.Application.Caja
             Assert.Equal(2, resultado.Count);
 
             var movimientoVenta =
-                Assert.Single(
-                    resultado.Where(x => x.VentaId == venta.Id));
+            Assert.Single(resultado, x => x.VentaId == venta.Id);           
 
             Assert.Equal(
                 TipoMovimientoCaja.IngresoVenta,
@@ -208,8 +207,8 @@ namespace BodegaLuchito.Tests.Application.Caja
 
             var movimientoAbastecimiento =
                 Assert.Single(
-                    resultado.Where(
-                        x => x.AbastecimientoId == abastecimiento.Id));
+                    resultado,
+                    x => x.AbastecimientoId == abastecimiento.Id);
 
             Assert.Equal(
                 TipoMovimientoCaja.EgresoAbastecimiento,

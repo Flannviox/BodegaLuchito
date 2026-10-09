@@ -118,6 +118,7 @@ public partial class App : System.Windows.Application
         services.AddTransient<CerrarCajaUseCase>();
         services.AddTransient<ConsultarHistorialCierresUseCase>();
         services.AddTransient<ConsultarDetalleMovimientosCajaUseCase>();
+        services.AddTransient<ResolverDescuadreCajaUseCase>();
     }
 
     protected override async void OnStartup(

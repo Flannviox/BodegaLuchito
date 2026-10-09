@@ -1,152 +1,115 @@
 <Window x:Class="BodegaLuchito.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="{Binding TituloVentana}"
-        Height="700"
-        Width="1200"
-        MinHeight="600"
-        MinWidth="1000"
-        WindowStartupLocation="CenterScreen"
-        WindowState="Maximized">
-
-    <Grid>
-
+        Title="{Binding TituloVentana}" Height="700" Width="1200" MinHeight="600" MinWidth="1000"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" Background="#F4F7FB"
+        FontFamily="Segoe UI" UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/ShellStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid x:Name="Entorno" Background="#F4F7FB">
         <Grid.ColumnDefinitions>
-
-            <ColumnDefinition Width="220" />
-
-            <ColumnDefinition Width="*" />
-
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-
-        <!-- MENU LATERAL -->
-
-        <Border Grid.Column="0"
-                BorderBrush="LightGray"
-                BorderThickness="0,0,1,0">
-
-            <Grid Margin="16">
-
+        <!-- El menú y el cierre de sesión permanecen independientes del contenido del módulo. -->
+        <Border Background="{StaticResource ShellFondoMenu}">
+            <Grid Margin="12,0">
                 <Grid.RowDefinitions>
-
-                    <RowDefinition Height="Auto" />
-
-                    <RowDefinition Height="*" />
-
-                    <RowDefinition Height="Auto" />
-
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+                <StackPanel Margin="10,26,10,22">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Border Width="38" Height="42" Background="#244C75" CornerRadius="10" HorizontalAlignment="Left">
+                            <Viewbox Width="27" Height="27">
+                                <Canvas Width="24" Height="24">
+                                    <Path Stroke="White" StrokeThickness="1.6" StrokeLineJoin="Round"
+                                          Data="M3,9 L5,3 H19 L21,9 M3,9 V11 C3,14 7,14 7,11 C7,14 12,14 12,11 C12,14 17,14 17,11 C17,14 21,14 21,11 V9 Z M5,14 V21 H19 V14 M10,21 V16 H14 V21 M8,3 L7,9 M16,3 L17,9 M12,3 V9"/>
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="BODEGA" Foreground="#BAD5EF" FontSize="11" FontWeight="SemiBold"/>
+                            <TextBlock Text="Luchito" Foreground="White" FontSize="25" FontWeight="Bold" Margin="0,-2,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="Tu bodega, en orden" Foreground="#BAD0E7" FontSize="12" Margin="0,12,0,0"/>
+                </StackPanel>
 
-
-                <!-- TITULO -->
-
-                <TextBlock Grid.Row="0"
-                           Text="Bodega Luchito"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           Margin="0,10,0,30" />
-
-
-                <!-- MENU -->
-
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl
-                              ItemsSource="{Binding MenuItems}">
-
-                    <ItemsControl.ItemTemplate>
-
-                        <DataTemplate>
-
-                            <Button Content="{Binding Titulo}"
-                                    Command="{Binding Command}"
-                                    Height="42"
-                                    Margin="0,0,0,10" />
-
-                        </DataTemplate>
-
-                    </ItemsControl.ItemTemplate>
-
-                </ItemsControl>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              CanContentScroll="False" Padding="0,0,2,0" Focusable="False">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource ShellBarraMenu}"/>
+                    </ScrollViewer.Resources>
+                    <ItemsControl ItemsSource="{Binding MenuItems}" KeyboardNavigation.TabNavigation="Continue">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource ShellBotonMenu}" Command="{Binding Command}"
+                                        AutomationProperties.Name="{Binding Titulo}" ToolTip="{Binding Titulo}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="32"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <Viewbox Width="21" Height="21" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <Canvas Width="24" Height="24"><Path Style="{StaticResource ShellIcono}" Data="{Binding Icono}"/></Canvas>
+                                        </Viewbox>
+                                        <TextBlock Grid.Column="1" Text="{Binding Titulo}" TextWrapping="Wrap"
+                                                   VerticalAlignment="Center" LineHeight="18"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </ScrollViewer>
 
-
-                <!-- CERRAR SESION -->
-
-                <Button Grid.Row="2"
-                        Content="Cerrar sesion"
-                        Command="{Binding CerrarSesionCommand}"
-                        Height="42"
-                        Margin="0,15,0,0" />
-
+                <Border Grid.Row="2" BorderBrush="#355372" BorderThickness="0,1,0,0" Margin="4,16,4,16" Padding="0,14,0,0">
+                    <Button Style="{StaticResource ShellBotonSalir}" Command="{Binding CerrarSesionCommand}" Margin="0"
+                            AutomationProperties.Name="Cerrar sesión">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="20" Height="20" Margin="0,0,12,0">
+                                <Canvas Width="24" Height="24">
+                                    <Path Style="{StaticResource ShellIcono}" Data="M10,3 H4 V21 H10 M9,12 H22 M17,7 L22,12 17,17"/>
+                                </Canvas>
+                            </Viewbox>
+                            <TextBlock Text="Cerrar sesión" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
             </Grid>
-
         </Border>
 
-
-        <!-- CONTENIDO -->
-
         <Grid Grid.Column="1">
-
-            <Grid.RowDefinitions>
-
-                <RowDefinition Height="Auto" />
-
-                <RowDefinition Height="*" />
-
-            </Grid.RowDefinitions>
-
-
-            <!-- HEADER -->
-
-            <Border Grid.Row="0"
-                    BorderBrush="LightGray"
-                    BorderThickness="0,0,0,1"
-                    Padding="24,16">
-
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Border Background="White" BorderBrush="#E1E8F1" BorderThickness="0,0,0,1" Padding="24,15">
                 <Grid>
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition Width="*" />
-
-                        <ColumnDefinition Width="Auto" />
-
-                    </Grid.ColumnDefinitions>
-
-
-                    <TextBlock Grid.Column="0"
-                               Text="{Binding TituloPagina}"
-                               FontSize="20"
-                               FontWeight="SemiBold"
-                               VerticalAlignment="Center" />
-
-
-                    <StackPanel Grid.Column="1">
-
-                        <TextBlock Text="{Binding NombreCompleto}"
-                            FontWeight="SemiBold" />
-
-                        <TextBlock Text="{Binding NombreRol}"
-                            Foreground="#64748B"
-                            FontSize="13" />
-
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="BODEGA LUCHITO" Foreground="#6E839C" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TituloPagina}" FontSize="22" FontWeight="SemiBold" Foreground="#153657"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
                     </StackPanel>
-
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Border Width="36" Height="36" CornerRadius="18" Background="#EAF2FF" HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding InicialesUsuario}" Foreground="#1767D8" FontSize="13" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" MaxWidth="200" VerticalAlignment="Center" ToolTip="{Binding NombreCompleto}">
+                            <TextBlock Text="{Binding NombreCompleto}" Foreground="#203C5A" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding NombreRol}" Foreground="#617791" FontSize="12" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-
             </Border>
-
-
-            <!-- MODULO ACTUAL -->
-
-            <ContentControl Grid.Row="1"
-                            Content="{Binding CurrentViewModel}"
-                            Margin="30" />
-
+            <!-- Mantener el alto limitado: cada módulo administra sus propias tablas y desplazamiento. -->
+            <ContentControl x:Name="ContenidoModulo" Grid.Row="1" Content="{Binding CurrentViewModel}" Margin="20"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </Grid>
-
     </Grid>
-
 </Window>

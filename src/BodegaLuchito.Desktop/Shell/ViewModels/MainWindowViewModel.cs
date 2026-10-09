@@ -71,61 +71,51 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool EstaAutenticado =>
         _sesionUsuario.EstaAutenticado;
 
+    public string InicialesUsuario => string.IsNullOrWhiteSpace(NombreCompleto) ? "BL"
+        : string.Concat(NombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2).Select(parte => System.Globalization.StringInfo.GetNextTextElement(parte))).ToUpperInvariant();
+
     private void ConstruirMenu()
     {
         MenuItems.Clear();
-
-        MenuItems.Add(
-            new NavigationItemViewModel(
-                "Inicio",
-                IrAInicioCommand));
+        AgregarDestino<InicioViewModel>("Inicio", IrAInicioCommand, IconosNavegacion.Inicio);
 
         if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
         {
-            MenuItems.Add(
-                new NavigationItemViewModel(
-                    "Productos",
-                    IrAProductosCommand));
-            MenuItems.Add(new NavigationItemViewModel("Inventario", IrAInventarioCommand));
-            MenuItems.Add(new NavigationItemViewModel("Predicción de demanda", IrAPrediccionCommand));
-
-            MenuItems.Add(
-                new NavigationItemViewModel(
-                    "Proveedores",
-                    IrAProveedoresCommand));
-
-            MenuItems.Add(
-                new NavigationItemViewModel(
-                    "Abastecimiento",
-                    IrAAbastecimientoCommand));
-
-            MenuItems.Add(
-                new NavigationItemViewModel(
-                    "Usuarios",
-                    IrAUsuariosCommand));
+            AgregarDestino<ProductosViewModel>("Productos", IrAProductosCommand, IconosNavegacion.Productos);
+            AgregarDestino<InventarioViewModel>("Inventario", IrAInventarioCommand, IconosNavegacion.Inventario);
+            AgregarDestino<PrediccionDemandaViewModel>("Predicción de demanda", IrAPrediccionCommand, IconosNavegacion.Prediccion);
+            AgregarDestino<ProveedoresViewModel>("Proveedores", IrAProveedoresCommand, IconosNavegacion.Proveedores);
+            AgregarDestino<AbastecimientoViewModel>("Abastecimiento", IrAAbastecimientoCommand, IconosNavegacion.Abastecimiento);
+            AgregarDestino<UsuariosViewModel>("Usuarios", IrAUsuariosCommand, IconosNavegacion.Usuarios);
         }
 
-        MenuItems.Add(
-            new NavigationItemViewModel(
-                "Ventas",
-                IrAVentasCommand));
+        AgregarDestino<VentasViewModel>("Ventas", IrAVentasCommand, IconosNavegacion.Ventas);
+        AgregarDestino<CajaViewModel>("Caja", IrACajaCommand, IconosNavegacion.Caja);
+        ActualizarSeleccion();
+    }
 
-        MenuItems.Add(
-            new NavigationItemViewModel(
-                "Caja",
-                IrACajaCommand));
+    private void AgregarDestino<T>(string titulo, System.Windows.Input.ICommand command, string icono)
+        where T : ViewModelBase => MenuItems.Add(new NavigationItemViewModel(titulo, command, typeof(T), icono));
+
+    private void ActualizarSeleccion()
+    {
+        foreach (var item in MenuItems)
+            item.EstaSeleccionado = CurrentViewModel is not null && item.TipoDestino.IsInstanceOfType(CurrentViewModel);
     }
 
     private void OnCurrentViewModelChanged()
     {
         OnPropertyChanged(nameof(CurrentViewModel));
         OnPropertyChanged(nameof(TituloPagina));
+        ActualizarSeleccion();
     }
 
     private void OnSesionCambiada()
     {
         OnPropertyChanged(nameof(NombreUsuario));
         OnPropertyChanged(nameof(NombreRol));
+        OnPropertyChanged(nameof(InicialesUsuario));
         OnPropertyChanged(nameof(EstaAutenticado));
         OnPropertyChanged(nameof(NombreCompleto));
 
@@ -226,8 +216,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
         OnPropertyChanged(nameof(NombreUsuario));
         OnPropertyChanged(nameof(NombreRol));
+        OnPropertyChanged(nameof(InicialesUsuario));
         OnPropertyChanged(nameof(EstaAutenticado));
 
+        OnPropertyChanged(nameof(NombreCompleto));
         _navigationService.NavigateTo<InicioViewModel>();
     }
     public string NombreCompleto =>

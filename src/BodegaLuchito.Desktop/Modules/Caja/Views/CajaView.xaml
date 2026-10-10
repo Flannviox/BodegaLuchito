@@ -70,7 +70,11 @@
 
                         <Button Content="Historial de cierres"
                                 Command="{Binding AbrirHistorialCommand}"
-                                Margin="0,0,12,0">
+                                Margin="0,0,12,0"
+                                Width ="140"
+                                Height="44"
+
+                                Click="Button_Click">
 
                             <Button.Style>
                                 <Style TargetType="Button"

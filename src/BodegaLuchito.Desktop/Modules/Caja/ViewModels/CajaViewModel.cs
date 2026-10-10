@@ -114,6 +114,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         [ObservableProperty] private decimal _efectivoEsperadoActual;
         [ObservableProperty] private decimal _yapeNetoActual;
         [ObservableProperty] private decimal _plinNetoActual;
+        [ObservableProperty] private decimal _totalActual;
 
         public bool MostrarApertura => EstadoVista == EstadoVistaCaja.Apertura;
         public bool MostrarResumen => EstadoVista == EstadoVistaCaja.EnOperacion;
@@ -351,6 +352,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
             EfectivoEsperadoActual = FondoInicialActual + IngresosEfectivoActual - EgresosEfectivoActual - ReversionesEfectivoActual;
             YapeNetoActual = CalcularNetoMetodoPago(MetodoPago.Yape);
             PlinNetoActual = CalcularNetoMetodoPago(MetodoPago.Plin);
+            TotalActual = EfectivoEsperadoActual + YapeNetoActual + PlinNetoActual;
         }
         private decimal CalcularNetoMetodoPago(MetodoPago metodoPago)
         {

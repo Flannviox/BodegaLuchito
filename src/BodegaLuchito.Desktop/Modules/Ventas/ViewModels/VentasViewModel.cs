@@ -260,6 +260,9 @@ public partial class VentasViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void LimpiarBusqueda() => TextoBusquedaProducto = string.Empty;
+
     private void ProcesarBusquedaOEscaneo()
     {
         if (string.IsNullOrWhiteSpace(TextoBusquedaProducto))

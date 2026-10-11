@@ -37,12 +37,35 @@ public class DetalleCarritoVenta : ViewModelBase
         get => _cantidadTexto;
         set
         {
+            //Si el campo se vacía por completo, lo permitimos
+            if (string.IsNullOrEmpty(value))
+            {
+                _cantidadTexto = value;
+                OnPropertyChanged();
+                return;
+            }
+            // Rechazar si contiene cualquier carácter que no sea un dígito o un punto (bloquea comas, letras, símbolos)
+            if (value.Any(c => !char.IsDigit(c) && c != '.'))
+            {
+                OnPropertyChanged();
+                return;
+            }
+            //rechazar si el usuario intenta poner más de un punto decimal
+            if (value.Count(c => c == '.') > 1)
+            {
+                OnPropertyChanged();
+                return;
+            }
+            //rechazar el punto si el producto se vende por unidad
+            if (UnidadVenta == UnidadVenta.Unidad && value.Contains("."))
+            {
+                OnPropertyChanged();
+                return;
+            }
             _cantidadTexto = value;
             OnPropertyChanged();
 
-            if (string.IsNullOrWhiteSpace(value)) return;
-            string textoSeguro = value.Replace(",", ".");
-            if (decimal.TryParse(textoSeguro, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal parsed))
+            if (decimal.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal parsed))
             {
                 if (parsed < 0) return;
 

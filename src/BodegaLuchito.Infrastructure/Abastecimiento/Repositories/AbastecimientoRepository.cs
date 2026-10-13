@@ -145,4 +145,18 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
             .Take(200)
             .ToListAsync(cancellationToken);
     }
+    public async Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerAbastecimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var fechaFinAjustada = fin.Date.AddDays(1).AddTicks(-1);
+
+        return await context.Set<EntidadAbastecimiento>()
+            .Include(a => a.Proveedor)
+            .Include(a => a.Detalles)
+            .AsNoTracking()
+            .Where(a => a.FechaHora >= inicio.Date && a.FechaHora <= fechaFinAjustada)
+            .OrderByDescending(a => a.FechaHora)
+            .ToListAsync(cancellationToken);
+    }
 }

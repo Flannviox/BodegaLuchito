@@ -11,4 +11,6 @@ public interface IVentaRepository
     Task RegistrarVentaAsync(Venta venta, CancellationToken cancellationToken = default);
     Task<Venta?> ObtenerPorIdAsync(int id, CancellationToken cancellationToken = default);
     Task AnularVentaAsync(Venta venta, int sesionCajaAbiertaId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Venta>> ObtenerVentasPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default);
 }

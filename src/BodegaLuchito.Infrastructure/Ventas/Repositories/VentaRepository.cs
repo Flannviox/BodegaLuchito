@@ -165,4 +165,18 @@ public sealed class VentaRepository : IVentaRepository
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
+    public async Task<IReadOnlyList<Venta>> ObtenerVentasPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var fechaFinAjustada = fin.Date.AddDays(1).AddTicks(-1);
+
+        return await context.Set<Venta>()
+            .Include(v => v.Usuario)
+            .Include(v => v.Detalles)
+            .AsNoTracking()
+            .Where(v => v.FechaHora >= inicio.Date && v.FechaHora <= fechaFinAjustada)
+            .OrderByDescending(v => v.FechaHora)
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -28,6 +28,9 @@ namespace BodegaLuchito.Application.Caja.Interfaces
         Task<SesionCaja?> ObtenerSesionPorIdAsync(int sesionCajaId,
             CancellationToken cancellationToken = default);
 
+        Task<IReadOnlyList<MovimientoCaja>> ObtenerMovimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<SesionCaja>> ObtenerCierresPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default);
+
     }
 
 }

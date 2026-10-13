@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -63,6 +64,7 @@ public sealed class InventarioRepository : IInventarioRepository
         if (!await context.Set<Usuario>().AnyAsync(u => u.Id == usuarioId && u.Activo &&
             u.Rol == RolUsuario.Administradora, cancellationToken))
             throw new UnauthorizedAccessException("La administradora debe tener una sesión activa.");
+
         Producto producto;
         if (solicitud.ProductoNuevo is not null)
         {
@@ -74,19 +76,27 @@ public sealed class InventarioRepository : IInventarioRepository
         else
             producto = await context.Productos.SingleOrDefaultAsync(x => x.Id == solicitud.ProductoId, cancellationToken)
                 ?? throw new InvalidOperationException("El producto ya no está disponible.");
+
         var tieneOperaciones = await context.MovimientosInventario.AnyAsync(x => x.ProductoId == producto.Id, cancellationToken)
             || await context.DetallesAbastecimiento.AnyAsync(x => x.ProductoId == producto.Id, cancellationToken)
             || await context.Set<DetalleVenta>().AnyAsync(x => x.ProductoId == producto.Id, cancellationToken);
+
         var posterior = ReglasMovimientoManual.CalcularStockPosterior(producto, solicitud.Tipo,
             solicitud.Cantidad, solicitud.StockEsperado, tieneOperaciones, solicitud.Motivo);
+
         context.MovimientosInventario.Add(new MovimientoInventario
         {
-            Producto = producto, UsuarioId = usuarioId, Tipo = solicitud.Tipo,
+            Producto = producto,
+            UsuarioId = usuarioId,
+            Tipo = solicitud.Tipo,
             Cantidad = Math.Abs(posterior - producto.StockActual),
-            StockAnterior = producto.StockActual, StockPosterior = posterior,
-            FechaHora = DateTime.Now, Descripcion = solicitud.Motivo.Trim()
+            StockAnterior = producto.StockActual,
+            StockPosterior = posterior,
+            FechaHora = DateTime.Now,
+            Descripcion = solicitud.Motivo.Trim()
         });
         producto.StockActual = posterior;
+
         await context.SaveChangesAsync(cancellationToken);
         await transaccion.CommitAsync(cancellationToken);
     }
@@ -96,7 +106,7 @@ public sealed class InventarioRepository : IInventarioRepository
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
 
-        return await context.Set<MovimientoInventario>()
+        return await context.MovimientosInventario
             .AsNoTracking()
             .Include(x => x.Producto)
             .Where(x => !tipo.HasValue || x.Tipo == tipo.Value)
@@ -105,5 +115,16 @@ public sealed class InventarioRepository : IInventarioRepository
             .Take(200)
             .ToListAsync(cancellationToken);
     }
+    public async Task<IReadOnlyList<MovimientoInventario>> ObtenerMovimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+        var fechaFinAjustada = fin.Date.AddDays(1).AddTicks(-1);
 
+        return await context.MovimientosInventario
+            .Include(m => m.Producto)
+            .AsNoTracking()
+            .Where(m => m.FechaHora >= inicio.Date && m.FechaHora <= fechaFinAjustada)
+            .OrderByDescending(m => m.FechaHora)
+            .ToListAsync(cancellationToken);
+    }
 }

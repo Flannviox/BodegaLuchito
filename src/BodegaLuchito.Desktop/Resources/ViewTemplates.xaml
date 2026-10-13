@@ -18,7 +18,10 @@
     xmlns:inventarioVm="clr-namespace:BodegaLuchito.Desktop.Modules.Inventario.ViewModels"
     xmlns:inventarioV="clr-namespace:BodegaLuchito.Desktop.Modules.Inventario.Views"
     xmlns:biVm="clr-namespace:BodegaLuchito.Desktop.Modules.BI.ViewModels"
-    xmlns:biV="clr-namespace:BodegaLuchito.Desktop.Modules.BI.Views">
+    xmlns:biV="clr-namespace:BodegaLuchito.Desktop.Modules.BI.Views"
+    xmlns:reportesVm="clr-namespace:BodegaLuchito.Desktop.Modules.Reportes.ViewModels"
+    xmlns:reportesV="clr-namespace:BodegaLuchito.Desktop.Modules.Reportes.Views">
+    
 
     <DataTemplate DataType="{x:Type biVm:PrediccionDemandaViewModel}">
         <biV:PrediccionDemandaView />
@@ -55,6 +58,9 @@
     
     <DataTemplate DataType="{x:Type abastecimientoVm:AbastecimientoViewModel}">
         <abastecimientoV:AbastecimientoView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type reportesVm:ReportesViewModel}">
+        <reportesV:ReportesView />
     </DataTemplate>
 
 </ResourceDictionary>

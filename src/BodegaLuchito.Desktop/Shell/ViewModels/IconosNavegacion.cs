@@ -12,4 +12,5 @@ internal static class IconosNavegacion
     public const string Usuarios = "M5,7 A4,4 0 1 0 13,7 A4,4 0 1 0 5,7 M2,21 V19 C2,12 16,12 16,19 V21 Z M17,3 C22,3 22,11 17,11 M19,14 C23,14 23,18 23,21";
     public const string Ventas = "M2,3 H5 L8,15 H19 L22,6 H6 M8,19 A1.5,1.5 0 1 0 11,19 A1.5,1.5 0 1 0 8,19 M17,19 A1.5,1.5 0 1 0 20,19 A1.5,1.5 0 1 0 17,19";
     public const string Caja = "M5,3 H17 V10 H5 Z M7,5 H15 V8 H7 Z M4,10 H18 L21,16 V21 H2 V16 Z M2,16 H21 M8,19 H15 M7,12 H8 M11,12 H12 M15,12 H16";
+    public const string Reportes = "M3,3 H5 V21 H3 V3 M19,9 H21 V21 H19 V9 M11,13 H13 V21 H11 V13 M7,17 H9 V21 H7 V17 M15,5 H17 V21 H15 V5";
 }

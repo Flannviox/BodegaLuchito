@@ -18,4 +18,5 @@ public interface IInventarioRepository
         int usuarioId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<MovimientoInventario>> ObtenerMovimientosAsync(
         CancellationToken cancellationToken = default, TipoMovimientoInventario? tipo = null);
+    Task<IReadOnlyList<MovimientoInventario>> ObtenerMovimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default);
 }

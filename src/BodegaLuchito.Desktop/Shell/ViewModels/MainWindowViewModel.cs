@@ -12,6 +12,7 @@ using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using CommunityToolkit.Mvvm.Input;
 using BodegaLuchito.Desktop.Modules.BI.ViewModels;
+using BodegaLuchito.Desktop.Modules.Reportes.ViewModels;
 
 namespace BodegaLuchito.Desktop.Shell.ViewModels;
 
@@ -49,6 +50,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ProveedoresViewModel => "Proveedores",
         AbastecimientoViewModel => "Abastecimiento",
         UsuariosViewModel => "Usuarios",
+        ReportesViewModel => "Reportes comerciales",
         VentasViewModel => "Ventas",
         CajaViewModel => "Caja",
         _ => "Bodega Luchito"
@@ -88,6 +90,7 @@ public partial class MainWindowViewModel : ViewModelBase
             AgregarDestino<ProveedoresViewModel>("Proveedores", IrAProveedoresCommand, IconosNavegacion.Proveedores);
             AgregarDestino<AbastecimientoViewModel>("Abastecimiento", IrAAbastecimientoCommand, IconosNavegacion.Abastecimiento);
             AgregarDestino<UsuariosViewModel>("Usuarios", IrAUsuariosCommand, IconosNavegacion.Usuarios);
+            AgregarDestino<ReportesViewModel>("Reportes", IrAReportesCommand, IconosNavegacion.Reportes);
         }
 
         AgregarDestino<VentasViewModel>("Ventas", IrAVentasCommand, IconosNavegacion.Ventas);
@@ -210,6 +213,11 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _sesionUsuario.CerrarSesion();
     }
+    [RelayCommand]
+    private void IrAReportes()
+    {
+        _navigationService.NavigateTo<ReportesViewModel>();
+    }
     public void InicializarParaSesionActual()
     {
         ConstruirMenu();
@@ -222,6 +230,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(NombreCompleto));
         _navigationService.NavigateTo<InicioViewModel>();
     }
+
     public string NombreCompleto =>
     _sesionUsuario.UsuarioActual?.NombreCompleto
     ?? string.Empty;

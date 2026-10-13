@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BodegaLuchito.Application.Caja.Interfaces;
+using BodegaLuchito.Application.Caja.DTOs;
 using BodegaLuchito.Domain.Caja.Entities;
 using BodegaLuchito.Domain.Caja.Enums;
+using BodegaLuchito.Domain.Ventas.Entities;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using BodegaLuchito.Application.Caja.DTOs;
-using BodegaLuchito.Domain.Ventas.Entities;
 using EntidadAbastecimiento = BodegaLuchito.Domain.Abastecimiento.Entities.Abastecimiento;
 
 namespace BodegaLuchito.Infrastructure.Caja.Repositories
@@ -25,9 +27,7 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
         {
             return _context.Set<SesionCaja>()
                 .FirstOrDefaultAsync(s => s.Estado == EstadoSesionCaja.Abierta, cancellationToken);
-
         }
-
 
         public async Task AgregarSesionAsync(SesionCaja sesion, CancellationToken cancellationToken = default)
         {
@@ -45,104 +45,103 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
             return movimientos;
         }
 
-        public async Task<IReadOnlyList<MovimientoCajaDetalleResult>>
-        ObtenerDetalleMovimientosPorSesionAsync(
+        public async Task<IReadOnlyList<MovimientoCajaDetalleResult>> ObtenerDetalleMovimientosPorSesionAsync(
             int sesionCajaId,
             CancellationToken cancellationToken = default)
-            {
-                var movimientos = await _context
-                    .Set<MovimientoCaja>()
-                    .AsNoTracking()
-                    .Where(m => m.SesionCajaId == sesionCajaId)
-                    .OrderBy(m => m.FechaHora)
-                    .ThenBy(m => m.Id)
-                    .ToListAsync(cancellationToken);
+        {
+            var movimientos = await _context
+                .Set<MovimientoCaja>()
+                .AsNoTracking()
+                .Where(m => m.SesionCajaId == sesionCajaId)
+                .OrderBy(m => m.FechaHora)
+                .ThenBy(m => m.Id)
+                .ToListAsync(cancellationToken);
 
-                var ventaIds = movimientos
-                    .Where(m => m.VentaId.HasValue)
-                    .Select(m => m.VentaId!.Value)
-                    .Distinct()
-                    .ToList();
+            var ventaIds = movimientos
+                .Where(m => m.VentaId.HasValue)
+                .Select(m => m.VentaId!.Value)
+                .Distinct()
+                .ToList();
 
-                var abastecimientoIds = movimientos
-                    .Where(m => m.AbastecimientoId.HasValue)
-                    .Select(m => m.AbastecimientoId!.Value)
-                    .Distinct()
-                    .ToList();
+            var abastecimientoIds = movimientos
+                .Where(m => m.AbastecimientoId.HasValue)
+                .Select(m => m.AbastecimientoId!.Value)
+                .Distinct()
+                .ToList();
 
-                var ventas = await _context
-                    .Set<Venta>()
-                    .AsNoTracking()
-                    .Include(v => v.Detalles)
-                        .ThenInclude(d => d.Producto)
-                    .Where(v => ventaIds.Contains(v.Id))
-                    .ToDictionaryAsync(v => v.Id, cancellationToken);
+            var ventas = await _context
+                .Set<Venta>()
+                .AsNoTracking()
+                .Include(v => v.Detalles)
+                    .ThenInclude(d => d.Producto)
+                .Where(v => ventaIds.Contains(v.Id))
+                .ToDictionaryAsync(v => v.Id, cancellationToken);
 
-                var abastecimientos = await _context
-                    .Set<EntidadAbastecimiento>()
-                    .AsNoTracking()
-                    .Include(a => a.Detalles)
-                        .ThenInclude(d => d.Producto)
-                    .Where(a => abastecimientoIds.Contains(a.Id))
-                    .ToDictionaryAsync(a => a.Id, cancellationToken);
+            var abastecimientos = await _context
+                .Set<EntidadAbastecimiento>()
+                .AsNoTracking()
+                .Include(a => a.Detalles)
+                    .ThenInclude(d => d.Producto)
+                .Where(a => abastecimientoIds.Contains(a.Id))
+                .ToDictionaryAsync(a => a.Id, cancellationToken);
 
-                return movimientos
-                    .Select(movimiento =>
+            return movimientos
+                .Select(movimiento =>
+                {
+                    IReadOnlyList<DetalleOperacionCajaItem> detalles = [];
+
+                    if (movimiento.VentaId.HasValue &&
+                        ventas.TryGetValue(
+                            movimiento.VentaId.Value,
+                            out var venta))
                     {
-                        IReadOnlyList<DetalleOperacionCajaItem> detalles =
-                            [];
+                        detalles = venta.Detalles
+                            .Select(detalle =>
+                                new DetalleOperacionCajaItem(
+                                    detalle.ProductoId,
+                                    detalle.Producto.Nombre,
+                                    detalle.Cantidad,
+                                    detalle.PrecioUnitario,
+                                    detalle.Subtotal))
+                            .ToList();
+                    }
+                    else if (
+                        movimiento.AbastecimientoId.HasValue &&
+                        abastecimientos.TryGetValue(
+                            movimiento.AbastecimientoId.Value,
+                            out var abastecimiento))
+                    {
+                        detalles = abastecimiento.Detalles
+                            .Select(detalle =>
+                                new DetalleOperacionCajaItem(
+                                    detalle.ProductoId,
+                                    detalle.Producto.Nombre,
+                                    detalle.Cantidad,
+                                    detalle.CostoUnitario,
+                                    detalle.TotalLinea))
+                            .ToList();
+                    }
 
-                        if (movimiento.VentaId.HasValue &&
-                            ventas.TryGetValue(
-                                movimiento.VentaId.Value,
-                                out var venta))
-                        {
-                            detalles = venta.Detalles
-                                .Select(detalle =>
-                                    new DetalleOperacionCajaItem(
-                                        detalle.ProductoId,
-                                        detalle.Producto.Nombre,
-                                        detalle.Cantidad,
-                                        detalle.PrecioUnitario,
-                                        detalle.Subtotal))
-                                .ToList();
-                        }
-                        else if (
-                            movimiento.AbastecimientoId.HasValue &&
-                            abastecimientos.TryGetValue(
-                                movimiento.AbastecimientoId.Value,
-                                out var abastecimiento))
-                        {
-                            detalles = abastecimiento.Detalles
-                                .Select(detalle =>
-                                    new DetalleOperacionCajaItem(
-                                        detalle.ProductoId,
-                                        detalle.Producto.Nombre,
-                                        detalle.Cantidad,
-                                        detalle.CostoUnitario,
-                                        detalle.TotalLinea))
-                                .ToList();
-                        }
-
-                        return new MovimientoCajaDetalleResult(
-                            movimiento.Id,
-                            movimiento.FechaHora,
-                            movimiento.Tipo,
-                            movimiento.MetodoPago,
-                            movimiento.Monto,
-                            movimiento.UsuarioId,
-                            movimiento.VentaId,
-                            movimiento.AbastecimientoId,
-                            movimiento.Descripcion,
-                            detalles);
-                    })
-                    .ToList();
-            }
+                    return new MovimientoCajaDetalleResult(
+                        movimiento.Id,
+                        movimiento.FechaHora,
+                        movimiento.Tipo,
+                        movimiento.MetodoPago,
+                        movimiento.Monto,
+                        movimiento.UsuarioId,
+                        movimiento.VentaId,
+                        movimiento.AbastecimientoId,
+                        movimiento.Descripcion,
+                        detalles);
+                })
+                .ToList();
+        }
 
         public Task GuardarCambiosAsync(CancellationToken cancellationToken = default)
         {
             return _context.SaveChangesAsync(cancellationToken);
         }
+
         public async Task AgregarMovimientoAsync(MovimientoCaja movimiento, CancellationToken cancellationToken = default)
         {
             await _context.Set<MovimientoCaja>().AddAsync(movimiento, cancellationToken);
@@ -159,8 +158,8 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
                 .ThenByDescending(s => s.Id)
                 .Take(200)
                 .ToListAsync(cancellationToken);
-
         }
+
         public async Task<SesionCaja?> ObtenerSesionPorIdAsync(
             int sesionCajaId,
             CancellationToken cancellationToken = default)
@@ -171,6 +170,26 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
                     s => s.Id == sesionCajaId,
                     cancellationToken);
         }
+        public async Task<IReadOnlyList<MovimientoCaja>> ObtenerMovimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
+        {
+            var fechaFinAjustada = fin.Date.AddDays(1).AddTicks(-1);
 
+            return await _context.Set<MovimientoCaja>()
+                .AsNoTracking()
+                .Where(m => m.FechaHora >= inicio.Date && m.FechaHora <= fechaFinAjustada)
+                .OrderByDescending(m => m.FechaHora)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IReadOnlyList<SesionCaja>> ObtenerCierresPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
+        {
+            var fechaFinAjustada = fin.Date.AddDays(1).AddTicks(-1);
+
+            return await _context.Set<SesionCaja>()
+                .AsNoTracking()
+                .Where(s => s.FechaApertura >= inicio.Date && s.FechaApertura <= fechaFinAjustada)
+                .OrderByDescending(s => s.FechaApertura)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

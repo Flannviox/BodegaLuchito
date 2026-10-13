@@ -8,6 +8,8 @@ using BodegaLuchito.Application.Inventario.UseCases;
 using BodegaLuchito.Application.Productos.Interfaces;
 using BodegaLuchito.Application.Proveedores.Interfaces;
 using BodegaLuchito.Application.Proveedores.UseCases;
+using BodegaLuchito.Application.Reportes.Servicios;
+using BodegaLuchito.Application.Reportes.UseCases;
 using BodegaLuchito.Application.Ventas.Interfaces;
 using BodegaLuchito.Application.Ventas.UseCases;
 using BodegaLuchito.Infrastructure.Abastecimiento.Repositories;
@@ -22,6 +24,8 @@ using BodegaLuchito.Infrastructure.Proveedores.Repositories;
 using BodegaLuchito.Infrastructure.Ventas.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
+
 
 namespace BodegaLuchito.Infrastructure;
 

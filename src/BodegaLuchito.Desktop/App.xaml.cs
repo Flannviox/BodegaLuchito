@@ -5,6 +5,8 @@ using BodegaLuchito.Application.Caja.UseCases;
 using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Application.Productos.UseCases;
 using BodegaLuchito.Application.Proveedores.UseCases;
+using BodegaLuchito.Application.Reportes.Servicios;
+using BodegaLuchito.Application.Reportes.UseCases;
 using BodegaLuchito.Application.Ventas.UseCases;
 using BodegaLuchito.Desktop.Modules.Abastecimiento.ViewModels; // Agregado
 using BodegaLuchito.Desktop.Modules.Abastecimiento.Views; // Agregado
@@ -14,6 +16,7 @@ using BodegaLuchito.Desktop.Modules.Caja.ViewModels;
 using BodegaLuchito.Desktop.Modules.Inicio.ViewModels;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 using BodegaLuchito.Desktop.Modules.Proveedores.ViewModels;
+using BodegaLuchito.Desktop.Modules.Reportes.ViewModels;
 using BodegaLuchito.Desktop.Modules.Ventas.ViewModels;
 using BodegaLuchito.Desktop.Navigation;
 using BodegaLuchito.Desktop.Shell.ViewModels;
@@ -120,6 +123,10 @@ public partial class App : System.Windows.Application
         services.AddTransient<ConsultarHistorialCierresUseCase>();
         services.AddTransient<ConsultarDetalleMovimientosCajaUseCase>();
         services.AddTransient<ResolverDescuadreCajaUseCase>();
+
+        services.AddTransient<ExportacionExcelService>();
+        services.AddTransient<ObtenerReportesUseCase>();
+        services.AddTransient<ReportesViewModel>();
     }
 
     protected override async void OnStartup(

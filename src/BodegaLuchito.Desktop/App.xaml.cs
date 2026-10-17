@@ -24,6 +24,8 @@ using BodegaLuchito.Infrastructure;
 using BodegaLuchito.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using BodegaLuchito.Application.BI.UseCases;
+using BodegaLuchito.Desktop.Modules.BI.ViewModels;
 
 namespace BodegaLuchito.Desktop;
 
@@ -127,6 +129,10 @@ public partial class App : System.Windows.Application
         services.AddTransient<ExportacionExcelService>();
         services.AddTransient<ObtenerReportesUseCase>();
         services.AddTransient<ReportesViewModel>();
+
+        // BI & Dashboard
+        services.AddTransient<ObtenerDatosDashboardUseCase>();
+        services.AddTransient<DashboardViewModel>();
     }
 
     protected override async void OnStartup(

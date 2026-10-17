@@ -36,14 +36,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ConstruirMenu();
 
-        _navigationService.NavigateTo<InicioViewModel>();
+        IrAInicio();
     }
 
     public string TituloVentana => "Bodega Luchito";
 
     public string TituloPagina => CurrentViewModel switch
     {
-        InicioViewModel => "Inicio",
+        DashboardViewModel => "Inicio",
         ProductosViewModel => "Gestión de productos",
         InventarioViewModel => "Inventario",
         PrediccionDemandaViewModel => "Predicción de demanda",
@@ -80,7 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ConstruirMenu()
     {
         MenuItems.Clear();
-        AgregarDestino<InicioViewModel>("Inicio", IrAInicioCommand, IconosNavegacion.Inicio);
+        AgregarDestino<DashboardViewModel>("Inicio", IrAInicioCommand, IconosNavegacion.Inicio);
 
         if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
         {
@@ -130,7 +130,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void IrAInicio()
     {
-        _navigationService.NavigateTo<InicioViewModel>();
+        _navigationService.NavigateTo<DashboardViewModel>();
     }
 
     [RelayCommand]
@@ -228,7 +228,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(EstaAutenticado));
 
         OnPropertyChanged(nameof(NombreCompleto));
-        _navigationService.NavigateTo<InicioViewModel>();
+        _navigationService.NavigateTo<DashboardViewModel>();
     }
 
     public string NombreCompleto =>

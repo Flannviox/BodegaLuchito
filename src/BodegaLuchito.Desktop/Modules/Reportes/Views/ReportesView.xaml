@@ -4,114 +4,152 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" 
-             Background="#F8FAFC"
-             d:DesignHeight="700" d:DesignWidth="1000">
+             Background="#F4F7FB"
+             d:DesignHeight="750" d:DesignWidth="1100">
 
-    <Grid Margin="20">
+    <Grid Margin="25">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- TARJETAS SUPERIORES -->
-        <Grid Grid.Row="0" Margin="0,0,0,20">
+        <!-- ENCABEZADO DE LA VISTA -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Reportes Comerciales" FontSize="26" FontWeight="Bold" Foreground="#153657"/>
+            <TextBlock Text="Consulta, filtra y exporta la información operativa de la bodega." FontSize="14" Foreground="#6E839C" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- SECCIÓN SUPERIOR: FILTROS Y TARJETAS -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="15" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="15" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Tarjeta 1: Total Ventas -->
-            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="20">
+            <!-- PANEL DE FILTROS -->
+            <Border Grid.Column="0" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
                 <Border.Effect>
-                    <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
+                    <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
                 </Border.Effect>
-                <StackPanel>
-                    <TextBlock Text="Total ventas" FontSize="14" Foreground="#64748B" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding TotalVentas, StringFormat=S/ {0:N2}}" FontSize="28" Foreground="#10B981" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
-                    <TextBlock Text="En el periodo seleccionado" FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                </StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Configurar Reporte" FontSize="16" FontWeight="SemiBold" Foreground="#153657" Margin="0,0,0,15"/>
+
+                    <StackPanel Grid.Row="1" Margin="0,0,0,15">
+                        <TextBlock Text="Rango de fechas:" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C" Margin="0,0,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <DatePicker Grid.Column="0" SelectedDate="{Binding FechaInicio}" Height="38" FontSize="14" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                            <TextBlock Grid.Column="1" Text="-" VerticalAlignment="Center" Margin="10,0" Foreground="#6E839C" FontWeight="Bold"/>
+                            <DatePicker Grid.Column="2" SelectedDate="{Binding FechaFin}" Height="38" FontSize="14" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                        <TextBlock Text="Tipo de información:" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding TiposReporte}" SelectedItem="{Binding TipoReporteSeleccionado}" Height="38" FontSize="14" Padding="10,0" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
+                    </StackPanel>
+
+                    <!-- BOTONES DE ACCIÓN (Generar y Limpiar) -->
+                    <Grid Grid.Row="3" VerticalAlignment="Bottom">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Command="{Binding LimpiarFiltrosCommand}" Content="Restablecer" Height="40" Background="Transparent" Foreground="#6E839C" BorderBrush="#CBD5E1" BorderThickness="1" Cursor="Hand" FontWeight="SemiBold">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <Button Grid.Column="2" Command="{Binding GenerarReporteCommand}" Content="Generar (F2)" Height="40" Background="#1767D8" Foreground="White" BorderThickness="0" Cursor="Hand" FontWeight="Bold">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </Grid>
             </Border>
 
-            <!-- Tarjeta 2: Total Egresos -->
-            <Border Grid.Column="2" Background="White" CornerRadius="8" Padding="20">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
-                </Border.Effect>
-                <StackPanel>
-                    <TextBlock Text="Total egresos" FontSize="14" Foreground="#64748B" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding TotalEgresos, StringFormat=S/ {0:N2}}" FontSize="28" Foreground="#EF4444" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
-                    <TextBlock Text="Pagos a proveedores en periodo" FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Tarjeta 3: Diferencia de Caja -->
-            <Border Grid.Column="4" Background="White" CornerRadius="8" Padding="20">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
-                </Border.Effect>
-                <StackPanel>
-                    <TextBlock Text="Diferencia referencial" FontSize="14" Foreground="#64748B" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding DiferenciaCaja, StringFormat=S/ {0:N2}}" FontSize="28" Foreground="#3B82F6" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
-                    <TextBlock Text="Ventas - Egresos (Sin fondo base)" FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- BARRA DE FILTROS -->
-        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="20" Margin="0,0,0,20">
-            <Border.Effect>
-                <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
-            </Border.Effect>
-            <Grid>
+            <!-- TARJETAS DE RESUMEN -->
+            <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="20" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="20" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Rango de fechas" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <StackPanel Orientation="Horizontal">
-                        <DatePicker SelectedDate="{Binding FechaInicio}" Width="130" Height="35" Margin="0,0,10,0"/>
-                        <TextBlock Text="Hasta" VerticalAlignment="Center" Foreground="#64748B" Margin="0,0,10,0"/>
-                        <DatePicker SelectedDate="{Binding FechaFin}" Width="130" Height="35"/>
+                <!-- Ingresos -->
+                <Border Grid.Column="0" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <Border Width="40" Height="40" Background="#E0F2FE" CornerRadius="8" HorizontalAlignment="Left" Margin="0,0,0,15">
+                            <TextBlock Text="💰" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Ingresos del Periodo" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C"/>
+                        <TextBlock Text="{Binding TotalVentas, StringFormat=S/ {0:N2}}" FontSize="28" FontWeight="Bold" Foreground="#0EA5E9" Margin="0,5,0,0"/>
+                        <TextBlock Text="Total por ventas" FontSize="11" Foreground="#94A3B8" Margin="0,5,0,0"/>
                     </StackPanel>
-                </StackPanel>
+                </Border>
 
-                <StackPanel Grid.Column="2">
-                    <TextBlock Text="Tipo de reporte" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <ComboBox ItemsSource="{Binding TiposReporte}" SelectedItem="{Binding TipoReporteSeleccionado}" Width="200" Height="35" VerticalContentAlignment="Center"/>
-                </StackPanel>
+                <!-- Egresos -->
+                <Border Grid.Column="2" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <Border Width="40" Height="40" Background="#FEE2E2" CornerRadius="8" HorizontalAlignment="Left" Margin="0,0,0,15">
+                            <TextBlock Text="📉" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Egresos del Periodo" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C"/>
+                        <TextBlock Text="{Binding TotalEgresos, StringFormat=S/ {0:N2}}" FontSize="28" FontWeight="Bold" Foreground="#EF4444" Margin="0,5,0,0"/>
+                        <TextBlock Text="Pagos a proveedores" FontSize="11" Foreground="#94A3B8" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
 
-                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <Button Command="{Binding LimpiarFiltrosCommand}" Content="Limpiar (F3)" Width="110" Height="35" Background="Transparent" Foreground="#64748B" BorderBrush="#CBD5E1" Cursor="Hand" Margin="0,0,10,0">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="4"/>
-                            </Style>
-                        </Button.Resources>
-                    </Button>
-                    <Button Command="{Binding GenerarReporteCommand}" Content="Generar reporte (F2)" Width="150" Height="35" Background="#3B82F6" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="4"/>
-                            </Style>
-                        </Button.Resources>
-                    </Button>
-                </StackPanel>
+                <!-- Diferencia -->
+                <Border Grid.Column="4" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <Border Width="40" Height="40" Background="#ECFDF5" CornerRadius="8" HorizontalAlignment="Left" Margin="0,0,0,15">
+                            <TextBlock Text="⚖️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Diferencia Neta" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C"/>
+                        <TextBlock Text="{Binding DiferenciaCaja, StringFormat=S/ {0:N2}}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,5,0,0"/>
+                        <TextBlock Text="Ingresos menos egresos" FontSize="11" Foreground="#94A3B8" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
             </Grid>
-        </Border>
+        </Grid>
 
-        <!-- RESULTADOS Y EXPORTACIÓN -->
-        <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="20">
+        <!-- SECCIÓN INFERIOR: RESULTADOS Y EXPORTACIÓN -->
+        <Border Grid.Row="2" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
             <Border.Effect>
-                <DropShadowEffect Color="Black" Opacity="0.05" BlurRadius="10" ShadowDepth="2"/>
+                <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
             </Border.Effect>
             <Grid>
                 <Grid.RowDefinitions>
@@ -119,31 +157,68 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
-                    <Button Command="{Binding ExportarExcelCommand}" Content="Exportar a Excel (F4)" Width="150" Height="35" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Detalle de Resultados" FontSize="16" FontWeight="SemiBold" Foreground="#153657"/>
+                        <TextBlock Text="Vista previa de los datos obtenidos en la base de datos." FontSize="13" Foreground="#6E839C"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Command="{Binding ExportarExcelCommand}" Height="40" Padding="20,0" Background="#10B981" Foreground="White" BorderThickness="0" Cursor="Hand" FontWeight="Bold">
                         <Button.Resources>
                             <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="4"/>
+                                <Setter Property="CornerRadius" Value="6"/>
                             </Style>
                         </Button.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📄" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Exportar a Excel (F4)" VerticalAlignment="Center"/>
+                        </StackPanel>
                     </Button>
-                </StackPanel>
+                </Grid>
 
-                <!-- El DataGrid se adapta automáticamente al DTO que devuelva la base de datos (AutoGenerateColumns="True") -->
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Resultados}" AutoGenerateColumns="True" IsReadOnly="True" 
-                          CanUserAddRows="False" HeadersVisibility="Column" Background="Transparent" BorderThickness="0"
-                          RowHeight="40" AlternatingRowBackground="#F8FAFC" HorizontalGridLinesBrush="#F1F5F9" VerticalGridLinesBrush="Transparent">
-                    <DataGrid.ColumnHeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="White"/>
-                            <Setter Property="Foreground" Value="#64748B"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="Padding" Value="10"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,2"/>
-                            <Setter Property="BorderBrush" Value="#E2E8F0"/>
-                        </Style>
-                    </DataGrid.ColumnHeaderStyle>
-                </DataGrid>
+                <Border Grid.Row="1" CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1" ClipToBounds="True">
+                    <DataGrid ItemsSource="{Binding Resultados}" AutoGenerateColumns="True" IsReadOnly="True" 
+                              CanUserAddRows="False" HeadersVisibility="Column" Background="White" BorderThickness="0"
+                              RowHeight="45" AlternatingRowBackground="#F8FAFC" HorizontalGridLinesBrush="#F1F5F9" VerticalGridLinesBrush="Transparent">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F1F5F9"/>
+                                <Setter Property="Foreground" Value="#475569"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Padding" Value="15,12"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="15,0"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}" Background="Transparent">
+                                                <ContentPresenter VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#E0F2FE"/>
+                                        <Setter Property="Foreground" Value="#0F172A"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                    </DataGrid>
+                </Border>
             </Grid>
         </Border>
     </Grid>

@@ -1,0 +1,190 @@
+<UserControl x:Class="BodegaLuchito.Desktop.Modules.BI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+             mc:Ignorable="d" 
+             Background="#F4F7FB"
+             d:DesignHeight="850" d:DesignWidth="1100">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ENCABEZADO -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="Dashboard Comercial" FontSize="26" FontWeight="Bold" Foreground="#153657"/>
+                <TextBlock Text="Visualiza el estado y rendimiento de la Bodega Luchito." FontSize="14" Foreground="#6E839C" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- TARJETAS SUPERIORES -->
+            <UniformGrid Grid.Row="1" Columns="4" Rows="1" Margin="0,0,0,20">
+
+                <!-- Ventas del Día -->
+                <Border Background="White" CornerRadius="10" Padding="15" Margin="0,0,15,0" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="🛒" FontSize="18" Margin="0,0,10,0"/>
+                            <TextBlock Text="Ventas del día" FontSize="14" FontWeight="SemiBold" Foreground="#6E839C" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Datos.VentasDelDia.TotalMonto, StringFormat=S/ {0:N2}, FallbackValue='S/ 0.00'}" FontSize="24" FontWeight="Bold" Foreground="#153657"/>
+                        <TextBlock Text="{Binding Datos.VentasDelDia.VariacionPorcentualMonto, StringFormat={}{0:N2}% vs ayer}" FontSize="12" Foreground="#10B981" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Ventas del Mes -->
+                <Border Background="White" CornerRadius="10" Padding="15" Margin="0,0,15,0" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="📈" FontSize="18" Margin="0,0,10,0"/>
+                            <TextBlock Text="Ventas del mes" FontSize="14" FontWeight="SemiBold" Foreground="#6E839C" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Datos.VentasDelMes.TotalMonto, StringFormat=S/ {0:N2}, FallbackValue='S/ 0.00'}" FontSize="24" FontWeight="Bold" Foreground="#153657"/>
+                        <TextBlock Text="{Binding Datos.VentasDelMes.VariacionPorcentualMonto, StringFormat={}{0:N2}% vs mes anterior}" FontSize="12" Foreground="#3B82F6" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Total Operaciones Mes -->
+                <Border Background="White" CornerRadius="10" Padding="15" Margin="0,0,15,0" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="🧾" FontSize="18" Margin="0,0,10,0"/>
+                            <TextBlock Text="Tickets emitidos (Mes)" FontSize="14" FontWeight="SemiBold" Foreground="#6E839C" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Datos.VentasDelMes.CantidadTransacciones, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="#153657"/>
+                        <TextBlock Text="Operaciones de venta" FontSize="12" Foreground="#94A3B8" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Diferencia Caja Día -->
+                <Border Background="White" CornerRadius="10" Padding="15" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="⚖️" FontSize="18" Margin="0,0,10,0"/>
+                            <TextBlock Text="Diferencia cierres hoy" FontSize="14" FontWeight="SemiBold" Foreground="#6E839C" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Datos.DiferenciaCajaDelDia, StringFormat=S/ {0:N2}, FallbackValue='S/ 0.00'}" FontSize="24" FontWeight="Bold" Foreground="#EF4444"/>
+                        <TextBlock Text="Acumulado diario" FontSize="12" Foreground="#94A3B8" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+            </UniformGrid>
+
+            <!-- SECCIÓN DE GRÁFICOS -->
+            <Grid Grid.Row="2" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Gráfico de Líneas: Evolución de Ventas -->
+                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="300"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Evolución de ventas (Últimos 7 días)" FontSize="16" FontWeight="SemiBold" Foreground="#153657" Margin="0,0,0,15"/>
+                        <!-- Control de LiveCharts2 -->
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding SerieEvolucionVentas}" XAxes="{Binding EjeX}" YAxes="{Binding EjeY}" TooltipPosition="Top" />
+                    </Grid>
+                </Border>
+
+                <!-- Gráfico de Torta: Medios de Pago -->
+                <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="20" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="300"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Ventas por método de pago (Mes)" FontSize="16" FontWeight="SemiBold" Foreground="#153657" Margin="0,0,0,15"/>
+                        <!-- Control de LiveCharts2 -->
+                        <lvc:PieChart Grid.Row="1" Series="{Binding SerieMediosPago}" LegendPosition="Right" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- SECCIÓN DE TABLAS -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="5*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Tabla: Productos más vendidos -->
+                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Productos más vendidos (Mes)" FontSize="16" FontWeight="SemiBold" Foreground="#153657" Margin="0,0,0,15"/>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Datos.ProductosMasVendidosDelMes}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0" RowHeight="40">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" Width="*"/>
+                                <DataGridTextColumn Header="Categoría" Binding="{Binding Categoria}" Width="*"/>
+                                <DataGridTextColumn Header="Cantidad" Binding="{Binding CantidadVendida, StringFormat={}{0:N0}}" Width="Auto"/>
+                                <DataGridTextColumn Header="Importe (S/)" Binding="{Binding MontoTotalGenerado, StringFormat=S/ {0:N2}}" Width="Auto"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <!-- Tabla: Alertas de Stock Bajo -->
+                <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="20" BorderBrush="#E1E8F1" BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                            <TextBlock Text="⚠️" FontSize="16" Margin="0,0,8,0"/>
+                            <TextBlock Text="Alertas de Stock Bajo" FontSize="16" FontWeight="SemiBold" Foreground="#EF4444"/>
+                        </StackPanel>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Datos.ProductosConStockBajo}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0" RowHeight="40">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*"/>
+                                <DataGridTextColumn Header="Stock Actual" Binding="{Binding StockActual}" Width="Auto"/>
+                                <DataGridTextColumn Header="Stock Mínimo" Binding="{Binding StockMinimo}" Width="Auto"/>
+                                <DataGridTextColumn Header="Unidad" Binding="{Binding UnidadVenta}" Width="Auto"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+        </Grid>
+    </ScrollViewer>
+</UserControl>

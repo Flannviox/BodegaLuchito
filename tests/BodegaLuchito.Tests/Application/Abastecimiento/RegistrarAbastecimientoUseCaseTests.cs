@@ -79,6 +79,13 @@ public sealed class RegistrarAbastecimientoUseCaseTests
 
         var registroHistorico = Assert.Single(historial);
         Assert.Equal("Proveedor Prueba", registroHistorico.Proveedor.Nombre);
+        var autor = await context.Set<Usuario>().SingleAsync(x => x.Id == datos.usuarioId);
+        Assert.Equal(autor.NombreCompleto, registroHistorico.RegistradoPor);
+        autor.Activo = false;
+        await context.SaveChangesAsync();
+        var historicoInactivo = await new ConsultarHistorialAbastecimientosUseCase(new AbastecimientoRepository(factory)).ExecuteAsync();
+        Assert.Equal(autor.NombreCompleto, Assert.Single(historicoInactivo).RegistradoPor);
+
         Assert.Equal(MetodoPago.Efectivo, registroHistorico.MetodoPago);
         Assert.Equal(40m, registroHistorico.Total);
         Assert.Equal("Gaseosa personal", registroHistorico.Detalles.Single().Producto.Nombre);

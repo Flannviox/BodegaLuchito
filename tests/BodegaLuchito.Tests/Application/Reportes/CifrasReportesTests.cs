@@ -1,3 +1,4 @@
+using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Application.BI.UseCases;
 using BodegaLuchito.Application.Reportes.DTOs;
 using BodegaLuchito.Application.Reportes.Servicios;
@@ -111,7 +112,7 @@ public sealed class CifrasReportesTests
     [Fact]
     public async Task Reportes_RechazanFechasInvertidasYTipoDesconocido()
     {
-        var reportes = new ObtenerReportesUseCase(null!, null!, null!, null!);
+        var reportes = new ObtenerReportesUseCase(null!, null!, null!, null!, SesionAdministradora());
         var inicio = DateTime.Today;
         var fin = inicio.AddDays(-1);
         await Assert.ThrowsAsync<ArgumentException>(() => reportes.GenerarAsync("Ventas", inicio, fin));
@@ -157,6 +158,27 @@ public sealed class CifrasReportesTests
         Assert.Equal(70m, categoria.TotalMonto);
         await Assert.ThrowsAsync<ArgumentException>(() => caso.EjecutarAsync(DateTime.Today.AddYears(1)));
     }
+    private static SesionUsuario SesionAdministradora()
+    {
+        var sesion = new SesionUsuario();
+        sesion.IniciarSesion(new UsuarioSesion { IdUsuario = 1, Rol = RolUsuario.Administradora });
+        return sesion;
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ReportesRechazaVendedoraYSesionCerrada(bool iniciar)
+    {
+        var sesion = new SesionUsuario();
+        if (iniciar) sesion.IniciarSesion(new UsuarioSesion { IdUsuario = 2, Rol = RolUsuario.Vendedora });
+        var caso = new ObtenerReportesUseCase(null!, null!, null!, null!, sesion);
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => caso.GenerarAsync("Ventas", DateTime.Today, DateTime.Today));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => caso.ObtenerReporteVentasAsync(DateTime.Today, DateTime.Today));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => caso.ObtenerReporteAbastecimientosAsync(DateTime.Today, DateTime.Today));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => caso.ObtenerReporteCajaAsync(DateTime.Today, DateTime.Today));
+    }
+
     private sealed class Datos : IAsyncDisposable
     {
         private readonly SqliteConnection _connection;
@@ -173,7 +195,7 @@ public sealed class CifrasReportesTests
             Factory = new TestDbContextFactory(options);
             Ventas = new VentaRepository(Factory);
             Caja = new CajaRepository(_context);
-            Reportes = new ObtenerReportesUseCase(Ventas, new AbastecimientoRepository(Factory), Caja, new BodegaLuchito.Infrastructure.Autenticacion.Repositories.UsuarioRepository(Factory));
+            Reportes = new ObtenerReportesUseCase(Ventas, new AbastecimientoRepository(Factory), Caja, new BodegaLuchito.Infrastructure.Autenticacion.Repositories.UsuarioRepository(Factory), SesionAdministradora());
         }
 
         public static async Task<Datos> CrearAsync()

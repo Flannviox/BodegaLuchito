@@ -39,6 +39,7 @@ public class FiltrosHistorialTests
         var septiembre = await caso.ExecuteAsync(desde: new DateTime(2026, 9, 30), hasta: new DateTime(2026, 9, 30), proveedorId: 1);
         Assert.Single(septiembre);
         Assert.Equal(12, septiembre[0].Total);
+        Assert.Equal("Sin registro de responsable", septiembre[0].RegistradoPor);
         Assert.Equal("Proveedor antiguo", septiembre[0].Proveedor.Nombre);
         Assert.Empty(await caso.ExecuteAsync(desde: new DateTime(2026, 9, 30), hasta: new DateTime(2026, 9, 30), proveedorId: 2));
         await Assert.ThrowsAsync<ArgumentException>(() => caso.ExecuteAsync(desde: new DateTime(2026, 10, 1), hasta: new DateTime(2026, 9, 30)));

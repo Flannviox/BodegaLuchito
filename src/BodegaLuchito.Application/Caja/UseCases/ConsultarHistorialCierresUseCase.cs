@@ -1,27 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using BodegaLuchito.Application.Autenticacion.Interfaces;
+using BodegaLuchito.Application.Caja.DTOs;
 using BodegaLuchito.Application.Caja.Interfaces;
-using BodegaLuchito.Domain.Caja.Entities;
 
-namespace BodegaLuchito.Application.Caja.UseCases
+namespace BodegaLuchito.Application.Caja.UseCases;
+
+public class ConsultarHistorialCierresUseCase(ICajaRepository cajaRepository, IUsuarioRepository usuarioRepository)
 {
-    public class ConsultarHistorialCierresUseCase
+    public async Task<IReadOnlyList<HistorialCierreResult>> EjecutarAsync(CancellationToken cancellationToken = default)
     {
-        private readonly ICajaRepository _cajaRepository;
-
-        public ConsultarHistorialCierresUseCase(
-            ICajaRepository cajaRepository)
-        {
-            _cajaRepository = cajaRepository;
-        }
-
-        public Task <IReadOnlyList<SesionCaja>>EjecutarAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return _cajaRepository.ObtenerHistorialCierresAsync(cancellationToken);
-        }
+        var cierres = await cajaRepository.ObtenerHistorialCierresAsync(cancellationToken);
+        var usuarios = await usuarioRepository.ObtenerTodosAsync(cancellationToken);
+        var nombres = usuarios.ToDictionary(x => x.Id, x => string.IsNullOrWhiteSpace(x.NombreCompleto)
+            ? x.NombreUsuario : x.NombreCompleto);
+        string Nombre(int? id) => id.HasValue
+            ? nombres.GetValueOrDefault(id.Value, "Usuario no disponible") : "Sin registro";
+        return cierres.Select(x => new HistorialCierreResult(x, Nombre(x.UsuarioAperturaId), Nombre(x.UsuarioCierreId))).ToList();
     }
 }

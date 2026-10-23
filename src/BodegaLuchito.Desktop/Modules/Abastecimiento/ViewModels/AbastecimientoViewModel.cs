@@ -85,6 +85,7 @@ public sealed class DetalleHistorialAbastecimientoItem
 
 public sealed class HistorialAbastecimientoItem
 {
+    public string RegistradoPor { get; init; } = string.Empty;
     public int Id { get; init; }
     public DateTime FechaHora { get; init; }
     public string Proveedor { get; init; } = string.Empty;
@@ -358,6 +359,7 @@ public partial class AbastecimientoViewModel : ViewModelBase
                 Id = abastecimiento.Id,
                 FechaHora = abastecimiento.FechaHora,
                 Proveedor = abastecimiento.Proveedor.Nombre,
+                RegistradoPor = abastecimiento.RegistradoPor,
                 MetodoPago = abastecimiento.MetodoPago,
                 Total = abastecimiento.Total,
                 Detalles = abastecimiento.Detalles.Select(detalle => new DetalleHistorialAbastecimientoItem

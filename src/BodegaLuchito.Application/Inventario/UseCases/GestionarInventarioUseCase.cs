@@ -8,8 +8,8 @@ public sealed class GestionarInventarioUseCase(IInventarioRepository repositorio
     private int ValidarAcceso()
     {
         var usuario = sesion.UsuarioActual;
-        if (usuario is null || !usuario.EsAdministradora)
-            throw new UnauthorizedAccessException("Solo la administradora puede gestionar el inventario.");
+        if (usuario?.PuedeOperar != true)
+            throw new UnauthorizedAccessException("Inicia sesión con un usuario autorizado para gestionar el inventario.");
         return usuario.IdUsuario;
     }
 

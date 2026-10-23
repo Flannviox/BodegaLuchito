@@ -1,3 +1,4 @@
+using BodegaLuchito.Application.Abastecimiento.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -130,14 +131,14 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
         await transaction.CommitAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerHistorialAsync(
+    public async Task<IReadOnlyList<HistorialAbastecimientoResult>> ObtenerHistorialAsync(
         CancellationToken cancellationToken = default, DateTime? desde = null, DateTime? hasta = null, int? proveedorId = null)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
 
         var inicio = desde?.Date;
         var finExclusivo = hasta?.Date.AddDays(1);
-        return await context.Set<EntidadAbastecimiento>()
+        var compras = await context.Set<EntidadAbastecimiento>()
             .AsNoTracking()
             .Include(x => x.Proveedor)
             .Include(x => x.Detalles)
@@ -149,6 +150,33 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
             .ThenByDescending(x => x.Id)
             .Take(200)
             .ToListAsync(cancellationToken);
+        var ids = compras.Select(x => x.Id).ToList();
+        // Recuperar la autoría de la operación original, nunca del usuario que consulta.
+        var autoresCaja = context.Set<MovimientoCaja>().AsNoTracking()
+            .Where(x => x.AbastecimientoId.HasValue && ids.Contains(x.AbastecimientoId.Value) &&
+                x.Tipo == TipoMovimientoCaja.EgresoAbastecimiento)
+            .Select(x => new { CompraId = x.AbastecimientoId!.Value, x.UsuarioId });
+        var autoresInventario = context.Set<MovimientoInventario>().AsNoTracking()
+            .Where(x => x.AbastecimientoId.HasValue && ids.Contains(x.AbastecimientoId.Value) &&
+                x.Tipo == TipoMovimientoInventario.EntradaAbastecimiento)
+            .Select(x => new { CompraId = x.AbastecimientoId!.Value, x.UsuarioId });
+        var autores = await (from autor in autoresCaja.Union(autoresInventario)
+                             join usuario in context.Set<Usuario>() on autor.UsuarioId equals usuario.Id into usuarios
+                             from usuario in usuarios.DefaultIfEmpty()
+                             select new { autor.CompraId, autor.UsuarioId,
+                                 Nombre = usuario == null ? "Usuario no disponible" :
+                                     usuario.NombreCompleto.Trim() != "" ? usuario.NombreCompleto : usuario.NombreUsuario })
+            .ToListAsync(cancellationToken);
+        var nombres = autores.GroupBy(x => x.CompraId).ToDictionary(x => x.Key,
+            x => x.Select(a => a.UsuarioId).Distinct().Count() > 1
+                ? "Responsables distintos (revisar)"
+                : x.First().Nombre);
+        return compras.Select(x => new HistorialAbastecimientoResult
+        {
+            Id = x.Id, FechaHora = x.FechaHora, Proveedor = x.Proveedor,
+            MetodoPago = x.MetodoPago, Total = x.Total, Detalles = x.Detalles,
+            RegistradoPor = nombres.GetValueOrDefault(x.Id, "Sin registro de responsable")
+        }).ToList();
     }
     public async Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerAbastecimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
     {

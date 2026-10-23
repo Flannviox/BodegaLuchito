@@ -80,19 +80,19 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ConstruirMenu()
     {
         MenuItems.Clear();
+        if (!PuedeOperar()) return;
         AgregarDestino<DashboardViewModel>("Inicio", IrAInicioCommand, IconosNavegacion.Inicio);
-
-        if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
-        {
-            AgregarDestino<ProductosViewModel>("Productos", IrAProductosCommand, IconosNavegacion.Productos);
-            AgregarDestino<InventarioViewModel>("Inventario", IrAInventarioCommand, IconosNavegacion.Inventario);
+        AgregarDestino<ProductosViewModel>("Productos", IrAProductosCommand, IconosNavegacion.Productos);
+        AgregarDestino<InventarioViewModel>("Inventario", IrAInventarioCommand, IconosNavegacion.Inventario);
+        if (PuedeAdministrar())
             AgregarDestino<PrediccionDemandaViewModel>("Predicción de demanda", IrAPrediccionCommand, IconosNavegacion.Prediccion);
-            AgregarDestino<ProveedoresViewModel>("Proveedores", IrAProveedoresCommand, IconosNavegacion.Proveedores);
-            AgregarDestino<AbastecimientoViewModel>("Abastecimiento", IrAAbastecimientoCommand, IconosNavegacion.Abastecimiento);
+        AgregarDestino<ProveedoresViewModel>("Proveedores", IrAProveedoresCommand, IconosNavegacion.Proveedores);
+        AgregarDestino<AbastecimientoViewModel>("Abastecimiento", IrAAbastecimientoCommand, IconosNavegacion.Abastecimiento);
+        if (PuedeAdministrar())
+        {
             AgregarDestino<UsuariosViewModel>("Usuarios", IrAUsuariosCommand, IconosNavegacion.Usuarios);
             AgregarDestino<ReportesViewModel>("Reportes", IrAReportesCommand, IconosNavegacion.Reportes);
         }
-
         AgregarDestino<VentasViewModel>("Ventas", IrAVentasCommand, IconosNavegacion.Ventas);
         AgregarDestino<CajaViewModel>("Caja", IrACajaCommand, IconosNavegacion.Caja);
         ActualizarSeleccion();
@@ -124,84 +124,68 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ConstruirMenu();
 
+        foreach (var command in new IRelayCommand[] { IrAInicioCommand, IrAProductosCommand, IrAInventarioCommand, IrAPrediccionCommand, IrAProveedoresCommand, IrAAbastecimientoCommand, IrAUsuariosCommand, IrAVentasCommand, IrACajaCommand, IrAReportesCommand })
+            command.NotifyCanExecuteChanged();
         CerrarSesionCommand.NotifyCanExecuteChanged();
+        if (PuedeOperar() && CurrentViewModel is null) IrAInicio();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrAInicio()
     {
-        _navigationService.NavigateTo<DashboardViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<DashboardViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrAProductos()
     {
-        _navigationService.NavigateTo<ProductosViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<ProductosViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrAInventario()
     {
-        if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
-            _navigationService.NavigateTo<InventarioViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<InventarioViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeAdministrar))]
     private void IrAPrediccion()
     {
-        if (_sesionUsuario.UsuarioActual?.EsAdministradora == true)
-            _navigationService.NavigateTo<PrediccionDemandaViewModel>();
+        if (PuedeAdministrar()) _navigationService.NavigateTo<PrediccionDemandaViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrAProveedores()
     {
-        if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
-        {
-            return;
-        }
-
-        _navigationService.NavigateTo<ProveedoresViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<ProveedoresViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrAAbastecimiento()
     {
-        if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
-        {
-            return;
-        }
-
-        _navigationService.NavigateTo<AbastecimientoViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<AbastecimientoViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeAdministrar))]
     private void IrAUsuarios()
     {
-        if (_sesionUsuario.UsuarioActual?.EsAdministradora != true)
-        {
-            return;
-        }
-
-        _navigationService.NavigateTo<UsuariosViewModel>();
+        if (PuedeAdministrar()) _navigationService.NavigateTo<UsuariosViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrAVentas()
     {
-        _navigationService.NavigateTo<VentasViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<VentasViewModel>();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeOperar))]
     private void IrACaja()
     {
-        if (!_sesionUsuario.EstaAutenticado)
-        {
-            return;
-        }
-
-        _navigationService.NavigateTo<CajaViewModel>();
+        if (PuedeOperar()) _navigationService.NavigateTo<CajaViewModel>();
     }
+
+    private bool PuedeOperar() => _sesionUsuario.UsuarioActual?.PuedeOperar == true;
+    private bool PuedeAdministrar() => PuedeOperar() && _sesionUsuario.UsuarioActual!.EsAdministradora;
 
     private bool PuedeCerrarSesion()
     {
@@ -213,10 +197,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _sesionUsuario.CerrarSesion();
     }
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeAdministrar))]
     private void IrAReportes()
     {
-        _navigationService.NavigateTo<ReportesViewModel>();
+        if (PuedeAdministrar()) _navigationService.NavigateTo<ReportesViewModel>();
     }
     public void InicializarParaSesionActual()
     {

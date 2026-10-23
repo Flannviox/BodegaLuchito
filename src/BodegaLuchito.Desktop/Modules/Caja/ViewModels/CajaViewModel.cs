@@ -28,6 +28,7 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         public int Id { get; init; }
         public int UsuarioAperturaId { get; init; }
         public string UsuarioAperturaNombre { get; init; } = string.Empty;
+        public string UsuarioCierreNombre { get; init; } = string.Empty;
         public DateTime FechaApertura { get; init; }
         public DateTime? FechaCierre { get; init; }
         public decimal FondoInicial { get; init; }
@@ -422,23 +423,19 @@ namespace BodegaLuchito.Desktop.Modules.Caja.ViewModels
         private async Task CargarHistorialAsync()
         {
             var cierres = await _consultarHistorialCierresUseCase.EjecutarAsync();
-            var nombresUsuarios = UsuariosFiltro
-                .Where(x => x.Id.HasValue)
-                .ToDictionary(x => x.Id!.Value, x => x.Nombre);
 
             HistorialCierres.Clear();
 
-            foreach (var cierre in cierres)
+            foreach (var registro in cierres)
             {
-                var nombreUsuario = nombresUsuarios.TryGetValue(cierre.UsuarioAperturaId, out var nombre)
-                    ? nombre
-                    : $"Usuario #{cierre.UsuarioAperturaId}";
+                var cierre = registro.Sesion;
 
                 HistorialCierres.Add(new HistorialCierreItem
                 {
                     Id = cierre.Id,
                     UsuarioAperturaId = cierre.UsuarioAperturaId,
-                    UsuarioAperturaNombre = nombreUsuario,
+                    UsuarioAperturaNombre = registro.AbiertoPor,
+                    UsuarioCierreNombre = registro.CerradoPor,
                     FechaApertura = cierre.FechaApertura,
                     FechaCierre = cierre.FechaCierre,
                     FondoInicial = cierre.FondoInicial,

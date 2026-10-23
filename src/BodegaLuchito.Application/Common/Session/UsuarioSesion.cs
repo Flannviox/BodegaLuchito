@@ -14,6 +14,8 @@ public sealed class UsuarioSesion
 
     public string NombreRol => Rol.ToString();
 
+    public bool PuedeOperar => IdUsuario > 0 && Rol is RolUsuario.Administradora or RolUsuario.Vendedora;
+
     public bool EsAdministradora =>
         Rol == RolUsuario.Administradora;
 }

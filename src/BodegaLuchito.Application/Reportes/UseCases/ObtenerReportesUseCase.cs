@@ -1,3 +1,4 @@
+using BodegaLuchito.Application.Common.Session;
 using BodegaLuchito.Application.Autenticacion.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,21 +18,24 @@ public class ObtenerReportesUseCase
     private readonly IAbastecimientoRepository _abastecimientoRepository;
     private readonly ICajaRepository _cajaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly ISesionUsuario _sesionUsuario;
 
     public ObtenerReportesUseCase(
         IVentaRepository ventaRepository,
         IAbastecimientoRepository abastecimientoRepository,
         ICajaRepository cajaRepository,
-        IUsuarioRepository usuarioRepository)
+        IUsuarioRepository usuarioRepository, ISesionUsuario sesionUsuario)
     {
         _ventaRepository = ventaRepository;
         _abastecimientoRepository = abastecimientoRepository;
         _cajaRepository = cajaRepository;
         _usuarioRepository = usuarioRepository;
+        _sesionUsuario = sesionUsuario;
     }
 
     public async Task<ResultadoReporte> GenerarAsync(string tipo, DateTime inicio, DateTime fin)
     {
+        ValidarAcceso();
         ValidarPeriodo(inicio, fin);
         if (tipo is not ("Ventas" or "Abastecimientos" or "Movimientos de Caja"))
             throw new ArgumentException("Seleccione un tipo de reporte válido.");
@@ -47,9 +51,16 @@ public class ObtenerReportesUseCase
             _ => (await ObtenerReporteCajaAsync(inicio, fin)).Cast<object>().ToList()
         };
 
+        ValidarAcceso();
         return new ResultadoReporte(tipo, inicio.Date, fin.Date, filas,
             ventas.Sum(v => v.Total), abastecimientos.Sum(a => a.Total),
             cierres.Sum(c => c.DiferenciaEfectivo ?? 0m), cierres.Count);
+    }
+
+    private void ValidarAcceso()
+    {
+        if (_sesionUsuario.UsuarioActual?.PuedeOperar != true || !_sesionUsuario.UsuarioActual.EsAdministradora)
+            throw new UnauthorizedAccessException("Solo la administradora puede consultar reportes.");
     }
 
     private static void ValidarPeriodo(DateTime inicio, DateTime fin)
@@ -61,9 +72,11 @@ public class ObtenerReportesUseCase
     }
     public async Task<IReadOnlyList<ReporteVentaDto>> ObtenerReporteVentasAsync(DateTime inicio, DateTime fin)
     {
+        ValidarAcceso();
         ValidarPeriodo(inicio, fin);
         var ventas = await _ventaRepository.ObtenerVentasPorPeriodoAsync(inicio, fin);
 
+        ValidarAcceso();
         return ventas.Select(v => new ReporteVentaDto(
             v.FechaHora,
             $"Venta #{v.Id}",
@@ -80,9 +93,11 @@ public class ObtenerReportesUseCase
 
     public async Task<IReadOnlyList<ReporteAbastecimientoDto>> ObtenerReporteAbastecimientosAsync(DateTime inicio, DateTime fin)
     {
+        ValidarAcceso();
         ValidarPeriodo(inicio, fin);
         var abastecimientos = await _abastecimientoRepository.ObtenerAbastecimientosPorPeriodoAsync(inicio, fin);
 
+        ValidarAcceso();
         return abastecimientos.Select(a => {
             // Calculamos matemáticamente el IGV y Subtotal a partir del Total guardado
             decimal subtotalCalc = Math.Round(a.Total / 1.18m, 2);
@@ -103,11 +118,13 @@ public class ObtenerReportesUseCase
 
     public async Task<IReadOnlyList<ReporteMovimientoCajaDto>> ObtenerReporteCajaAsync(DateTime inicio, DateTime fin)
     {
+        ValidarAcceso();
         ValidarPeriodo(inicio, fin);
         var movimientos = await _cajaRepository.ObtenerMovimientosPorPeriodoAsync(inicio, fin);
 
         var usuarios = (await _usuarioRepository.ObtenerTodosAsync()).ToDictionary(u => u.Id, u => u.NombreCompleto);
 
+        ValidarAcceso();
         return movimientos.Select(m => new ReporteMovimientoCajaDto(
             m.FechaHora,
             m.Tipo.ToString(),

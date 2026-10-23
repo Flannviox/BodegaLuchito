@@ -1,3 +1,4 @@
+using BodegaLuchito.Application.Abastecimiento.DTOs;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ public sealed class ConsultarHistorialAbastecimientosUseCase
         _abastecimientoRepository = abastecimientoRepository;
     }
 
-    public Task<IReadOnlyList<EntidadAbastecimiento>> ExecuteAsync(
+    public Task<IReadOnlyList<HistorialAbastecimientoResult>> ExecuteAsync(
         CancellationToken cancellationToken = default, DateTime? desde = null, DateTime? hasta = null, int? proveedorId = null)
     {
         if (desde.HasValue && hasta.HasValue && desde.Value.Date > hasta.Value.Date)

@@ -125,11 +125,12 @@ public sealed class InventarioOperativoTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task VendedoraOSesionCerrada_NoPuedeRegistrar()
+    public async Task VendedoraPuedeOperar_PeroSesionCerradaNo()
     {
         _sesion.IniciarSesion(new UsuarioSesion { IdUsuario = 1, Rol = RolUsuario.Vendedora });
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
-            _gestion.RegistrarAsync(Solicitud(TipoMovimientoInventario.SaldoInicial, 1)));
+        await _gestion.RegistrarAsync(Solicitud(TipoMovimientoInventario.SaldoInicial, 1));
+        Assert.Single(await _gestion.ConsultarHistorialAsync());
+        Assert.NotEmpty(await _gestion.ConsultarExistenciasAsync());
         _sesion.CerrarSesion();
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _gestion.ConsultarExistenciasAsync());
     }

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:BodegaLuchito.Desktop.Modules.Caja.Views.Estados"
              mc:Ignorable="d"
              d:DesignWidth="1200"
-             d:DesignHeight="720">
+             d:DesignHeight="720" Language="es-PE">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -14,24 +14,78 @@
                 <ResourceDictionary Source="../../Resources/CajaStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+    <Style x:Key="FechaHistorial" TargetType="DatePicker">
+        <Setter Property="Height" Value="40"/><Setter Property="SelectedDateFormat" Value="Short"/><Setter Property="Foreground" Value="#173657"/>
+        <Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="#CBD5E1"/><Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="DatePicker">
+            <Border x:Name="DateBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="6" Background="{TemplateBinding Background}">
+            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="34"/></Grid.ColumnDefinitions>
+                <DatePickerTextBox x:Name="PART_TextBox" Background="Transparent" BorderThickness="0" Padding="10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="{TemplateBinding Foreground}" FontSize="{TemplateBinding FontSize}"/>
+                <Button x:Name="PART_Button" Grid.Column="1" Focusable="False" Background="Transparent" BorderThickness="0" ToolTip="Abrir calendario">
+                    <Button.Template><ControlTemplate TargetType="Button"><Border Background="Transparent" Padding="7">
+                        <Path Stroke="#1767D8" StrokeThickness="1.5" Stretch="Uniform" Data="M 3,5 L 21,5 L 21,22 L 3,22 Z M 3,10 L 21,10 M 7,2 L 7,8 M 17,2 L 17,8"/>
+                    </Border></ControlTemplate></Button.Template>
+                </Button>
+                <Popup x:Name="PART_Popup" Placement="Bottom" StaysOpen="False" AllowsTransparency="True"/>
+            </Grid></Border>
+            <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="DateBorder" Property="BorderBrush" Value="#1767D8"/></Trigger>
+            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger></ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+
+        <Style x:Key="FiltroSelect" TargetType="ComboBox">
+        <Setter Property="BorderBrush" Value="#CBD5E1"/>
+        <Setter Property="Height" Value="40"/><Setter Property="FontSize" Value="13"/><Setter Property="Foreground" Value="#173657"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBox">
+            <Grid>
+                <ToggleButton Focusable="False" IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                    <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="SelectBorder" Background="White" BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType=ComboBox}}" BorderThickness="1" CornerRadius="6">
+                        <Path Data="M 0,0 L 4,4 L 8,0" Stroke="#1767D8" StrokeThickness="1.5" Width="8" Height="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        </Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="SelectBorder" Property="BorderBrush" Value="#1767D8"/></Trigger>
+                        <Trigger Property="IsChecked" Value="True"><Setter TargetName="SelectBorder" Property="BorderBrush" Value="#1767D8"/></Trigger></ControlTemplate.Triggers>
+                    </ControlTemplate></ToggleButton.Template>
+                </ToggleButton>
+                <TextBlock x:Name="TextoSeleccionado" Text="{TemplateBinding Text}" Margin="12,0,32,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" IsHitTestVisible="False"/>
+                <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False">
+                    <Border Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Margin="0,4,0,0" Padding="4" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                        <ScrollViewer MaxHeight="220"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/></ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+            <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="BorderBrush" Value="#1767D8"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger></ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+        <Setter Property="ItemContainerStyle"><Setter.Value><Style TargetType="ComboBoxItem">
+            <Setter Property="Padding" Value="10,9"/><Setter Property="Foreground" Value="#173657"/>
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBoxItem"><Border x:Name="Item" Padding="{TemplateBinding Padding}" CornerRadius="4" Background="Transparent"><ContentPresenter/></Border>
+            <ControlTemplate.Triggers><Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Item" Property="Background" Value="#EAF2FF"/></Trigger></ControlTemplate.Triggers>
+            </ControlTemplate></Setter.Value></Setter>
+        </Style></Setter.Value></Setter>
+    </Style>
+
             <Style x:Key="HistorialHeaderStyle" TargetType="DataGridColumnHeader">
-                <Setter Property="Background" Value="#F3F6FA" />
+                <Setter Property="Background" Value="#EAF2FF" />
                 <Setter Property="Foreground" Value="{StaticResource ColorTextoPrincipal}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="FontSize" Value="12" />
-                <Setter Property="Padding" Value="10,8" />
+                <Setter Property="Padding" Value="12,10" />
                 <Setter Property="BorderBrush" Value="{StaticResource ColorBorde}" />
                 <Setter Property="BorderThickness" Value="0,0,0,1" />
             </Style>
 
             <Style x:Key="HistorialCellStyle" TargetType="DataGridCell">
-                <Setter Property="Padding" Value="10,8" />
+                <Setter Property="Padding" Value="12,10" />
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Foreground" Value="{StaticResource ColorTextoPrincipal}" />
+                <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="DataGridCell">
+                    <Border Padding="{TemplateBinding Padding}" Background="Transparent"><ContentPresenter VerticalAlignment="Center"/></Border>
+                </ControlTemplate></Setter.Value></Setter>
             </Style>
 
             <Style x:Key="HistorialRowStyle" TargetType="DataGridRow">
-                <Setter Property="MinHeight" Value="34" />
+                <Setter Property="MinHeight" Value="44" />
                 <Setter Property="Background" Value="White" />
                 <Setter Property="BorderBrush" Value="{StaticResource ColorBorde}" />
                 <Setter Property="BorderThickness" Value="0,0,0,1" />
@@ -124,16 +178,15 @@
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource ColorTextoPrincipal}" />
 
-                        <TextBlock Text="Consulta los cierres, identifica descuadres pendientes y registra su resolución."
+                        <TextBlock Text="Revisa el efectivo contado, las diferencias y quién abrió o cerró cada caja."
                                    FontSize="13"
                                    Foreground="{StaticResource ColorTextoSecundario}"
                                    Margin="0,6,0,0"
                                    TextWrapping="Wrap" />
 
-                        <TextBlock Text="Puede seleccionar un cierre con descuadre pendiente para marcarlo como resuelto."
-                                   FontSize="15"
-                                   FontStyle="Oblique"
-                                   Foreground="{StaticResource ColorError}"
+                        <TextBlock Text="Selecciona un cierre para consultar su detalle. La administradora puede resolver descuadres pendientes."
+                                   FontSize="12"
+                                   Foreground="{StaticResource ColorTextoSecundario}"
                                    Margin="0,6,0,0"
                                    TextWrapping="Wrap" />
                     </StackPanel>
@@ -156,80 +209,18 @@
                         BorderThickness="1"
                         CornerRadius="8"
                         Padding="14">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="155" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="155" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="180" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="145" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="10" />
-                            <ColumnDefinition Width="100" />
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Fecha desde" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
-                            <DatePicker SelectedDate="{Binding FechaDesdeFiltro}" />
+                    <WrapPanel Margin="0,0,-12,-12">
+                        <StackPanel Width="180" Margin="0,0,12,12"><TextBlock Text="Desde" FontSize="12" Foreground="#173657" Margin="0,0,0,7"/><DatePicker Style="{StaticResource FechaHistorial}" SelectedDate="{Binding FechaDesdeFiltro}"/></StackPanel>
+                        <StackPanel Width="180" Margin="0,0,12,12"><TextBlock Text="Hasta" FontSize="12" Foreground="#173657" Margin="0,0,0,7"/><DatePicker Style="{StaticResource FechaHistorial}" SelectedDate="{Binding FechaHastaFiltro}"/></StackPanel>
+                        <StackPanel Width="200" Margin="0,0,12,12"><TextBlock Text="Abierto por" FontSize="12" Foreground="#173657" Margin="0,0,0,7"/><ComboBox Style="{StaticResource FiltroSelect}" ItemsSource="{Binding UsuariosFiltro}" SelectedItem="{Binding UsuarioFiltroSeleccionado}" DisplayMemberPath="Nombre"/></StackPanel>
+                        <StackPanel Width="175" Margin="0,0,12,12"><TextBlock Text="Estado del descuadre" FontSize="12" Foreground="#173657" Margin="0,0,0,7"/><ComboBox Style="{StaticResource FiltroSelect}" ItemsSource="{Binding EstadosDescuadreFiltro}" SelectedItem="{Binding EstadoDescuadreFiltroSeleccionado}"/></StackPanel>
+                        <StackPanel Width="145" Margin="0,0,12,12"><TextBlock Text="Efectivo mín. (S/)" FontSize="12" Foreground="#173657" Margin="0,0,0,7"/><TextBox Style="{StaticResource CajaTextBox}" Height="40" VerticalContentAlignment="Center" Text="{Binding MontoMinimoFiltroInput, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                        <StackPanel Width="145" Margin="0,0,12,12"><TextBlock Text="Efectivo máx. (S/)" FontSize="12" Foreground="#173657" Margin="0,0,0,7"/><TextBox Style="{StaticResource CajaTextBox}" Height="40" VerticalContentAlignment="Center" Text="{Binding MontoMaximoFiltroInput, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,23,12,12" VerticalAlignment="Bottom">
+                            <Button Content="Filtrar" Command="{Binding AplicarFiltrosHistorialCommand}" Style="{StaticResource BotonPrimario}" Width="100" Height="40" Margin="0,0,10,0"/>
+                            <Button Content="Limpiar" Command="{Binding LimpiarFiltrosHistorialCommand}" Style="{StaticResource BotonSecundario}" Width="100" Height="40"/>
                         </StackPanel>
-
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Fecha hasta" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
-                            <DatePicker SelectedDate="{Binding FechaHastaFiltro}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="4">
-                            <TextBlock Text="Usuario" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
-                            <ComboBox ItemsSource="{Binding UsuariosFiltro}"
-                                      SelectedItem="{Binding UsuarioFiltroSeleccionado}"
-                                      DisplayMemberPath="Nombre"
-                                      Height="25" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="6">
-                            <TextBlock Text="Estado descuadre" FontSize="12" FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
-                            <ComboBox ItemsSource="{Binding EstadosDescuadreFiltro}"
-                                      SelectedItem="{Binding EstadoDescuadreFiltroSeleccionado}"
-                                      Height="25" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="8">
-                            <TextBlock Text="Efectivo mín." FontSize="12" FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
-                            <TextBox Height="25"
-                                     Text="{Binding MontoMinimoFiltroInput, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="10">
-                            <TextBlock Text="Efectivo máx." FontSize="12" FontWeight="SemiBold"
-                                       Foreground="{StaticResource ColorTextoPrincipal}" Margin="0,0,0,5" />
-                            <TextBox Height="25"
-                                     Text="{Binding MontoMaximoFiltroInput, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-
-                        <Button Grid.Column="12"
-                                Content="Filtrar"
-                                Command="{Binding AplicarFiltrosHistorialCommand}"
-                                Style="{StaticResource BotonPrimario}"
-                                VerticalAlignment="Bottom" />
-
-                        <Button Grid.Column="14"
-                                Content="Limpiar"
-                                Command="{Binding LimpiarFiltrosHistorialCommand}"
-                                Style="{StaticResource BotonSecundario}"
-                                VerticalAlignment="Bottom" />
-                    </Grid>
+                    </WrapPanel>
                 </Border>
 
                 <TextBlock Grid.Row="3"
@@ -259,7 +250,7 @@
                           RowBackground="White"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto"
-                          MaxHeight="430"
+                          MaxHeight="430" MinHeight="140"
                           SelectionMode="Single"
                           SelectionUnit="FullRow">
 
@@ -269,10 +260,12 @@
                                             SortMemberPath="Id"
                                             Width="65" />
 
-                        <DataGridTextColumn Header="Usuario"
+                        <DataGridTextColumn Header="Abierto por"
                                             Binding="{Binding UsuarioAperturaNombre}"
                                             SortMemberPath="UsuarioAperturaNombre"
                                             Width="150" />
+
+                        <DataGridTextColumn Header="Cerrado por" Binding="{Binding UsuarioCierreNombre}" Width="150"/>
 
                         <DataGridTextColumn Header="Apertura"
                                             Binding="{Binding FechaApertura, StringFormat={}{0:dd/MM/yyyy HH:mm}}"

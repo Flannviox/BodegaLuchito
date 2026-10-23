@@ -1,3 +1,4 @@
+using BodegaLuchito.Application.Abastecimiento.DTOs;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ public interface IAbastecimientoRepository
         int usuarioId,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerHistorialAsync(
+    Task<IReadOnlyList<HistorialAbastecimientoResult>> ObtenerHistorialAsync(
         CancellationToken cancellationToken = default, DateTime? desde = null, DateTime? hasta = null, int? proveedorId = null);
 
     Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerAbastecimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default);

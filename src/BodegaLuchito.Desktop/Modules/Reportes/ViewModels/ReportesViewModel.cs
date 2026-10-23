@@ -1,3 +1,4 @@
+using BodegaLuchito.Application.Common.Session;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.ObjectModel;
@@ -15,6 +16,8 @@ public partial class ReportesViewModel : ViewModelBase
 {
     private readonly ObtenerReportesUseCase _obtenerReportesUseCase;
     private readonly ExportacionExcelService _excelService;
+    private readonly ISesionUsuario _sesionUsuario;
+    private bool PuedeAcceder => _sesionUsuario.UsuarioActual?.PuedeOperar == true && _sesionUsuario.UsuarioActual.EsAdministradora;
     private ResultadoReporte? _reporteGenerado;
     private int _versionFiltros;
     [ObservableProperty]
@@ -63,10 +66,11 @@ public partial class ReportesViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(GenerarReporteCommand))]
     private bool _estaGenerando;
 
-    public ReportesViewModel(ObtenerReportesUseCase obtenerReportesUseCase, ExportacionExcelService excelService)
+    public ReportesViewModel(ObtenerReportesUseCase obtenerReportesUseCase, ExportacionExcelService excelService, ISesionUsuario sesionUsuario)
     {
         _obtenerReportesUseCase = obtenerReportesUseCase;
         _excelService = excelService;
+        _sesionUsuario = sesionUsuario;
     }
 
     partial void OnFechaInicioChanged(DateTime value) => InvalidarReporte();
@@ -82,13 +86,13 @@ public partial class ReportesViewModel : ViewModelBase
         MensajeEstado = "Filtros actualizados. Genere el reporte para consultar y exportar.";
     }
 
-    private bool PuedeGenerar() => !EstaGenerando;
-    private bool PuedeExportar() => !EstaGenerando && _reporteGenerado is not null && Resultados.Count > 0;
+    private bool PuedeGenerar() => PuedeAcceder && !EstaGenerando;
+    private bool PuedeExportar() => PuedeAcceder && !EstaGenerando && _reporteGenerado is not null && Resultados.Count > 0;
 
     [RelayCommand(CanExecute = nameof(PuedeGenerar))]
     private async Task GenerarReporteAsync()
     {
-        if (EstaGenerando) return;
+        if (!PuedeGenerar()) return;
         InvalidarReporte();
         var version = _versionFiltros;
         var tipo = TipoReporteSeleccionado;

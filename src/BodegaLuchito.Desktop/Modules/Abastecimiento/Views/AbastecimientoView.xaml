@@ -452,7 +452,8 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="N.°" Binding="{Binding Id, StringFormat=# {0}}" Width="80"/>
                                 <DataGridTextColumn Header="Fecha" Binding="{Binding FechaHora, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="160"/>
-                                <DataGridTextColumn Header="Proveedor" Binding="{Binding Proveedor}" Width="*"/>
+                                <DataGridTextColumn Header="Proveedor" Binding="{Binding Proveedor}" Width="*" MinWidth="160"/>
+                                <DataGridTextColumn Header="Registrado por" Binding="{Binding RegistradoPor}" Width="190"/>
                                 <DataGridTextColumn Header="Medio de pago" Binding="{Binding MetodoPago}" Width="150"/>
                                 <DataGridTextColumn Header="Total pagado" Binding="{Binding Total, StringFormat=S/ {0:N2}}" Width="140"/>
                             </DataGrid.Columns>

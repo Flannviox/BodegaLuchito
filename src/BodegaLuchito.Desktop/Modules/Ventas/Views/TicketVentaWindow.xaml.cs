@@ -17,9 +17,16 @@ public partial class TicketVentaWindow : Window
         decimal subtotal,
         decimal igv,
         decimal total,
-        IEnumerable<DetalleCarritoVenta> productos)
+        IEnumerable<DetalleCarritoVenta> productos,
+        decimal? montoRecibido = null)
     {
         InitializeComponent();
+        if (metodoPago == MetodoPago.Efectivo && montoRecibido.HasValue)
+        {
+            PagoEfectivo.Visibility = Visibility.Visible;
+            TxtRecibido.Text = $"Recibido: S/ {montoRecibido.Value:N2}";
+            TxtVuelto.Text = $"Vuelto: S/ {montoRecibido.Value - total:N2}";
+        }
         CargarDatosReales(ventaId, nombreCajero, metodoPago, subtotal, igv, total, productos);
     }
 

@@ -1,6 +1,7 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Ventas.Views.VentasView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pago="clr-namespace:BodegaLuchito.Domain.Shared.Enums;assembly=BodegaLuchito.Domain"
     xmlns:conv="clr-namespace:BodegaLuchito.Desktop.Modules.Ventas.Converters"
     Background="#F4F7FB" Foreground="#17365D" FontSize="13" Language="es-PE" IsEnabled="{Binding PuedeInteractuar}">
     <UserControl.Resources>
@@ -31,7 +32,7 @@
               Tag="{Binding ActualWidth, RelativeSource={RelativeSource Self}, Converter={StaticResource Compacta}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition><ColumnDefinition.Style><Style TargetType="ColumnDefinition"><Setter Property="Width" Value="300"/>
+                <ColumnDefinition><ColumnDefinition.Style><Style TargetType="ColumnDefinition"><Setter Property="Width" Value="340"/>
                     <Style.Triggers><DataTrigger Binding="{Binding Tag, ElementName=DisposicionVenta}" Value="True"><Setter Property="Width" Value="0"/></DataTrigger></Style.Triggers>
                 </Style></ColumnDefinition.Style></ColumnDefinition>
             </Grid.ColumnDefinitions>
@@ -117,29 +118,68 @@
                 </Grid>
             </Border>
 
-            <Border Grid.Column="1" Grid.RowSpan="2" Margin="14,0,0,0" VerticalAlignment="Top">
-                <Border.Style><Style TargetType="Border" BasedOn="{StaticResource VentaTarjeta}"><Style.Triggers><DataTrigger Binding="{Binding Tag, ElementName=DisposicionVenta}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Border.Style>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer.Style><Style TargetType="ScrollViewer">
+                    <Setter Property="Grid.Column" Value="1"/><Setter Property="Grid.Row" Value="0"/><Setter Property="Grid.RowSpan" Value="2"/>
+                    <Setter Property="Margin" Value="14,0,0,0"/>
+                    <Style.Triggers><DataTrigger Binding="{Binding Tag, ElementName=DisposicionVenta}" Value="True">
+                        <Setter Property="Grid.Column" Value="0"/><Setter Property="Grid.Row" Value="2"/><Setter Property="Grid.RowSpan" Value="1"/><Setter Property="Grid.ColumnSpan" Value="2"/>
+                        <Setter Property="Margin" Value="0,12,0,0"/><Setter Property="MaxHeight" Value="270"/>
+                    </DataTrigger></Style.Triggers>
+                </Style></ScrollViewer.Style>
                 <StackPanel>
-                    <TextBlock Text="Resumen de la venta" FontSize="17" FontWeight="SemiBold"/>
-                    <TextBlock Text="Revisa las cantidades antes de continuar." Foreground="#617791" TextWrapping="Wrap" Margin="0,8,0,20"/>
-                    <DockPanel><TextBlock Text="Productos diferentes" Foreground="#617791"/><TextBlock Text="{Binding Carrito.Count}" TextAlignment="Right" FontWeight="SemiBold"/></DockPanel>
-                    <Border BorderBrush="#E3EBF5" BorderThickness="0,1,0,0" Margin="0,18,0,0" Padding="0,18,0,0"><StackPanel>
-                        <TextBlock Text="TOTAL A COBRAR" FontSize="11" Foreground="#617791" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding TotalVenta, Mode=OneWay, StringFormat=S/ {0:N2}}" FontSize="34" FontWeight="Bold" Foreground="#1767D8" TextWrapping="Wrap" Margin="0,4,0,18"/>
-                        <Button Content="Continuar al cobro" Style="{StaticResource VentaBoton}" Command="{Binding IrACobrarCommand}" MinHeight="46"/>
+                    <Border Style="{StaticResource VentaTarjeta}" Margin="0,0,0,12"><StackPanel>
+                        <TextBlock Text="Resumen de la venta" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                        <DockPanel Margin="0,0,0,8"><TextBlock Text="Productos diferentes" Foreground="#617791"/><TextBlock Text="{Binding Carrito.Count}" TextAlignment="Right"/></DockPanel>
+                        <DockPanel Margin="0,0,0,8"><TextBlock Text="Subtotal" Foreground="#617791"/><TextBlock Text="{Binding SubtotalVenta, StringFormat=S/ {0:N2}}" TextAlignment="Right"/></DockPanel>
+                        <DockPanel><TextBlock Text="IGV (18%)" Foreground="#617791"/><TextBlock Text="{Binding IgvVenta, StringFormat=S/ {0:N2}}" TextAlignment="Right"/></DockPanel>
+                        <Border BorderBrush="#E3EBF5" BorderThickness="0,1,0,0" Margin="0,14,0,0" Padding="0,14,0,0"><StackPanel>
+                            <TextBlock Text="TOTAL A COBRAR" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalVenta, StringFormat=S/ {0:N2}}" FontSize="32" FontWeight="Bold" Foreground="#1767D8" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel></Border>
                     </StackPanel></Border>
-                    <Border Background="#F1F6FD" CornerRadius="6" Padding="12" Margin="0,18,0,0"><StackPanel>
-                        <TextBlock Text="Medios de pago" FontWeight="SemiBold"/><TextBlock Text="Efectivo · Yape · Plin" Foreground="#617791" Margin="0,5,0,0"/>
-                        <TextBlock Text="Elegirás cómo paga el cliente al confirmar la venta." TextWrapping="Wrap" Foreground="#617791" FontSize="12" Margin="0,8,0,0"/>
+                    <Border Style="{StaticResource VentaTarjeta}"><StackPanel>
+                        <TextBlock Text="Método de pago" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,14"/>
+                        <UniformGrid Columns="3">
+                            <Button Command="{Binding SeleccionarMedioCobroCommand}" CommandParameter="{x:Static pago:MetodoPago.Efectivo}" Margin="3,0" Padding="5,10" AutomationProperties.Name="Pagar con Efectivo">
+                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource VentaSecundario}"><Style.Triggers>
+                                    <DataTrigger Binding="{Binding MedioCobro}" Value="Efectivo"><Setter Property="Background" Value="#EAF3FF"/><Setter Property="BorderBrush" Value="#1767D8"/><Setter Property="Foreground" Value="#174475"/></DataTrigger>
+                                </Style.Triggers></Style></Button.Style>
+                                <StackPanel><Path Data="M 2,5 L 22,5 L 22,19 L 2,19 Z M 9,12 A 3,3 0 1 0 15,12 A 3,3 0 1 0 9,12 M 5,9 L 5,15 M 19,9 L 19,15" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.6" Width="25" Height="25" Stretch="Uniform" HorizontalAlignment="Center"/><TextBlock Text="Efectivo" HorizontalAlignment="Center" Margin="0,7,0,0"/></StackPanel>
+                            </Button>
+                            <Button Command="{Binding SeleccionarMedioCobroCommand}" CommandParameter="{x:Static pago:MetodoPago.Yape}" Margin="3,0" Padding="5,10" AutomationProperties.Name="Pagar con Yape">
+                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource VentaSecundario}"><Style.Triggers>
+                                    <DataTrigger Binding="{Binding MedioCobro}" Value="Yape"><Setter Property="Background" Value="#EAF3FF"/><Setter Property="BorderBrush" Value="#1767D8"/><Setter Property="Foreground" Value="#174475"/></DataTrigger>
+                                </Style.Triggers></Style></Button.Style>
+                                <StackPanel><Path Data="M 7,2 L 17,2 L 17,22 L 7,22 Z M 10,5 L 14,5 M 11,19 L 13,19" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.6" Width="25" Height="25" Stretch="Uniform" HorizontalAlignment="Center"/><TextBlock Text="Yape" HorizontalAlignment="Center" Margin="0,7,0,0"/></StackPanel>
+                            </Button>
+                            <Button Command="{Binding SeleccionarMedioCobroCommand}" CommandParameter="{x:Static pago:MetodoPago.Plin}" Margin="3,0" Padding="5,10" AutomationProperties.Name="Pagar con Plin">
+                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource VentaSecundario}"><Style.Triggers>
+                                    <DataTrigger Binding="{Binding MedioCobro}" Value="Plin"><Setter Property="Background" Value="#EAF3FF"/><Setter Property="BorderBrush" Value="#1767D8"/><Setter Property="Foreground" Value="#174475"/></DataTrigger>
+                                </Style.Triggers></Style></Button.Style>
+                                <StackPanel><Path Data="M 7,2 L 17,2 L 17,22 L 7,22 Z M 10,5 L 14,5 M 11,19 L 13,19" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.6" Width="25" Height="25" Stretch="Uniform" HorizontalAlignment="Center"/><TextBlock Text="Plin" HorizontalAlignment="Center" Margin="0,7,0,0"/></StackPanel>
+                            </Button>
+                        </UniformGrid>
+                        <StackPanel Visibility="{Binding EsEfectivo, Converter={StaticResource Visible}}" Margin="0,18,0,0">
+                            <TextBlock Text="Monto recibido (S/)" FontWeight="SemiBold" Margin="0,0,0,7"/>
+                            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding MontoRecibidoTexto, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource VentaEntrada}" FontSize="21" Height="44" MaxLength="16" AutomationProperties.Name="Monto recibido en efectivo"/>
+                                <Button Grid.Column="1" Content="Exacto" Command="{Binding ImporteExactoCommand}" Style="{StaticResource VentaSecundario}" Margin="8,0,0,0" Padding="10,6"/>
+                            </Grid>
+                            <Border Background="#E6F7F1" CornerRadius="7" Padding="12" Margin="0,12,0,0"><StackPanel>
+                                <TextBlock Text="Vuelto a entregar" Foreground="#076B54"/>
+                                <TextBlock Text="{Binding Vuelto, StringFormat=S/ {0:N2}}" Foreground="#076B54" FontSize="26" FontWeight="Bold"/>
+                            </StackPanel></Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding MensajeCobro}" TextWrapping="Wrap" Foreground="#617791" Margin="0,12,0,14"/>
+                        <Button Content="Confirmar venta" Command="{Binding ConfirmarCobroCommand}" MinHeight="48">
+                            <Button.Style><Style TargetType="Button" BasedOn="{StaticResource VentaBoton}"><Setter Property="Background" Value="#078268"/><Setter Property="BorderBrush" Value="#078268"/>
+                                <Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="#E8EDF4"/><Setter Property="BorderBrush" Value="#D8E2EE"/></Trigger></Style.Triggers>
+                            </Style></Button.Style>
+                        </Button>
                     </StackPanel></Border>
                 </StackPanel>
-            </Border>
-            <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource VentaTarjeta}" Margin="0,12,0,0" Visibility="{Binding Tag, ElementName=DisposicionVenta, Converter={StaticResource Visible}}">
-                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                    <StackPanel><TextBlock Text="Total a cobrar" Foreground="#617791"/><TextBlock Text="{Binding TotalVenta, Mode=OneWay, StringFormat=S/ {0:N2}}" FontSize="26" FontWeight="Bold" Foreground="#1767D8"/></StackPanel>
-                    <Button Grid.Column="1" Content="Continuar al cobro" Style="{StaticResource VentaBoton}" Command="{Binding IrACobrarCommand}" VerticalAlignment="Center" Margin="12,0,0,0"/>
-                </Grid>
-            </Border>
+            </ScrollViewer>
         </Grid>
 
         <Border Grid.Row="1" Style="{StaticResource VentaTarjeta}" Padding="0" Visibility="{Binding IsHistorialVisible, Converter={StaticResource Visible}}">
@@ -224,20 +264,6 @@
             </Grid>
         </Border>
 
-        <Border Grid.RowSpan="2" Background="#800B2443" Visibility="{Binding ModalCobroVisible}" Panel.ZIndex="10">
-            <Border Style="{StaticResource VentaTarjeta}" Width="410" Padding="24" Margin="16" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <ScrollViewer MaxHeight="410" VerticalScrollBarVisibility="Auto"><StackPanel>
-                    <TextBlock Text="Confirmar el cobro" FontSize="22" FontWeight="SemiBold"/>
-                    <TextBlock Text="Total de la venta" Foreground="#617791" Margin="0,12,0,0"/>
-                    <TextBlock Text="{Binding TotalVenta, Mode=OneWay, StringFormat=S/ {0:N2}}" FontSize="34" FontWeight="Bold" Foreground="#1767D8" Margin="0,2,0,16"/>
-                    <TextBlock Text="Elige cómo pagó el cliente. Al pulsar una opción, se registrará la venta." TextWrapping="Wrap" Margin="0,0,0,12"/>
-                    <Button Content="Cobrar en efectivo" Style="{StaticResource VentaBoton}" Command="{Binding CobrarEfectivoCommand}" MinHeight="44" Margin="0,0,0,8"/>
-                    <Button Content="Cobrar con Yape" Style="{StaticResource VentaSecundario}" Command="{Binding CobrarYapeCommand}" MinHeight="44" Margin="0,0,0,8"/>
-                    <Button Content="Cobrar con Plin" Style="{StaticResource VentaSecundario}" Command="{Binding CobrarPlinCommand}" MinHeight="44" Margin="0,0,0,16"/>
-                    <Button Content="Volver a la venta" Style="{StaticResource VentaSecundario}" Command="{Binding CancelarCobroCommand}"/>
-                </StackPanel></ScrollViewer>
-            </Border>
-        </Border>
         <Border Grid.RowSpan="2" Panel.ZIndex="20" Background="#EAF3FF" BorderBrush="#B6D4FA" BorderThickness="1" CornerRadius="8" Padding="14"
                 VerticalAlignment="Bottom" HorizontalAlignment="Center" MaxWidth="450" Margin="16" IsHitTestVisible="False" Visibility="{Binding IsSnackbarActive, Converter={StaticResource Visible}}">
             <TextBlock Text="{Binding MensajeSnackbar}" TextWrapping="Wrap" Foreground="#174475"/>

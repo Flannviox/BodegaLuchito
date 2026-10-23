@@ -137,6 +137,10 @@
 
                         <Rectangle Height="1" Fill="Black" StrokeDashArray="2 2" Margin="0,3"/>
 
+                        <StackPanel x:Name="PagoEfectivo" Visibility="Collapsed" Margin="0,4">
+                            <TextBlock x:Name="TxtRecibido"/>
+                            <TextBlock x:Name="TxtVuelto" FontWeight="Bold"/>
+                        </StackPanel>
                         <!-- PIE DEL TICKET -->
                         <TextBlock Text="¡Gracias por su preferencia!" HorizontalAlignment="Center" Margin="0,5,0,2" FontWeight="Bold"/>
                         <TextBlock Text="Vuelva pronto" HorizontalAlignment="Center" Margin="0,0,0,5"/>

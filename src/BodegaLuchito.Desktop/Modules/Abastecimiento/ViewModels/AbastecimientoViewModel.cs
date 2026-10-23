@@ -15,6 +15,7 @@ using BodegaLuchito.Domain.Proveedores.Entities;
 using BodegaLuchito.Domain.Shared.Enums;
 using BodegaLuchito.Desktop.Common.ViewModels;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using BodegaLuchito.Application.Productos.DTOs;
 using BodegaLuchito.Desktop.Modules.Productos.ViewModels;
 
@@ -94,6 +95,23 @@ public sealed class HistorialAbastecimientoItem
 
 public partial class AbastecimientoViewModel : ViewModelBase
 {
+    [ObservableProperty] private DateTime? _historialDesde;
+    [ObservableProperty] private DateTime? _historialHasta;
+    [ObservableProperty] private int _historialProveedorId;
+    [ObservableProperty] private bool _cargandoHistorial;
+    [ObservableProperty] private string _resumenHistorial = "Consulta tus abastecimientos por proveedor y fechas.";
+    public ObservableCollection<Proveedor> ProveedoresHistorial { get; } = new();
+
+    [RelayCommand]
+    private Task FiltrarHistorialAsync() => CargarHistorialAbastecimientosAsync();
+    [RelayCommand]
+    private async Task LimpiarFiltrosHistorialAsync()
+    {
+        if (CargandoHistorial) return;
+        HistorialDesde = null; HistorialHasta = null; HistorialProveedorId = 0;
+        await CargarHistorialAbastecimientosAsync();
+    }
+
     private const string CostoPorUnidad = "Costo por unidad";
     private const string CostoTotalLote = "Costo total del lote";
 
@@ -272,14 +290,23 @@ public partial class AbastecimientoViewModel : ViewModelBase
 
     private async Task CargarDatosInicialesAsync()
     {
-        await CargarCatalogosAsync();
-        await CargarMovimientosAsync();
-        await CargarHistorialAbastecimientosAsync();
+        try
+        {
+            await CargarCatalogosAsync();
+            await CargarMovimientosAsync();
+            await CargarHistorialAbastecimientosAsync();
+        }
+        catch (Exception ex) { MostrarMensaje($"No se pudieron cargar los datos: {ex.Message}"); }
     }
 
     private async Task CargarCatalogosAsync()
     {
         var proveedores = await _proveedorRepository.ObtenerTodosAsync();
+        var proveedorAnterior = HistorialProveedorId;
+        ProveedoresHistorial.Clear();
+        ProveedoresHistorial.Add(new Proveedor { Id = 0, Nombre = "Todos los proveedores" });
+        foreach (var proveedor in proveedores.OrderBy(x => x.Nombre)) ProveedoresHistorial.Add(proveedor);
+        HistorialProveedorId = proveedorAnterior;
         _todosLosProveedores = proveedores.Where(x => x.Activo).ToList();
         FiltrarProveedores();
 
@@ -315,7 +342,12 @@ public partial class AbastecimientoViewModel : ViewModelBase
 
     private async Task CargarHistorialAbastecimientosAsync()
     {
-        var abastecimientos = await _consultarHistorialUseCase.ExecuteAsync();
+        if (CargandoHistorial) return;
+        CargandoHistorial = true;
+        try
+        {
+        var abastecimientos = await _consultarHistorialUseCase.ExecuteAsync(desde: HistorialDesde,
+            hasta: HistorialHasta, proveedorId: HistorialProveedorId == 0 ? null : HistorialProveedorId);
         HistorialAbastecimientos.Clear();
         AbastecimientoHistorialSeleccionado = null;
 
@@ -337,6 +369,18 @@ public partial class AbastecimientoViewModel : ViewModelBase
                 }).ToList()
             });
         }
+            ResumenHistorial = HistorialAbastecimientos.Count == 0
+            ? "No hay abastecimientos para los filtros elegidos."
+            : $"{HistorialAbastecimientos.Count} abastecimientos · Total mostrado: S/ {HistorialAbastecimientos.Sum(x => x.Total):N2}" +
+              (HistorialAbastecimientos.Count == 200 ? " · Se muestran los 200 más recientes; acota las fechas para ver otros." : "");
+        }
+        catch (Exception ex)
+        {
+            HistorialAbastecimientos.Clear();
+            AbastecimientoHistorialSeleccionado = null;
+            ResumenHistorial = ex.Message;
+        }
+        finally { CargandoHistorial = false; }
     }
 
     private void CargarDetallesHistorial()

@@ -14,7 +14,7 @@ public interface IAbastecimientoRepository
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerHistorialAsync(
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default, DateTime? desde = null, DateTime? hasta = null, int? proveedorId = null);
 
     Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerAbastecimientosPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default);
 }

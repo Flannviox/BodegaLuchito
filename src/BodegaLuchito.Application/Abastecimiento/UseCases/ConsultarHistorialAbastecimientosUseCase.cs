@@ -17,8 +17,13 @@ public sealed class ConsultarHistorialAbastecimientosUseCase
     }
 
     public Task<IReadOnlyList<EntidadAbastecimiento>> ExecuteAsync(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, DateTime? desde = null, DateTime? hasta = null, int? proveedorId = null)
     {
-        return _abastecimientoRepository.ObtenerHistorialAsync(cancellationToken);
+        if (desde.HasValue && hasta.HasValue && desde.Value.Date > hasta.Value.Date)
+            throw new ArgumentException("La fecha Desde no puede ser posterior a Hasta.");
+        if (hasta?.Date == DateTime.MaxValue.Date)
+            throw new ArgumentException("Selecciona una fecha final anterior al 31/12/9999.");
+        if (proveedorId <= 0) throw new ArgumentException("Selecciona un proveedor válido.");
+        return _abastecimientoRepository.ObtenerHistorialAsync(cancellationToken, desde, hasta, proveedorId);
     }
 }

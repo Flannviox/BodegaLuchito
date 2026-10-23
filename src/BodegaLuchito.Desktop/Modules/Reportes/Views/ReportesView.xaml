@@ -1,225 +1,97 @@
 <UserControl x:Class="BodegaLuchito.Desktop.Modules.Reportes.Views.ReportesView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" 
-             Background="#F4F7FB"
-             d:DesignHeight="750" d:DesignWidth="1100">
-
-    <Grid Margin="25">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- ENCABEZADO DE LA VISTA -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="Reportes Comerciales" FontSize="26" FontWeight="Bold" Foreground="#153657"/>
-            <TextBlock Text="Consulta, filtra y exporta la información operativa de la bodega." FontSize="14" Foreground="#6E839C" Margin="0,5,0,0"/>
-        </StackPanel>
-
-        <!-- SECCIÓN SUPERIOR: FILTROS Y TARJETAS -->
-        <Grid Grid.Row="1" Margin="0,0,0,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="30"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- PANEL DE FILTROS -->
-            <Border Grid.Column="0" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
-                <Border.Effect>
-                    <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
-                </Border.Effect>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Text="Configurar Reporte" FontSize="16" FontWeight="SemiBold" Foreground="#153657" Margin="0,0,0,15"/>
-
-                    <StackPanel Grid.Row="1" Margin="0,0,0,15">
-                        <TextBlock Text="Rango de fechas:" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C" Margin="0,0,0,5"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <DatePicker Grid.Column="0" SelectedDate="{Binding FechaInicio}" Height="38" FontSize="14" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
-                            <TextBlock Grid.Column="1" Text="-" VerticalAlignment="Center" Margin="10,0" Foreground="#6E839C" FontWeight="Bold"/>
-                            <DatePicker Grid.Column="2" SelectedDate="{Binding FechaFin}" Height="38" FontSize="14" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
-                        </Grid>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                        <TextBlock Text="Tipo de información:" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C" Margin="0,0,0,5"/>
-                        <ComboBox ItemsSource="{Binding TiposReporte}" SelectedItem="{Binding TipoReporteSeleccionado}" Height="38" FontSize="14" Padding="10,0" BorderBrush="#CBD5E1" Background="#F8FAFC"/>
-                    </StackPanel>
-
-                    <!-- BOTONES DE ACCIÓN (Generar y Limpiar) -->
-                    <Grid Grid.Row="3" VerticalAlignment="Bottom">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Column="0" Command="{Binding LimpiarFiltrosCommand}" Content="Restablecer" Height="40" Background="Transparent" Foreground="#6E839C" BorderBrush="#CBD5E1" BorderThickness="1" Cursor="Hand" FontWeight="SemiBold">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="6"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-
-                        <Button Grid.Column="2" Command="{Binding GenerarReporteCommand}" Content="Generar (F2)" Height="40" Background="#1767D8" Foreground="White" BorderThickness="0" Cursor="Hand" FontWeight="Bold">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="6"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Border>
-
-            <!-- TARJETAS DE RESUMEN -->
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="15"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="15"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Ingresos -->
-                <Border Grid.Column="0" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
-                    </Border.Effect>
-                    <StackPanel VerticalAlignment="Center">
-                        <Border Width="40" Height="40" Background="#E0F2FE" CornerRadius="8" HorizontalAlignment="Left" Margin="0,0,0,15">
-                            <TextBlock Text="💰" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <TextBlock Text="Ingresos del Periodo" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C"/>
-                        <TextBlock Text="{Binding TotalVentas, StringFormat=S/ {0:N2}}" FontSize="28" FontWeight="Bold" Foreground="#0EA5E9" Margin="0,5,0,0"/>
-                        <TextBlock Text="Total por ventas" FontSize="11" Foreground="#94A3B8" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- Egresos -->
-                <Border Grid.Column="2" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
-                    </Border.Effect>
-                    <StackPanel VerticalAlignment="Center">
-                        <Border Width="40" Height="40" Background="#FEE2E2" CornerRadius="8" HorizontalAlignment="Left" Margin="0,0,0,15">
-                            <TextBlock Text="📉" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <TextBlock Text="Egresos del Periodo" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C"/>
-                        <TextBlock Text="{Binding TotalEgresos, StringFormat=S/ {0:N2}}" FontSize="28" FontWeight="Bold" Foreground="#EF4444" Margin="0,5,0,0"/>
-                        <TextBlock Text="Pagos a proveedores" FontSize="11" Foreground="#94A3B8" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- Diferencia -->
-                <Border Grid.Column="4" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
-                    </Border.Effect>
-                    <StackPanel VerticalAlignment="Center">
-                        <Border Width="40" Height="40" Background="#ECFDF5" CornerRadius="8" HorizontalAlignment="Left" Margin="0,0,0,15">
-                            <TextBlock Text="⚖️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <TextBlock Text="Diferencia Neta" FontSize="13" FontWeight="SemiBold" Foreground="#6E839C"/>
-                        <TextBlock Text="{Binding DiferenciaCaja, StringFormat=S/ {0:N2}}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,5,0,0"/>
-                        <TextBlock Text="Ingresos menos egresos" FontSize="11" Foreground="#94A3B8" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Grid>
-
-        <!-- SECCIÓN INFERIOR: RESULTADOS Y EXPORTACIÓN -->
-        <Border Grid.Row="2" Background="White" CornerRadius="10" BorderBrush="#E1E8F1" BorderThickness="1" Padding="20">
-            <Border.Effect>
-                <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
-            </Border.Effect>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0" Margin="0,0,0,15">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="Detalle de Resultados" FontSize="16" FontWeight="SemiBold" Foreground="#153657"/>
-                        <TextBlock Text="Vista previa de los datos obtenidos en la base de datos." FontSize="13" Foreground="#6E839C"/>
-                    </StackPanel>
-
-                    <Button Grid.Column="1" Command="{Binding ExportarExcelCommand}" Height="40" Padding="20,0" Background="#10B981" Foreground="White" BorderThickness="0" Cursor="Hand" FontWeight="Bold">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="6"/>
-                            </Style>
-                        </Button.Resources>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📄" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Exportar a Excel (F4)" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Grid>
-
-                <Border Grid.Row="1" CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1" ClipToBounds="True">
-                    <DataGrid ItemsSource="{Binding Resultados}" AutoGenerateColumns="True" IsReadOnly="True" 
-                              CanUserAddRows="False" HeadersVisibility="Column" Background="White" BorderThickness="0"
-                              RowHeight="45" AlternatingRowBackground="#F8FAFC" HorizontalGridLinesBrush="#F1F5F9" VerticalGridLinesBrush="Transparent">
-                        <DataGrid.ColumnHeaderStyle>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="#F1F5F9"/>
-                                <Setter Property="Foreground" Value="#475569"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                                <Setter Property="Padding" Value="15,12"/>
-                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
-                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                            </Style>
-                        </DataGrid.ColumnHeaderStyle>
-                        <DataGrid.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Padding" Value="15,0"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="DataGridCell">
-                                            <Border Padding="{TemplateBinding Padding}" Background="Transparent">
-                                                <ContentPresenter VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Background" Value="#E0F2FE"/>
-                                        <Setter Property="Foreground" Value="#0F172A"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.CellStyle>
-                    </DataGrid>
-                </Border>
-            </Grid>
-        </Border>
-    </Grid>
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Background="#F4F7FB" Language="es-PE" FontFamily="Segoe UI">
+ <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/BodegaLuchito.Desktop;component/Resources/PanelComercialStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
+ <UserControl.InputBindings><KeyBinding Key="F2" Command="{Binding GenerarReporteCommand}"/><KeyBinding Key="F4" Command="{Binding ExportarExcelCommand}"/></UserControl.InputBindings>
+ <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="24">
+ <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+ <StackPanel Margin="0,0,0,20"><TextBlock Text="Reportes comerciales" FontSize="24" FontWeight="SemiBold" Foreground="#173657"/>
+ <TextBlock Style="{StaticResource PanelMuted}" Text="Consulta tus operaciones y lleva los resultados a Excel." Margin="0,6,0,0"/></StackPanel>
+ <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,18">
+ <Border Style="{StaticResource PanelCard}" Margin="0,0,14,0" Padding="18">
+<Grid><Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+<Border Background="#E6F7F1" Width="36" Height="36" VerticalAlignment="Top" CornerRadius="9"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconTrend}" Stroke="#078268"/></Border>
+<StackPanel Grid.Column="1"><TextBlock Text="Ventas del período" Foreground="#52657E" FontSize="12" FontWeight="SemiBold"/>
+<Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock Style="{StaticResource PanelMoney}" Text="{Binding TotalVentas, StringFormat=S/ {0:N2}}" Margin="0,7,0,5"/></Viewbox>
+<TextBlock Style="{StaticResource PanelMuted}" Text="Sin ventas anuladas"/></StackPanel></Grid></Border>
+ <Border Style="{StaticResource PanelCard}" Margin="0,0,14,0" Padding="18">
+<Grid><Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+<Border Background="#FFF0ED" Width="36" Height="36" VerticalAlignment="Top" CornerRadius="9"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconOutgoing}" Stroke="#B14F43"/></Border>
+<StackPanel Grid.Column="1"><TextBlock Text="Pagos a proveedores" Foreground="#52657E" FontSize="12" FontWeight="SemiBold"/>
+<Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock Style="{StaticResource PanelMoney}" Text="{Binding TotalEgresos, StringFormat=S/ {0:N2}}" Margin="0,7,0,5"/></Viewbox>
+<TextBlock Style="{StaticResource PanelMuted}" Text="Abastecimientos del período"/></StackPanel></Grid></Border>
+ <Border Style="{StaticResource PanelCard}" Margin="0" Padding="18">
+<Grid><Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+<Border Background="#FFF4E5" Width="36" Height="36" VerticalAlignment="Top" CornerRadius="9"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconBalance}" Stroke="#B56B13"/></Border>
+<StackPanel Grid.Column="1"><TextBlock Text="Diferencia de cierres" Foreground="#52657E" FontSize="12" FontWeight="SemiBold"/>
+<Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock Style="{StaticResource PanelMoney}" Text="{Binding DiferenciaCaja, StringFormat=S/ {0:N2}}" Margin="0,7,0,5"/></Viewbox>
+<TextBlock Style="{StaticResource PanelMuted}" Text="Efectivo real menos esperado"/></StackPanel></Grid></Border>
+ </UniformGrid>
+ <Border Grid.Row="2" Style="{StaticResource PanelCard}" Margin="0,0,0,18"><Grid>
+ <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+ <StackPanel Orientation="Horizontal" Margin="0,0,0,16"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconFilter}" Stroke="#1767D8"/><TextBlock Text="Filtrar información" Style="{StaticResource PanelTitle}" Margin="10,0,0,0"/></StackPanel>
+ <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="14"/><ColumnDefinition Width="*"/><ColumnDefinition Width="14"/><ColumnDefinition Width="1.3*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+ <StackPanel><TextBlock Text="Desde" Style="{StaticResource PanelMuted}" Margin="0,0,0,6"/>
+ <DatePicker Style="{StaticResource PanelDate}" SelectedDate="{Binding FechaInicio, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Fecha inicial"/></StackPanel>
+ <StackPanel Grid.Column="2"><TextBlock Text="Hasta" Style="{StaticResource PanelMuted}" Margin="0,0,0,6"/>
+ <DatePicker Style="{StaticResource PanelDate}" SelectedDate="{Binding FechaFin, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Fecha final"/></StackPanel>
+ <StackPanel Grid.Column="4"><TextBlock Text="Tipo de reporte" Style="{StaticResource PanelMuted}" Margin="0,0,0,6"/>
+ <ComboBox Style="{StaticResource PanelSelect}" ItemsSource="{Binding TiposReporte}" SelectedItem="{Binding TipoReporteSeleccionado}" AutomationProperties.Name="Tipo de reporte"/></StackPanel>
+ <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Bottom">
+ <Button Style="{StaticResource PanelButton}" Command="{Binding GenerarReporteCommand}" Content="Generar · F2" MinWidth="110"/>
+ <Button Style="{StaticResource PanelOutlineButton}" Command="{Binding LimpiarFiltrosCommand}" Margin="8,0,0,0" Padding="10" ToolTip="Restablecer filtros" AutomationProperties.Name="Restablecer filtros"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconRefresh}" Stroke="#1767D8"/></Button>
+ </StackPanel></Grid></Grid></Border>
+ <Border Grid.Row="3" Style="{StaticResource PanelCard}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="320"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+ <Grid Margin="0,0,0,18"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+ <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding TipoReporteSeleccionado, StringFormat=Detalle de {0}}" Style="{StaticResource PanelTitle}"/>
+ <TextBlock Text="{Binding MensajeEstado}" Style="{StaticResource PanelMuted}" AutomationProperties.LiveSetting="Polite" Margin="0,5,0,0"/></StackPanel>
+ <Button Grid.Column="2" Style="{StaticResource PanelButton}" Background="#078268" BorderBrush="#078268" Command="{Binding ExportarExcelCommand}" VerticalAlignment="Center">
+ <StackPanel Orientation="Horizontal"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconDown}" Stroke="White"/><TextBlock Text="Exportar · F4" VerticalAlignment="Center" Margin="9,0,0,0"/></StackPanel></Button></Grid>
+ <Border Grid.Row="1" Background="#EDF7F4" BorderBrush="#C9E7DE" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,14"
+         Visibility="{Binding HayAvisoExportacion, Converter={StaticResource PanelBoolVisibility}}">
+ <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+ <StackPanel><TextBlock Text="{Binding MensajeExportacion}" Foreground="#155E4B" FontWeight="SemiBold" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+ <TextBlock Text="{Binding UltimoArchivoExportado}" FontSize="12" Foreground="#52657E" TextWrapping="Wrap" Margin="0,5,0,0"/></StackPanel>
+ <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+ <Button Style="{StaticResource PanelOutlineButton}" Content="Abrir carpeta" Command="{Binding AbrirCarpetaCommand}"/>
+ <Button Style="{StaticResource PanelOutlineButton}" Content="Cerrar" Command="{Binding CerrarAvisoExportacionCommand}" Margin="8,0,0,0"/>
+ </StackPanel></Grid></Border>
+ <Border Grid.Row="2" BorderBrush="#E1E8F0" BorderThickness="1" CornerRadius="7" ClipToBounds="True"><Grid>
+ <DataGrid ItemsSource="{Binding Resultados}" x:Name="TablaVentas" MinHeight="230"><DataGrid.Style><Style TargetType="DataGrid" BasedOn="{StaticResource PanelTable}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding TipoReporteSeleccionado}" Value="Ventas"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></DataGrid.Style><DataGrid.Columns><DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="145"/>
+<DataGridTextColumn Header="Ticket" Binding="{Binding Comprobante}" Width="105"/>
+<DataGridTextColumn Header="Ítems" Binding="{Binding CantidadProductos}" Width="85" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Subtotal" Binding="{Binding TotalBruto, StringFormat=S/ {0:N2}}" Width="100" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="IGV" Binding="{Binding Igv, StringFormat=S/ {0:N2}}" Width="90" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=S/ {0:N2}}" Width="105" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Pago" Binding="{Binding MedioPago}" Width="90"/>
+<DataGridTextColumn Header="Usuario" Binding="{Binding Usuario}" Width="*"/></DataGrid.Columns></DataGrid>
+ <DataGrid ItemsSource="{Binding Resultados}" x:Name="TablaAbastecimientos" MinHeight="230"><DataGrid.Style><Style TargetType="DataGrid" BasedOn="{StaticResource PanelTable}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding TipoReporteSeleccionado}" Value="Abastecimientos"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></DataGrid.Style><DataGrid.Columns><DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="145"/>
+<DataGridTextColumn Header="Proveedor" Binding="{Binding Proveedor}" Width="*"/>
+<DataGridTextColumn Header="Ítems" Binding="{Binding CantidadProductos}" Width="85" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=S/ {0:N2}}" Width="100" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="IGV" Binding="{Binding Igv, StringFormat=S/ {0:N2}}" Width="90" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=S/ {0:N2}}" Width="105" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Pago" Binding="{Binding MedioPago}" Width="95"/></DataGrid.Columns></DataGrid>
+ <DataGrid ItemsSource="{Binding Resultados}" x:Name="TablaMovimientosdeCaja" MinHeight="230"><DataGrid.Style><Style TargetType="DataGrid" BasedOn="{StaticResource PanelTable}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding TipoReporteSeleccionado}" Value="Movimientos de Caja"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></DataGrid.Style><DataGrid.Columns><DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="145"/>
+<DataGridTemplateColumn Header="Movimiento" Width="160"><DataGridTemplateColumn.CellTemplate><DataTemplate>
+<TextBlock><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding TipoMovimiento}"/><Style.Triggers>
+<DataTrigger Binding="{Binding TipoMovimiento}" Value="IngresoVenta"><Setter Property="Text" Value="Venta"/></DataTrigger>
+<DataTrigger Binding="{Binding TipoMovimiento}" Value="EgresoAbastecimiento"><Setter Property="Text" Value="Abastecimiento"/></DataTrigger>
+<DataTrigger Binding="{Binding TipoMovimiento}" Value="ReversionVenta"><Setter Property="Text" Value="Anulación de venta"/></DataTrigger>
+</Style.Triggers></Style></TextBlock.Style></TextBlock>
+</DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+<DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
+<DataGridTextColumn Header="Pago" Binding="{Binding MedioPago}" Width="90"/>
+<DataGridTextColumn Header="Importe" Binding="{Binding Monto, StringFormat=S/ {0:N2}}" Width="105" ElementStyle="{StaticResource PanelNumber}"/>
+<DataGridTextColumn Header="Responsable" Binding="{Binding Usuario}" Width="115"/></DataGrid.Columns></DataGrid>
+ <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,40,20,0">
+ <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Resultados.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
+ <Border Width="48" Height="48" Background="#EEF4FC" CornerRadius="14" HorizontalAlignment="Center" Margin="0,0,0,12"><Path Style="{StaticResource PanelIcon}" Data="{StaticResource IconEmpty}" Stroke="#6D87A5"/></Border>
+ <TextBlock Text="No hay resultados para mostrar" HorizontalAlignment="Center" Style="{StaticResource PanelTitle}"/>
+ <TextBlock Text="Selecciona tus filtros y genera el reporte." HorizontalAlignment="Center" Style="{StaticResource PanelMuted}" Margin="0,7,0,0"/>
+ </StackPanel></Grid></Border>
+ <Border Grid.Row="3" Background="#F5F8FC" CornerRadius="6" Padding="12,10" Margin="0,14,0,0">
+ <TextBlock Text="Ventas vigentes y egresos del período. La diferencia corresponde a los cierres de efectivo, no a la utilidad del negocio." Style="{StaticResource PanelMuted}"/>
+ </Border></Grid></Border>
+ </Grid></ScrollViewer>
 </UserControl>

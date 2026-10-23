@@ -25,15 +25,22 @@ public class ObtenerDatosDashboardUseCase
         _cajaRepository = cajaRepository;
     }
 
-    public async Task<DashboardResult> EjecutarAsync()
+    public Task<DashboardResult> EjecutarAsync() => EjecutarAsync(DateTime.Today);
+
+    public async Task<DashboardResult> EjecutarAsync(DateTime mes)
     {
-        var hoy = DateTime.Today;
-        var inicioMes = new DateTime(hoy.Year, hoy.Month, 1);
+        var inicioMes = new DateTime(mes.Year, mes.Month, 1);
+        var mesActual = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        if (inicioMes > mesActual || inicioMes == DateTime.MinValue.Date)
+            throw new ArgumentException("Seleccione el mes actual o un mes anterior dentro del rango permitido.");
+        var hoy = inicioMes == mesActual ? DateTime.Today : inicioMes.AddMonths(1).AddDays(-1);
         var ayer = hoy.AddDays(-1);
         var inicioMesAnterior = inicioMes.AddMonths(-1);
-        var finMesAnterior = inicioMes.AddDays(-1);
+        // Un mes en curso se compara con el mismo tramo del mes anterior.
+        var finMesAnterior = inicioMes == mesActual
+            ? inicioMesAnterior.AddDays(Math.Min(hoy.Day, DateTime.DaysInMonth(inicioMesAnterior.Year, inicioMesAnterior.Month)) - 1)
+            : inicioMes.AddDays(-1);
         var hace7Dias = hoy.AddDays(-6);
-
         // 1. Consultas a la Base de Datos
         var ventasHoy = await _ventaRepository.ObtenerVentasPorPeriodoAsync(hoy, hoy);
         var ventasAyer = await _ventaRepository.ObtenerVentasPorPeriodoAsync(ayer, ayer);
@@ -91,7 +98,19 @@ public class ObtenerDatosDashboardUseCase
             .Take(5)
             .ToList();
 
-        decimal diferenciaCaja = 0m;
+        var cierresHoy = await _cajaRepository.ObtenerCierresPorPeriodoAsync(inicioMes, hoy);
+        var diferenciaCaja = cierresHoy.Sum(c => c.DiferenciaEfectivo ?? 0m);
+
+        var ventasPorDia = ventasEsteMes.GroupBy(v => v.FechaHora.Date)
+            .ToDictionary(g => g.Key, g => g.Sum(v => v.Total));
+        var evolucionMes = Enumerable.Range(0, (hoy - inicioMes).Days + 1)
+            .Select(i => inicioMes.AddDays(i))
+            .Select(fecha => new VentaDiariaDto(fecha, ventasPorDia.GetValueOrDefault(fecha)))
+            .ToList();
+        var categorias = ventasEsteMes.SelectMany(v => v.Detalles)
+            .GroupBy(d => d.Producto?.Categoria?.Nombre ?? "Sin categoría")
+            .Select(g => new VentaCategoriaDto(g.Key, g.Sum(d => d.Subtotal)))
+            .OrderByDescending(c => c.TotalMonto).ToList();
 
         return new DashboardResult(
             resumenHoy,
@@ -100,7 +119,13 @@ public class ObtenerDatosDashboardUseCase
             evolucionCompleta,
             productosVendidos,
             productosStockBajo,
-            diferenciaCaja);
+            diferenciaCaja)
+        {
+            InicioPeriodo = inicioMes,
+            FinPeriodo = hoy,
+            EvolucionVentasDelMes = evolucionMes,
+            VentasPorCategoria = categorias
+        };
     }
 
     private ResumenVentasDto CalcularResumenVentas(IEnumerable<BodegaLuchito.Domain.Ventas.Entities.Venta> actual, IEnumerable<BodegaLuchito.Domain.Ventas.Entities.Venta> anterior)

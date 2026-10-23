@@ -11,4 +11,10 @@ public record DashboardResult(
     IReadOnlyList<VentaDiariaDto> EvolucionVentasUltimos7Dias,
     IReadOnlyList<ProductoMasVendidoDto> ProductosMasVendidosDelMes,
     IReadOnlyList<ExistenciaInventario> ProductosConStockBajo,
-    decimal DiferenciaCajaDelDia);
+    decimal DiferenciaCajaDelDia)
+{
+    public DateTime InicioPeriodo { get; init; }
+    public DateTime FinPeriodo { get; init; }
+    public IReadOnlyList<VentaDiariaDto> EvolucionVentasDelMes { get; init; } = [];
+    public IReadOnlyList<VentaCategoriaDto> VentasPorCategoria { get; init; } = [];
+}

@@ -8,7 +8,7 @@ namespace BodegaLuchito.Application.Reportes.Servicios;
 
 public class ExportacionExcelService
 {
-    public string ExportarAExcel<T>(IEnumerable<T> datos, string tituloReporte, string rutaCarpeta)
+    public string ExportarAExcel<T>(IEnumerable<T> datos, string tituloReporte, string rutaCarpeta, DateTime? inicio = null, DateTime? fin = null)
     {
         if (datos == null || !datos.Any())
             throw new InvalidOperationException("No hay datos para exportar.");
@@ -31,6 +31,9 @@ public class ExportacionExcelService
 
         worksheet.Cell(2, 1).Value = $"Generado el: {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
         worksheet.Cell(2, 1).Style.Font.Italic = true;
+
+        if (inicio.HasValue && fin.HasValue)
+            worksheet.Cell(3, 1).Value = $"Período: {inicio:dd/MM/yyyy} al {fin:dd/MM/yyyy}";
 
         int colIndex = 1;
         int rowIndex = 4;

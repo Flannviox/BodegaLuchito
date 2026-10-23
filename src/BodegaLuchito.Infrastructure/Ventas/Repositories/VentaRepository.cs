@@ -174,8 +174,10 @@ public sealed class VentaRepository : IVentaRepository
         return await context.Set<Venta>()
             .Include(v => v.Usuario)
             .Include(v => v.Detalles)
+                .ThenInclude(d => d.Producto)
+                    .ThenInclude(p => p.Categoria)
             .AsNoTracking()
-            .Where(v => v.FechaHora >= inicio.Date && v.FechaHora <= fechaFinAjustada)
+            .Where(v => !v.Anulado && v.FechaHora >= inicio.Date && v.FechaHora <= fechaFinAjustada)
             .OrderByDescending(v => v.FechaHora)
             .ToListAsync(cancellationToken);
     }

@@ -187,8 +187,8 @@ namespace BodegaLuchito.Infrastructure.Caja.Repositories
 
             return await _context.Set<SesionCaja>()
                 .AsNoTracking()
-                .Where(s => s.FechaApertura >= inicio.Date && s.FechaApertura <= fechaFinAjustada)
-                .OrderByDescending(s => s.FechaApertura)
+                .Where(s => s.Estado == EstadoSesionCaja.Cerrada && s.FechaCierre >= inicio.Date && s.FechaCierre <= fechaFinAjustada)
+                .OrderByDescending(s => s.FechaCierre)
                 .ToListAsync(cancellationToken);
         }
     }

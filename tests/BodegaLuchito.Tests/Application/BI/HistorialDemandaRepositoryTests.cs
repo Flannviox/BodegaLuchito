@@ -12,7 +12,7 @@ namespace BodegaLuchito.Tests.Application.BI;
 public sealed class HistorialDemandaRepositoryTests
 {
     [Fact]
-    public async Task ConsultaAgrupaCantidades_ExcluyeAnuladasHoyEInactivos_SinEscribir()
+    public async Task ConsultaAgrupaCantidades_ExcluyeAnuladasHoyEInactivos_IncluyeSinInventario_SinEscribir()
     {
         var ruta = Path.Combine(Path.GetTempPath(), $"prediccion-{Guid.NewGuid():N}.db");
         var opciones = new DbContextOptionsBuilder<BodegaLuchitoDbContext>()
@@ -34,7 +34,14 @@ public sealed class HistorialDemandaRepositoryTests
                 await db.SaveChangesAsync();
             }
             var repo = new HistorialDemandaRepository(new TestDbContextFactory(opciones));
-            var fila = Assert.Single(await repo.ConsultarAsync(DateTime.Today.AddDays(-90), DateTime.Today));
+            var filas = await repo.ConsultarAsync(DateTime.Today.AddDays(-90), DateTime.Today);
+            // El producto inactivo (2) se excluye; el que no controla inventario (3) se incluye sin riesgo.
+            Assert.Equal(new[] { 1, 3 }, filas.Select(x => x.ProductoId).Order());
+            var sinInventario = filas.Single(x => x.ProductoId == 3);
+            Assert.False(sinInventario.ControlaInventario);
+            Assert.Equal(666m, Assert.Single(sinInventario.Ventas).Cantidad);
+            var fila = filas.Single(x => x.ProductoId == 1);
+            Assert.True(fila.ControlaInventario);
             Assert.Equal("kg", fila.Unidad);
             Assert.Equal(80, fila.Stock);
             Assert.Equal(DateTime.Today.AddDays(-4), fila.Desde);

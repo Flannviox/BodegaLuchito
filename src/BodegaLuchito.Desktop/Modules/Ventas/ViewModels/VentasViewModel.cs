@@ -267,21 +267,113 @@ public partial class VentasViewModel : ViewModelBase
         _todosLosProductos = productos.ToList();
     }
 
+    // ==========================================
+    // HISTORIAL: FILTRO POR FECHA Y PAGINACIÓN
+    // ==========================================
+    public const int VentasPorPagina = 20;
+
+    [ObservableProperty]
+    private DateTime? _filtroDesde;
+
+    [ObservableProperty]
+    private DateTime? _filtroHasta;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TextoPagina), nameof(TextoRango), nameof(HayPaginaAnterior), nameof(HayPaginaSiguiente))]
+    [NotifyCanExecuteChangedFor(nameof(PrimeraPaginaCommand), nameof(PaginaAnteriorCommand), nameof(PaginaSiguienteCommand), nameof(UltimaPaginaCommand))]
+    private int _paginaActual = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TextoPagina), nameof(HayPaginaSiguiente))]
+    [NotifyCanExecuteChangedFor(nameof(PaginaSiguienteCommand), nameof(UltimaPaginaCommand))]
+    private int _totalPaginas = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TextoRango), nameof(HayFiltroSinResultados))]
+    private int _totalVentasFiltradas;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HayFiltroSinResultados))]
+    private bool _filtroAplicado;
+
+    public bool HayPaginaAnterior => PaginaActual > 1;
+    public bool HayPaginaSiguiente => PaginaActual < TotalPaginas;
+    public bool HayFiltroSinResultados => FiltroAplicado && TotalVentasFiltradas == 0;
+    public string TextoPagina => $"Página {PaginaActual} de {TotalPaginas}";
+    public string TextoRango => TotalVentasFiltradas == 0
+        ? "Sin ventas para mostrar"
+        : $"Mostrando {(PaginaActual - 1) * VentasPorPagina + 1}–{Math.Min(PaginaActual * VentasPorPagina, TotalVentasFiltradas)} de {TotalVentasFiltradas} ventas";
+
     private async Task CargarHistorialAsync()
     {
-        HistorialVentas.Clear();
-        var historial = await _ventaRepository.ObtenerHistorialVentasAsync();
+        var pagina = await _ventaRepository.ObtenerHistorialPaginadoAsync(
+            FiltroDesde, FiltroHasta, PaginaActual, VentasPorPagina);
 
         var sesionAbierta = await _cajaRepository.ObtenerSesionAbiertaAsync();
 
-        foreach (var venta in historial)
+        HistorialVentas.Clear();
+        foreach (var venta in pagina.Ventas)
         {
-            
             venta.EsTurnoActual = sesionAbierta != null && venta.FechaHora >= sesionAbierta.FechaApertura;
-
             HistorialVentas.Add(venta);
         }
+
+        TotalVentasFiltradas = pagina.TotalVentas;
+        TotalPaginas = pagina.TotalPaginas;
+        PaginaActual = pagina.Pagina;
     }
+
+    private async Task IrAPaginaAsync(int pagina)
+    {
+        try
+        {
+            PaginaActual = pagina;
+            await CargarHistorialAsync();
+        }
+        catch (Exception ex) { MessageBox.Show(ex.Message, "No se pudo cargar el historial"); }
+    }
+
+    [RelayCommand]
+    private async Task FiltrarHistorialAsync()
+    {
+        if (FiltroDesde is DateTime desde && FiltroHasta is DateTime hasta && desde.Date > hasta.Date)
+        {
+            MostrarMensaje("La fecha «Desde» no puede ser posterior a la fecha «Hasta».");
+            return;
+        }
+        FiltroAplicado = FiltroDesde is not null || FiltroHasta is not null;
+        await IrAPaginaAsync(1);
+    }
+
+    [RelayCommand]
+    private async Task LimpiarFiltroHistorialAsync()
+    {
+        FiltroDesde = null;
+        FiltroHasta = null;
+        FiltroAplicado = false;
+        await IrAPaginaAsync(1);
+    }
+
+    [RelayCommand]
+    private async Task FiltrarHoyAsync()
+    {
+        FiltroDesde = DateTime.Today;
+        FiltroHasta = DateTime.Today;
+        FiltroAplicado = true;
+        await IrAPaginaAsync(1);
+    }
+
+    [RelayCommand(CanExecute = nameof(HayPaginaAnterior))]
+    private Task PrimeraPaginaAsync() => IrAPaginaAsync(1);
+
+    [RelayCommand(CanExecute = nameof(HayPaginaAnterior))]
+    private Task PaginaAnteriorAsync() => IrAPaginaAsync(PaginaActual - 1);
+
+    [RelayCommand(CanExecute = nameof(HayPaginaSiguiente))]
+    private Task PaginaSiguienteAsync() => IrAPaginaAsync(PaginaActual + 1);
+
+    [RelayCommand(CanExecute = nameof(HayPaginaSiguiente))]
+    private Task UltimaPaginaAsync() => IrAPaginaAsync(TotalPaginas);
 
     [RelayCommand]
     private void LimpiarBusqueda() => TextoBusquedaProducto = string.Empty;

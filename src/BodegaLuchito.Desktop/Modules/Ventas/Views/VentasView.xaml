@@ -145,7 +145,24 @@
         <Border Grid.Row="1" Style="{StaticResource VentaTarjeta}" Padding="0" Visibility="{Binding IsHistorialVisible, Converter={StaticResource Visible}}">
             <Grid>
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                <StackPanel Margin="16,14"><TextBlock Text="Ventas registradas" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Las ventas anuladas se conservan para consulta. Selecciona una para ver el motivo." Foreground="#617791" TextWrapping="Wrap" Margin="0,5,0,0"/></StackPanel>
+                <StackPanel Margin="16,14">
+                    <TextBlock Text="Ventas registradas" FontSize="17" FontWeight="SemiBold"/>
+                    <TextBlock Text="Las ventas anuladas se conservan para consulta. Selecciona una para ver el motivo." Foreground="#617791" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                    <!-- Filtro por fecha -->
+                    <WrapPanel Margin="0,12,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,14,6" VerticalAlignment="Center">
+                            <TextBlock Text="Desde" VerticalAlignment="Center" Foreground="#617791" Margin="0,0,8,0"/>
+                            <DatePicker Width="140" Height="34" VerticalContentAlignment="Center" SelectedDate="{Binding FiltroDesde}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,14,6" VerticalAlignment="Center">
+                            <TextBlock Text="Hasta" VerticalAlignment="Center" Foreground="#617791" Margin="0,0,8,0"/>
+                            <DatePicker Width="140" Height="34" VerticalContentAlignment="Center" SelectedDate="{Binding FiltroHasta}"/>
+                        </StackPanel>
+                        <Button Content="Buscar" Style="{StaticResource VentaBoton}" Padding="16,6" MinHeight="34" Margin="0,0,8,6" Command="{Binding FiltrarHistorialCommand}"/>
+                        <Button Content="Hoy" Style="{StaticResource VentaSecundario}" Padding="14,6" MinHeight="34" Margin="0,0,8,6" Command="{Binding FiltrarHoyCommand}"/>
+                        <Button Content="Ver todas" Style="{StaticResource VentaSecundario}" Padding="14,6" MinHeight="34" Margin="0,0,8,6" Command="{Binding LimpiarFiltroHistorialCommand}"/>
+                    </WrapPanel>
+                </StackPanel>
                 <DataGrid x:Name="TablaHistorial" Grid.Row="1" Style="{StaticResource VentaTabla}" ItemsSource="{Binding HistorialVentas}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Ticket" Binding="{Binding Id, StringFormat=Venta #{0}}" Width="90" ElementStyle="{StaticResource VentaTextoCelda}"/>
@@ -176,8 +193,11 @@
                         </StackPanel></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-                <TextBlock Grid.Row="1" Text="Aún no hay ventas registradas." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#617791">
-                    <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding HistorialVentas.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#617791">
+                    <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Text" Value="Aún no hay ventas registradas."/><Style.Triggers>
+                        <DataTrigger Binding="{Binding HistorialVentas.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                        <DataTrigger Binding="{Binding HayFiltroSinResultados}" Value="True"><Setter Property="Text" Value="No hay ventas en las fechas elegidas."/></DataTrigger>
+                    </Style.Triggers></Style></TextBlock.Style>
                 </TextBlock>
                 <StackPanel Grid.Row="2" Margin="16,10">
                     <Border Background="#FFF2F0" BorderBrush="#F3CEC9" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,10">
@@ -188,7 +208,18 @@
                             <TextBlock Text="{Binding SelectedItem.FechaAnulacion, ElementName=TablaHistorial, StringFormat=Anulada el {0:dd/MM/yyyy HH:mm}, TargetNullValue=Fecha de anulación no registrada}" Foreground="#617791" FontSize="12" Margin="0,4,0,0"/>
                         </StackPanel></ScrollViewer>
                     </Border>
-                    <TextBlock Text="{Binding HistorialVentas.Count, StringFormat=Ventas en el historial: {0}}" Foreground="#617791" FontSize="12"/>
+                    <!-- Paginación -->
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding TextoRango}" Foreground="#617791" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="«" ToolTip="Primera página" AutomationProperties.Name="Primera página" Style="{StaticResource VentaSecundario}" Padding="0" Width="36" MinHeight="34" Height="34" Command="{Binding PrimeraPaginaCommand}"/>
+                            <Button Content="‹ Anterior" Style="{StaticResource VentaSecundario}" Padding="12,6" MinHeight="34" Margin="6,0,0,0" Command="{Binding PaginaAnteriorCommand}"/>
+                            <TextBlock Text="{Binding TextoPagina}" VerticalAlignment="Center" FontWeight="SemiBold" Margin="14,0"/>
+                            <Button Content="Siguiente ›" Style="{StaticResource VentaSecundario}" Padding="12,6" MinHeight="34" Command="{Binding PaginaSiguienteCommand}"/>
+                            <Button Content="»" ToolTip="Última página" AutomationProperties.Name="Última página" Style="{StaticResource VentaSecundario}" Padding="0" Width="36" MinHeight="34" Height="34" Margin="6,0,0,0" Command="{Binding UltimaPaginaCommand}"/>
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
             </Grid>
         </Border>

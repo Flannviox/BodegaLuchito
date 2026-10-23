@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BodegaLuchito.Application.Inventario.UseCases;
+using BodegaLuchito.Application.Ventas.DTOs;
 using BodegaLuchito.Application.Ventas.Interfaces;
 using BodegaLuchito.Domain.Autenticacion.Entities;
 using BodegaLuchito.Domain.Caja.Entities;
@@ -165,6 +166,39 @@ public sealed class VentaRepository : IVentaRepository
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
+    public async Task<PaginaVentas> ObtenerHistorialPaginadoAsync(DateTime? desde, DateTime? hasta, int pagina,
+        int tamanoPagina, CancellationToken cancellationToken = default)
+    {
+        if (tamanoPagina <= 0) throw new ArgumentOutOfRangeException(nameof(tamanoPagina));
+        await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var consulta = context.Set<Venta>().AsNoTracking();
+        if (desde is DateTime inicio)
+        {
+            var desdeDia = inicio.Date;
+            consulta = consulta.Where(v => v.FechaHora >= desdeDia);
+        }
+        if (hasta is DateTime fin)
+        {
+            var hastaExclusiva = fin.Date.AddDays(1);
+            consulta = consulta.Where(v => v.FechaHora < hastaExclusiva);
+        }
+
+        var total = await consulta.CountAsync(cancellationToken);
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)tamanoPagina));
+        var paginaValida = Math.Clamp(pagina, 1, totalPaginas);
+
+        var ventas = await consulta
+            .Include(v => v.Usuario)
+            .Include(v => v.Detalles)
+            .OrderByDescending(v => v.FechaHora).ThenByDescending(v => v.Id)
+            .Skip((paginaValida - 1) * tamanoPagina)
+            .Take(tamanoPagina)
+            .ToListAsync(cancellationToken);
+
+        return new PaginaVentas(ventas, total, paginaValida, tamanoPagina);
+    }
+
     public async Task<IReadOnlyList<Venta>> ObtenerVentasPorPeriodoAsync(DateTime inicio, DateTime fin, CancellationToken cancellationToken = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);

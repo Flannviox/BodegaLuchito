@@ -9,12 +9,13 @@ public sealed class ModeloDemandaSsa : IModeloDemanda
     public decimal[] Predecir(IReadOnlyList<decimal> cantidades, int horizonte)
     {
         if (cantidades.Count < GenerarPrediccionDemandaUseCase.MinimoDiasEntrenamiento)
-            throw new ArgumentException("SSA requiere al menos 12 días de entrenamiento en esta versión.");
+            throw new ArgumentException($"SSA requiere al menos {GenerarPrediccionDemandaUseCase.MinimoDiasEntrenamiento} días de entrenamiento en esta versión.");
         if (horizonte <= 0 || cantidades.Any(x => x < 0))
             throw new ArgumentException("El horizonte debe ser positivo y las cantidades no negativas.");
-        // Ventana corta para el piloto; no pretende aprender estacionalidad semanal con dos semanas.
-        var ventana = cantidades.Count < 30 ? 3 : 7;
-        var longitud = cantidades.Count < 30 ? Math.Min(14, cantidades.Count) : 30;
+        // Con menos de cuatro semanas se usa una ventana corta: no hay datos para aprender el ciclo semanal.
+        // Desde cuatro semanas la ventana de 7 días permite capturar el patrón lunes-domingo.
+        var ventana = cantidades.Count < 28 ? 3 : 7;
+        var longitud = cantidades.Count < 28 ? Math.Min(14, cantidades.Count) : 28;
         var ml = new MLContext(seed: 42);
         var datos = ml.Data.LoadFromEnumerable(cantidades.Select(x => new Entrada { Cantidad = (float)x }));
         var estimador = ml.Forecasting.ForecastBySsa(nameof(Salida.Pronostico), nameof(Entrada.Cantidad),

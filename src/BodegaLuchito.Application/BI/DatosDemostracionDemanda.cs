@@ -3,24 +3,28 @@ namespace BodegaLuchito.Application.BI;
 /// <summary>Datos sintéticos deterministas en memoria. Nunca se insertan en ventas o inventario.</summary>
 public static class DatosDemostracionDemanda
 {
-    public const int Dias = 15;
+    /// <summary>Ocho semanas completas de historial que terminan el domingo de la semana analizada.</summary>
+    public const int Dias = 56;
 
-    public static IReadOnlyList<HistorialDemanda> Crear(DateTime hoy)
+    /// <param name="corte">Lunes siguiente a la semana analizada (fin exclusivo del historial).</param>
+    public static IReadOnlyList<HistorialDemanda> Crear(DateTime corte)
     {
-        var desde = hoy.Date.AddDays(-Dias);
+        var desde = corte.Date.AddDays(-Dias);
         return [
             CrearProducto(1, "Leche · ejemplo", "unid", 8, 4, desde, Dias),
-            CrearProducto(2, "Agua · ejemplo", "unid", 25, 5, desde, Dias),
+            CrearProducto(2, "Agua · ejemplo", "unid", 60, 5, desde, Dias),
             CrearProducto(3, "Papa · ejemplo", "kg", 80, 3, desde, Dias),
-            CrearProducto(4, "Producto nuevo · ejemplo", "unid", 10, 2, hoy.Date.AddDays(-8), 8)
+            CrearProducto(4, "Producto nuevo · ejemplo", "unid", 10, 2, corte.Date.AddDays(-10), 10),
+            // Se dejó de vender hace semanas: no aparece porque no tuvo ventas en la semana analizada.
+            CrearProducto(5, "Gaseosa · ejemplo", "unid", 12, 3, desde, 40)
         ];
     }
 
     private static HistorialDemanda CrearProducto(int id, string nombre, string unidad,
-        decimal stock, decimal baseDiaria, DateTime desde, int dias)
+        decimal stock, decimal baseDiaria, DateTime desde, int diasConVentas)
     {
         var aleatorio = new Random(1700 + id);
-        var ventas = Enumerable.Range(0, dias).Select(i =>
+        var ventas = Enumerable.Range(0, diasConVentas).Select(i =>
         {
             var fecha = desde.AddDays(i);
             var finSemana = fecha.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;

@@ -49,19 +49,19 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <StackPanel>
-
-                    <TextBlock Text="▣  BODEGA"
-                               Foreground="White"
-                               FontSize="32"
-                               FontWeight="Bold" />
-
-                    <TextBlock Text="     LUCHITO"
-                               Foreground="White"
-                               FontSize="32"
-                               FontWeight="Bold" />
-
-                </StackPanel>
+                                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Path Width="32" Height="32" VerticalAlignment="Top" Margin="0,8,0,0"
+                          Stretch="Uniform" Stroke="White" StrokeThickness="1.8"
+                          Data="M 3,10 L 5,3 L 19,3 L 21,10 M 3,10 C 3,14 7,14 8,10 C 8,14 12,14 12,10 C 12,14 16,14 16,10 C 17,14 21,14 21,10 M 5,14 L 5,22 L 19,22 L 19,14 M 10,22 L 10,16 L 15,16 L 15,22" />
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="BODEGA" Foreground="White" FontSize="32" FontWeight="Bold" />
+                        <TextBlock Text="LUCHITO" Foreground="White" FontSize="32" FontWeight="Bold" />
+                    </StackPanel>
+                </Grid>
 
                 <StackPanel Grid.Row="1"
                             Margin="0,48,0,0">

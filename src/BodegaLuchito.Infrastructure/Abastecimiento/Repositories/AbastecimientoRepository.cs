@@ -131,15 +131,20 @@ public sealed class AbastecimientoRepository : IAbastecimientoRepository
     }
 
     public async Task<IReadOnlyList<EntidadAbastecimiento>> ObtenerHistorialAsync(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, DateTime? desde = null, DateTime? hasta = null, int? proveedorId = null)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
 
+        var inicio = desde?.Date;
+        var finExclusivo = hasta?.Date.AddDays(1);
         return await context.Set<EntidadAbastecimiento>()
             .AsNoTracking()
             .Include(x => x.Proveedor)
             .Include(x => x.Detalles)
                 .ThenInclude(x => x.Producto)
+            .Where(x => (!inicio.HasValue || x.FechaHora >= inicio.Value) &&
+                (!finExclusivo.HasValue || x.FechaHora < finExclusivo.Value) &&
+                (!proveedorId.HasValue || x.ProveedorId == proveedorId.Value))
             .OrderByDescending(x => x.FechaHora)
             .ThenByDescending(x => x.Id)
             .Take(200)

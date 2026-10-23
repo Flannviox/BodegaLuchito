@@ -194,6 +194,7 @@ public partial class VentasViewModel : ViewModelBase
     private readonly AnularVentaUseCase _anularVentaUseCase;
     private readonly ICajaRepository _cajaRepository;
 
+    private readonly HashSet<DetalleCarritoVenta> _detallesObservados = new();
     private List<Producto> _todosLosProductos = new();
 
     public ObservableCollection<Producto> ProductosFiltrados { get; } = new();
@@ -225,14 +226,52 @@ public partial class VentasViewModel : ViewModelBase
         set => SetProperty(ref _isDropdownOpen, value);
     }
 
-    private Visibility _modalCobroVisible = Visibility.Collapsed;
-    public Visibility ModalCobroVisible
-    {
-        get => _modalCobroVisible;
-        set => SetProperty(ref _modalCobroVisible, value);
-    }
-
     public decimal TotalVenta => Carrito.Sum(x => x.Subtotal);
+
+    [ObservableProperty] private MetodoPago _medioCobro = MetodoPago.Efectivo;
+    [ObservableProperty] private string _montoRecibidoTexto = string.Empty;
+    public IEnumerable<MetodoPago> MediosCobro => Enum.GetValues<MetodoPago>();
+    public bool EsEfectivo => MedioCobro == MetodoPago.Efectivo;
+    public ResultadoCobro Cobro => EvaluarCobroUseCase.Ejecutar(TotalVenta, MedioCobro, MontoRecibidoTexto);
+    public decimal Vuelto => Cobro.Vuelto;
+    public string MensajeCobro => !Carrito.Any() ? "Agrega productos para registrar una venta." :
+        !CantidadesValidas ? "Revisa las cantidades: unidades enteras y kilos con hasta tres decimales." : Cobro.Mensaje;
+    public bool CantidadesValidas => Carrito.All(x => decimal.TryParse(x.CantidadTexto,
+        System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture,
+        out var cantidad) && cantidad == x.Cantidad && cantidad > 0 && decimal.Round(cantidad, 3) == cantidad &&
+        (x.UnidadVenta != UnidadVenta.Unidad || cantidad % 1 == 0));
+    public bool PuedeConfirmarCobro => !ProcesandoCobro && IsNuevaVentaVisible && Carrito.Any() && CantidadesValidas && Cobro.Valido;
+    public decimal SubtotalVenta => Math.Round(TotalVenta / 1.18m, 2);
+    public decimal IgvVenta => TotalVenta - SubtotalVenta;
+
+    partial void OnMedioCobroChanged(MetodoPago value)
+    {
+        MontoRecibidoTexto = string.Empty;
+        OnPropertyChanged(nameof(EsEfectivo));
+        NotificarCobro();
+    }
+    partial void OnIsNuevaVentaVisibleChanged(bool value) => NotificarCobro();
+    [RelayCommand]
+    private void SeleccionarMedioCobro(MetodoPago medio)
+    {
+        if (!ProcesandoCobro) MedioCobro = medio;
+    }
+    partial void OnMontoRecibidoTextoChanged(string value) => NotificarCobro();
+    partial void OnProcesandoCobroChanged(bool value) => NotificarCobro();
+    private void NotificarCobro()
+    {
+        OnPropertyChanged(nameof(SubtotalVenta));
+        OnPropertyChanged(nameof(IgvVenta));
+        OnPropertyChanged(nameof(Vuelto));
+        OnPropertyChanged(nameof(MensajeCobro));
+        OnPropertyChanged(nameof(PuedeConfirmarCobro));
+        ConfirmarCobroCommand.NotifyCanExecuteChanged();
+    }
+    [RelayCommand]
+    private void ImporteExacto() => MontoRecibidoTexto = TotalVenta.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+    [RelayCommand(CanExecute = nameof(PuedeConfirmarCobro))]
+    private Task ConfirmarCobroAsync() => ProcesarCobroAsync(MedioCobro);
 
     public VentasViewModel(
         IProductoRepository productoRepository,
@@ -248,6 +287,25 @@ public partial class VentasViewModel : ViewModelBase
         _anularVentaUseCase = anularVentaUseCase;
         _cajaRepository = cajaRepository;
         _sesionUsuario = sesionUsuario;
+        PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(TotalVenta)) NotificarCobro();
+        };
+        Carrito.CollectionChanged += (_, _) =>
+        {
+            foreach (var anterior in _detallesObservados.Where(x => !Carrito.Contains(x)).ToArray())
+            {
+                anterior.PropertyChanged -= DetalleCambiado;
+                _detallesObservados.Remove(anterior);
+            }
+            foreach (var nuevo in Carrito.Where(x => !_detallesObservados.Contains(x)))
+            {
+                nuevo.PropertyChanged += DetalleCambiado;
+                _detallesObservados.Add(nuevo);
+            }
+            if (Carrito.Count == 0) MontoRecibidoTexto = string.Empty;
+            OnPropertyChanged(nameof(TotalVenta));
+        };
         _ = InicializarCatalogosAsync();
     }
 
@@ -449,7 +507,6 @@ public partial class VentasViewModel : ViewModelBase
                 Cantidad = 1,
                 CantidadTexto = "1"
             };
-            detalle.PropertyChanged += DetalleCambiado;
             Carrito.Add(detalle);
 
             // GATILLO DEL SNACKBAR SI ES POR PESO
@@ -463,6 +520,7 @@ public partial class VentasViewModel : ViewModelBase
 
     private void DetalleCambiado(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(DetalleCarritoVenta.CantidadTexto)) NotificarCobro();
         if (e.PropertyName == nameof(DetalleCarritoVenta.Subtotal))
             OnPropertyChanged(nameof(TotalVenta));
     }
@@ -473,7 +531,6 @@ public partial class VentasViewModel : ViewModelBase
         if (detalle != null && Carrito.Contains(detalle))
         {
             Carrito.Remove(detalle);
-            detalle.PropertyChanged -= DetalleCambiado;
             OnPropertyChanged(nameof(TotalVenta));
         }
     }
@@ -500,33 +557,10 @@ public partial class VentasViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
-    private void IrACobrar()
-    {
-        if (!Carrito.Any())
-        {
-            MessageBox.Show("El carrito está vacío. Agregue productos antes de cobrar.", "Bodega Luchito", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        ModalCobroVisible = Visibility.Visible;
-    }
-
-    [RelayCommand]
-    private void CancelarCobro() => ModalCobroVisible = Visibility.Collapsed;
-
-    [RelayCommand]
-    private async Task CobrarEfectivoAsync() => await ProcesarCobroAsync(MetodoPago.Efectivo);
-
-    [RelayCommand]
-    private async Task CobrarYapeAsync() => await ProcesarCobroAsync(MetodoPago.Yape);
-
-    [RelayCommand]
-    private async Task CobrarPlinAsync() => await ProcesarCobroAsync(MetodoPago.Plin);
-
     private async Task ProcesarCobroAsync(MetodoPago metodoPago)
     {
-        if (ProcesandoCobro || !Carrito.Any()) return;
+        if (!PuedeConfirmarCobro) return;
+        var cobroConfirmado = Cobro;
         ProcesandoCobro = true;
         try
         {
@@ -565,8 +599,8 @@ public partial class VentasViewModel : ViewModelBase
 
             int nuevaVentaId = await _registrarVentaUseCase.ExecuteAsync(request);
 
-            ModalCobroVisible = Visibility.Collapsed;
-            foreach (var detalle in Carrito) detalle.PropertyChanged -= DetalleCambiado;
+            MedioCobro = MetodoPago.Efectivo;
+            MontoRecibidoTexto = string.Empty;
             Carrito.Clear();
             OnPropertyChanged(nameof(TotalVenta));
             TextoBusquedaProducto = "";
@@ -578,7 +612,8 @@ public partial class VentasViewModel : ViewModelBase
             try
             {
                 var ventanaTicket = new BodegaLuchito.Desktop.Modules.Ventas.Views.TicketVentaWindow(
-                    nuevaVentaId, usuario.NombreCompleto, metodoPago, subtotalCalc, igvCalc, total, productosTicket);
+                    nuevaVentaId, usuario.NombreCompleto, metodoPago, subtotalCalc, igvCalc, total, productosTicket,
+                    montoRecibido: metodoPago == MetodoPago.Efectivo ? cobroConfirmado.Recibido : null);
                 ventanaTicket.ShowDialog();
             }
             catch (Exception ex)

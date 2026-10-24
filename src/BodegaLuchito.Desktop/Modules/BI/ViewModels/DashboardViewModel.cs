@@ -203,8 +203,8 @@ public partial class DashboardViewModel : ViewModelBase
                 Values = categorias.Select(c => (double)c.TotalMonto).ToArray(),
                 Name = "Ventas por categoría", Fill = new SolidColorPaint(SKColor.Parse("#1767D8")),
                 Stroke = null, MaxBarWidth = 24,
-                XToolTipLabelFormatter = p => categorias[(int)p.SecondaryValue].Categoria,
-                YToolTipLabelFormatter = p => $"S/ {p.PrimaryValue:N2}"
+                XToolTipLabelFormatter = p => categorias[p.Index].Categoria,
+                YToolTipLabelFormatter = p => $"S/ {p.Coordinate.PrimaryValue:N2}"
             }
         };
         EjeCategoriasY = new ObservableCollection<Axis>

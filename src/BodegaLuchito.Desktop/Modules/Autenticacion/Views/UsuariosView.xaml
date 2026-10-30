@@ -349,13 +349,16 @@
                              Converter={StaticResource BoolToVisibility}}">
 
             <Border Width="500"
-                    Padding="34"
+                    Padding="34,28,22,28"
+                    Margin="16"
                     Background="White"
                     CornerRadius="12"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
 
-                <StackPanel>
+                <!-- Desplazamiento para pantallas pequeñas: el contenido nunca queda cortado. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="0,0,12,0">
 
                     <TextBlock Text="{Binding TituloFormulario}"
                                FontSize="24"
@@ -435,6 +438,7 @@
                     </StackPanel>
 
                 </StackPanel>
+                </ScrollViewer>
 
             </Border>
 
@@ -447,13 +451,16 @@
                              Converter={StaticResource BoolToVisibility}}">
 
             <Border Width="460"
-                    Padding="34"
+                    Padding="34,28,22,28"
+                    Margin="16"
                     Background="White"
                     CornerRadius="12"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
 
-                <StackPanel>
+                <!-- Desplazamiento para pantallas pequeñas: el contenido nunca queda cortado. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="0,0,12,0">
 
                     <TextBlock Text="Cambiar contraseña"
                                FontSize="24"
@@ -506,6 +513,7 @@
                     </StackPanel>
 
                 </StackPanel>
+                </ScrollViewer>
 
             </Border>
 

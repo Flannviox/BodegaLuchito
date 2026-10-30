@@ -271,7 +271,9 @@
                 </Style>
             </TabControl.Style>
             <TabItem Header="Nuevo abastecimiento">
-                <Grid Margin="0,15,0,0">
+                <!-- En pantallas pequeñas aparece desplazamiento vertical y horizontal en lugar de cortar el contenido. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PanningMode="Both">
+                <Grid Margin="0,15,8,8" MinWidth="960">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -392,6 +394,7 @@
                         </Grid>
                     </Border>
                 </Grid>
+                </ScrollViewer>
             </TabItem>
 
             <TabItem Header="Entradas al inventario">

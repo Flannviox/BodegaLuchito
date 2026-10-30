@@ -400,7 +400,9 @@
                                     Command="{Binding VerHistorialProductoCommand}"/>
                         </Grid>
 
-                        <StackPanel Grid.Row="2" IsEnabled="{Binding FormularioHabilitado}">
+                        <!-- Desplazamiento para pantallas pequeñas; los botones Guardar/Cancelar quedan siempre visibles. -->
+                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel IsEnabled="{Binding FormularioHabilitado}" Margin="0,0,10,0">
                             <TextBlock Text="Nombre del producto" Style="{StaticResource FieldLabel}"/>
                             <TextBox Style="{StaticResource InputBox}" Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}"/>
 
@@ -459,10 +461,11 @@
                                 <StackPanel>
                                     <TextBlock Text="{Binding StockActual, StringFormat=Stock actual: {0:0.##}}" Foreground="#1E3A5F" FontSize="12" FontWeight="SemiBold"/>
                                     <TextBlock Text="Se actualiza desde Abastecimiento y movimientos de inventario."
-                                                   Foreground="#526B8E" FontSize="10.5" Margin="0,2,0,0" TextWrapping="NoWrap"/>
+                                                   Foreground="#526B8E" FontSize="10.5" Margin="0,2,0,0" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
+                        </ScrollViewer>
 
                         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="Cancelar" Style="{StaticResource SecondaryButton}" Width="95" Margin="0,0,9,0"
